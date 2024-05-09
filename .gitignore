@@ -2,6 +2,24 @@
 dist
 node_modules
 
+# core node modules
+cblite/node_modules
+cblite-tests/node_modules
+
+example/node_modules
+example/dist
+example/.vscode
+example/android/.gradle
+example/android/app/build/*
+example/ios/DerivedData/*
+
+# windows
+windows/IonicCouchbaseLite/.vs/*
+windows/IonicCouchbaseLite/IonicCouchbaseLite/obj
+windows/IonicCouchbaseLite/IonicCouchbaseLite/bin
+windows/IonicCouchbaseLite/IonicCouchbaseLite.WPF/bin
+windows/IonicCouchbaseLite/IonicCouchbaseLite.WPF/obj
+
 # iOS files
 Pods
 Podfile.lock
@@ -10,8 +28,6 @@ xcuserdata
 
 # macOS files
 .DS_Store
-
-
 
 # Based on Android gitignore template: https://github.com/github/gitignore/blob/HEAD/Android.gitignore
 
@@ -59,3 +75,8 @@ captures
 
 # External native build folder generated in Android Studio 2.2 and later
 .externalNativeBuild
+
+.fake
+
+# VS Code
+.vscode

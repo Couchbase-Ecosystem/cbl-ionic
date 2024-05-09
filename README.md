@@ -1,37 +1,18 @@
-# cbl-ionic
+# Ionic Capacitor plugin for Couchbase Lite Enterprise 
+This plugin serves as a replacement for the original @ionic-enterprise/couchbase-lite plugin and is intended to be a spiritual successor to that project. The primary objective of this repository is to provide support for the newer versions of Couchbase Lite.
 
-Ionic Capacitor plugin for Couchbase Lite Enterprise (3.x+)
+Please note that this project is still a work in progress and is not officially supported by Ionic or Couchbase.
+
+# Integration of Couchbase Lite Enterprise in Ionic Capacitor apps
 
 ## Install
 
-```bash
-npm install cbl-ionic
-npx cap sync
-```
+TODO:  Create Installation instructions
 
-## API
+## Contributing
 
-<docgen-index>
+See the [Contributing](CONTRIBUTING.md) page for more information.
 
-* [`echo(...)`](#echo)
+## Migration 
 
-</docgen-index>
-
-<docgen-api>
-<!--Update the source file JSDoc comments and rerun docgen to update the docs below-->
-
-### echo(...)
-
-```typescript
-echo(options: { value: string; }) => Promise<{ value: string; }>
-```
-
-| Param         | Type                            |
-| ------------- | ------------------------------- |
-| **`options`** | <code>{ value: string; }</code> |
-
-**Returns:** <code>Promise&lt;{ value: string; }&gt;</code>
-
---------------------
-
-</docgen-api>
+See the [Migration](MIGRATIONS.md) page for more information on tips and tricks on migration from @ionic-enterprise/couchbase-lite.

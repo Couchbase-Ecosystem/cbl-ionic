@@ -7,10 +7,26 @@ def capacitor_pods
   pod 'CapacitorCordova', :path => '../node_modules/@capacitor/ios'
 end
 
+def couchbase_pods
+  use_frameworks!
+  pod 'CouchbaseLite-Swift-Enterprise', '~> 3.1'
+  pod 'CbliteSwiftJsLib', :path => '../../cbl-js-swift'
+end
+
 target 'Plugin' do
+  couchbase_pods
   capacitor_pods
 end
 
 target 'PluginTests' do
+  couchbase_pods
   capacitor_pods
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+    end
+  end
 end

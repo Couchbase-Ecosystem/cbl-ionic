@@ -1,6 +1,6 @@
 {
-  "name": "cbl-ionic",
-  "version": "0.0.1",
+  "name": "cblionic",
+  "version": "3.1.0",
   "description": "Ionic Capacitor plugin for Couchbase Lite Enterprise (3.x+)",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -13,7 +13,7 @@
     "ios/Plugin/",
     "CblIonic.podspec"
   ],
-  "author": "Aaron LaBeau",
+  "author": "Deveveloper Integrations  @ Couchbase",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -23,50 +23,51 @@
     "url": "https://github.com/couchbaselabs/cbl-ionic/issues"
   },
   "keywords": [
+    "couchbase",
+    "couchbase-lite",
     "capacitor",
     "plugin",
     "native"
   ],
   "scripts": {
-    "verify": "npm run verify:ios && npm run verify:android && npm run verify:web",
+    "verify": "npm run verify:ios && npm run verify:android",
     "verify:ios": "cd ios && pod install && xcodebuild -workspace Plugin.xcworkspace -scheme Plugin -destination generic/platform=iOS && cd ..",
     "verify:android": "cd android && ./gradlew clean build test && cd ..",
-    "verify:web": "npm run build",
     "lint": "npm run eslint && npm run prettier -- --check && npm run swiftlint -- lint",
-    "fmt": "npm run eslint -- --fix && npm run prettier -- --write && npm run swiftlint -- --fix --format",
+    "fmt": "npm run eslint -- --fix && npm run prettier -- --write && npm run swiftlint -- autocorrect --format",
     "eslint": "eslint . --ext ts",
     "prettier": "prettier \"**/*.{css,html,ts,js,java}\"",
     "swiftlint": "node-swiftlint",
-    "docgen": "docgen --api CblIonicPluginPlugin --output-readme README.md --output-json dist/docs.json",
-    "build": "npm run clean && npm run docgen && tsc && rollup -c rollup.config.js",
+    "docgen": "docgen --api IonicCouchbaseLitePlugin --output-readme README.md --output-json dist/docs.json",
+    "build": "npm run clean && tsc && rollup -c rollup.config.js",
+    "buildAll": "cd cblite && npm run clean && npm install && npm run build && cd .. && npm run clean && tsc && rollup -c rollup.config.js",
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
-    "@capacitor/android": "^5.0.0",
-    "@capacitor/core": "^5.0.0",
+    "cblite": "file:../cblite-js/cblite",
+    "@capacitor/android": "^5.7.4",
+    "@capacitor/core": "^5.7.4",
     "@capacitor/docgen": "^0.0.18",
-    "@capacitor/ios": "^5.0.0",
-    "@ionic/eslint-config": "^0.3.0",
+    "@capacitor/ios": "^5.7.4",
     "@ionic/prettier-config": "^1.0.1",
     "@ionic/swiftlint-config": "^1.1.2",
-    "eslint": "^7.11.0",
+    "@typescript-eslint/eslint-plugin": "^7.4.0",
+    "@typescript-eslint/parser": "^7.4.0",
+    "eslint": "^8.35.0",
     "prettier": "~2.3.0",
     "prettier-plugin-java": "~1.0.2",
     "rimraf": "^3.0.2",
     "rollup": "^2.32.0",
     "swiftlint": "^1.0.1",
-    "typescript": "~4.1.5"
+    "tslib": "^2.6.2",
+    "typescript": "5.4.2"
   },
   "peerDependencies": {
-    "@capacitor/core": "^5.0.0"
+    "@capacitor/core": "^5.7.4"
   },
-  "prettier": "@ionic/prettier-config",
   "swiftlint": "@ionic/swiftlint-config",
-  "eslintConfig": {
-    "extends": "@ionic/eslint-config/recommended"
-  },
   "capacitor": {
     "ios": {
       "src": "ios"
@@ -74,5 +75,10 @@
     "android": {
       "src": "android"
     }
+  },
+  "dependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.6"
   }
 }

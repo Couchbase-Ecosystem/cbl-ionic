@@ -1,0 +1,13 @@
+{
+  "name": "example",
+  "integrations": {
+    "capacitor": {},
+    "tailwindcss": {
+      "root": "./src/theme",
+      "config": "./tailwind.config.js",
+      "source": "./src/theme/tailwind.source.css",
+      "build": "./src/theme/tailwind.build.css"
+    }
+  },
+  "type": "react-vite"
+}
