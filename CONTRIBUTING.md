@@ -94,7 +94,7 @@ This is the Swift implementation of the Couchbase Lite SDK which includes defini
 8. Run npm build to build Javascript - from project root.
 
     ```shell
-    npm run buildAll
+    npm run build
     npm run verify
     ```
 
