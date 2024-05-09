@@ -120,11 +120,11 @@ To test the plugin an Example app has been provided.  To build the example app f
 
 ### Scripts
 
-#### `npm run buildAll`
+#### `npm run build`
 
-Build cblite-core.js npm module, cblite-core-tests npm package, and the plugin web assets.
+Build npm module and the plugin web assets.
 
-It will compile the TypeScript code from the `cblite-core`, `cblite-core-tests`, and `src/` into ESM JavaScript in `dist/esm/`. These files are used in apps with bundlers when your plugin is imported.
+It will compile the TypeScript code from the `cblite`, `cblite-tests`, and `src/` into ESM JavaScript in `dist/esm/`. These files are used in apps with bundlers when your plugin is imported.
 
 Then, Rollup will bundle the code `dist/plugin.js` with the other two npm packages included. This file is used in apps without bundlers by including it as a script in `index.html`.
 
