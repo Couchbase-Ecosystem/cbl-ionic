@@ -953,6 +953,7 @@ public class CblIonicPluginPlugin: CAPPlugin {
             }
             do {
                 if let parameters = call.getObject("parameters") {
+                    
                     let result = try DatabaseManager.shared.executeQuery(
                         query,
                         parameters: parameters,
@@ -968,7 +969,7 @@ public class CblIonicPluginPlugin: CAPPlugin {
             } catch {
                 DispatchQueue.main.async {
                     if let error = error as? NSError {
-                        call.reject("Error in query <\(query)>: \(error.debugDescription)")
+                        call.reject("Error in query <\(query)>: domain: <\(error.domain)>  debugDescription: <\(error.debugDescription)>")
                     } else{
                         call.reject("Error in query <\(query)>: \(error.localizedDescription)")
                     }

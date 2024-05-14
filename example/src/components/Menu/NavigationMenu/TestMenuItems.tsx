@@ -71,12 +71,6 @@ const TestMenuItems: React.FC = () => {
             </IonItem>
             <IonItem
                 style={{marginLeft: 20}}
-                routerLink="/tests/queryBuilder"
-                routerDirection="none">
-                <IonLabel>Query Builder</IonLabel>
-            </IonItem>
-            <IonItem
-                style={{marginLeft: 20}}
                 routerLink="/tests/query"
                 routerDirection="none">
                 <IonLabel>Query SQL++</IonLabel>

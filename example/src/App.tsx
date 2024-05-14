@@ -49,8 +49,7 @@ import {
 
 import {
     LiveQueryPage,
-    QueryBuilderPage,
-    QueryBuilderFTSPage,
+    QueryFTSPage,
     SqlPlusPlusPage,
 } from './pages/query';
 
@@ -67,7 +66,6 @@ import {
     NotificationsTestsPage,
     PredicateQueryTestsPage,
     QueryTestsPage,
-    QueryBuilderTestsPage,
     ReplicatorTestsPage,
     TestingTestPage,
     VectorSearchTestsPage,
@@ -123,7 +121,6 @@ const App: React.FC = () => {
                         <Route path="/tests/notifications" component={NotificationsTestsPage} exact/>
                         <Route path="/tests/predicateQuery" component={PredicateQueryTestsPage} exact/>
                         <Route path="/tests/query" component={QueryTestsPage} exact/>
-                        <Route path="/tests/queryBuilder" component={QueryBuilderTestsPage} exact/>
                         <Route path="/tests/replicator" component={ReplicatorTestsPage} exact/>
                         <Route path="/tests/vectorSearch" component={VectorSearchTestsPage} exact/>
                         <Route path="/tests/testing" component={TestingTestPage} exact/>
@@ -160,8 +157,7 @@ const App: React.FC = () => {
                         <Route path="/index/list" component={ListIndexesPage} exact />
 
                         <Route path="/query/liveQuery" component={LiveQueryPage} exact />
-                        <Route path="/query/queryBuilder" component={QueryBuilderPage} exact />
-                        <Route path="/query/queryBuilderFTS" component={QueryBuilderFTSPage} exact />
+                        <Route path="/query/queryFTS" component={QueryFTSPage} exact />
                         <Route path="/query/sqlPlusPlus" component={SqlPlusPlusPage} exact />
 
                         <Route path="/replication/replicator" component={ReplicatorPage} exact />
