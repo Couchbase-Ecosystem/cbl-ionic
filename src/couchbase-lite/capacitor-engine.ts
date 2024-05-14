@@ -1,41 +1,45 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import {
+  Collection,
+  CollectionArgs,
+  CollectionChangeListenerArgs,
+  CollectionCreateIndexArgs,
+  CollectionDeleteDocumentArgs,
+  CollectionDeleteIndexArgs,
+  CollectionDocumentGetBlobContentArgs,
+  CollectionDocumentSaveResult,
+  CollectionGetDocumentArgs,
+  CollectionPurgeDocumentArgs,
+  CollectionSaveArgs,
+  CollectionsResult,
+  DatabaseArgs,
+  DatabaseCopyArgs,
+  DatabaseCreateIndexArgs,
+  DatabaseDeleteDocumentArgs,
+  DatabaseDeleteIndexArgs,
+  DatabaseExistsArgs,
+  DocumentChangeListenerArgs,
+  DocumentGetBlobContentArgs,
+  DatabaseGetDocumentArgs,
+  DatabaseOpenArgs,
+  DatabasePerformMaintenanceArgs,
+  DatabasePurgeDocumentArgs,
+  DatabaseSaveArgs,
+  DatabaseSetFileLoggingConfigArgs,
+  DatabaseSetLogLevelArgs,
   DocumentResult,
   EngineLocator,
-  Scope,
-  Collection,
-  DatabaseArgs,
-  ScopeArgs,
-  CollectionArgs,
-  DatabaseOpenArgs,
-  DatabaseCopyArgs,
-  DatabaseExistsArgs,
-  DatabasePerformMaintenanceArgs,
-  DatabaseSetLogLevelArgs,
-  DatabaseSetFileLoggingConfigArgs,
-  CollectionCreateIndexArgs,
-  CollectionDeleteIndexArgs,
-  DatabaseCreateIndexArgs,
-  DatabaseDeleteIndexArgs,
-  DatabaseSaveArgs,
-  CollectionSaveArgs,
-  CollectionDocumentSaveResult,
-  DatabasePurgeDocumentArgs,
-  CollectionPurgeDocumentArgs,
-  DatabaseDeleteDocumentArgs,
-  CollectionDeleteDocumentArgs,
-  DatabaseGetDocumentArgs,
-  CollectionGetDocumentArgs,
-  DocumentGetBlobContentArgs,
-  CollectionDocumentGetBlobContentArgs,
+  ListenerCallback,
+  ListenerHandle,
   QueryExecuteArgs,
-  DatabaseChangeListenerArgs,
   Result,
   ReplicatorCreateArgs,
   ReplicatorArgs,
   ReplicatorStatus,
-  CollectionsResult, ScopesResult,
+  Scope,
+  ScopeArgs,
+  ScopesResult,
 } from "cblite";
 
 import { IonicCouchbaseLite } from "../ionic-couchbase-lite";
@@ -393,33 +397,65 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
   }
 
   //************************* 
-  // TODO fix change listeners
+  // change listeners
   //************************* 
 
   /**
-   * @deprecated This will be removed in future versions. Use collection_RemoveChangeListener instead.
-   */ 
-  async database_RemoveChangeListener(
-    args: DatabaseChangeListenerArgs
-  ): Promise<void> {
-    return IonicCouchbaseLite.database_RemoveChangeListener(args);
+   * Adds a collection change listener to the collection.
+   */
+  collection_AddChangeListener(
+      args: CollectionChangeListenerArgs,
+      cb: ListenerCallback
+  ): Promise<ListenerHandle> {
+    return IonicCouchbaseLite.collection_AddChangeListener(
+        {
+          name: args.name,
+          scopeName: args.scopeName,
+          collectionName: args.collectionName,
+          changeListenerToken: args.changeListenerToken,
+        },
+        cb
+    );
   }
 
   /**
-   * @deprecated This will be removed in future versions. Use collection_AddChangeListener instead.
-   */ 
-  database_AddChangeListener(
-    args: DatabaseChangeListenerArgs,
-    cb: PluginCallback
-  ): Promise<PluginListenerHandle> {
-    return IonicCouchbaseLite.database_AddChangeListener(
-      {
-        name: args.name,
-        changeListenerToken: args.changeListenerToken,
-      },
-      cb
+   * removes a collection change listener
+   */
+  async collection_RemoveChangeListener(
+      args: CollectionChangeListenerArgs
+  ): Promise<void> {
+    return IonicCouchbaseLite.collection_RemoveChangeListener(args);
+  }
+
+  /**
+   * Adds a collection document change listener to the collection.
+   */
+  collection_AddDocumentChangeListener(
+      args: DocumentChangeListenerArgs,
+      cb: ListenerCallback
+  ): Promise<ListenerHandle> {
+    return IonicCouchbaseLite.collection_AddDocumentChangeListener(
+        {
+          name: args.name,
+          scopeName: args.scopeName,
+          collectionName: args.collectionName,
+          changeListenerToken: args.changeListenerToken,
+          documentId: args.documentId,
+        },
+        cb
     );
   }
+
+  /**
+   * removes a collection document change listener
+   */
+  async collection_RemoveDocumentChangeListener(
+      args: CollectionChangeListenerArgs
+  ): Promise<void> {
+    return IonicCouchbaseLite.collection_RemoveChangeListener(args);
+  }
+
+
 
   replicator_AddChangeListener(
     args: ReplicatorArgs,

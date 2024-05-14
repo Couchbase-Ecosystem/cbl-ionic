@@ -1413,7 +1413,11 @@ public class CblIonicPluginPlugin: CAPPlugin {
                 let listener = collection
                     .addDocumentChangeListener(id: documentId, queue: DispatchQueue.main, listener: { change in
                         let docId = change.documentID
-                        let data:[String: Any] = ["documentId": docId]
+                        let data:[String: Any] = [
+                            "documentId": docId,
+                            "collectionName": change.collection.name,
+                            "scopeName": change.collection.scope.name,
+                            "databaseName": name]
                         call.resolve(data)
                     })
                 self.collectionChangeListeners[changeListenerToken] = listener

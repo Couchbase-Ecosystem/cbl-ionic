@@ -2,7 +2,7 @@
 import React from 'react';
 import DetailPageTestContainerRunner from '../../components/DetailPageTestRunnerContainer/DetailPageTestRunnerContainer';
 
-import { 
+import {
 	ConsoleLoggingTests,
 	CollectionTests,
 	CustomLoggingTests,
@@ -12,15 +12,11 @@ import {
 	FileLoggingTests,
 	FragmentTests,
 	IndexingTests,
+	ListenerTests,
 	PredicateQueryTests,
-	QueryBuilderTests,
 	QueryTests,
 	ReplicatorTests
 } from 'cblite-tests';
-
-import {
-	NotificationTests,
-} from '../../tests/e2e/notification-tests';
 
 const AllTestsPage: React.FC = () => {
   return (
@@ -37,9 +33,8 @@ const AllTestsPage: React.FC = () => {
 		FileLoggingTests,
 		FragmentTests,
 		IndexingTests,
-		NotificationTests,
+		ListenerTests,
 		PredicateQueryTests,
-		QueryBuilderTests,
 		QueryTests,
 		ReplicatorTests
 	]}

@@ -10,7 +10,6 @@ export {default as IndexingTestsPage } from './Indexing';
 export {default as NotificationsTestsPage } from './Notifications';
 export {default as PredicateQueryTestsPage } from './PredicateQuery';
 export {default as QueryTestsPage } from './Query';
-export {default as QueryBuilderTestsPage } from './QueryBuilder';
 export {default as ReplicatorTestsPage } from './Replicator';
 export {default as TestingTestPage } from './Testing';
 export {default as VectorSearchTestsPage } from './VectorSearch';

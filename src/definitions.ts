@@ -2,7 +2,6 @@
 /* eslint-disable no-unused-vars */
 
 import {
-  DatabaseChangeListenerArgs,
   ICoreEngine,
   ReplicatorArgs
 } from 'cblite';
@@ -22,16 +21,6 @@ export interface IonicCouchbaseLitePlugin
     extends ICoreEngine {
   //Plugin Configuration
   plugin_Configure(args: PluginConfigureArgs)
-    : Promise<void>;
-
-  //database functions
-  database_AddChangeListener(
-    args: DatabaseChangeListenerArgs, 
-    cb: PluginCallback)
-    : Promise<PluginListenerHandle>;
-
-  database_RemoveChangeListener(
-    args: DatabaseChangeListenerArgs)
     : Promise<void>;
 
   replicator_AddChangeListener(
