@@ -1,4 +1,4 @@
-// QueryBuilderFTS.tsx
+// QueryFTS.tsx
 import './QueryBuilder.css';
 import React, {useState, useContext} from 'react';
 import DatabaseContext from '../../providers/DatabaseContext';
@@ -18,11 +18,7 @@ import {
 
 import {playOutline} from 'ionicons/icons';
 
-import {
-    FullTextExpression
-} from 'cblite';
-
-const QueryBuilderPage: React.FC = () => {
+const QueryFTSPage: React.FC = () => {
     const {databases} = useContext(DatabaseContext)!;
     const [databaseName, setDatabaseName] = useState<string>('');
     const [indexName, setIndexName] = useState<string>('');
@@ -128,4 +124,4 @@ const QueryBuilderPage: React.FC = () => {
         ></DetailPageContainerItemResults>
     );
 };
-export default QueryBuilderPage;
+export default QueryFTSPage;
