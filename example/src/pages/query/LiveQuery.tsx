@@ -21,26 +21,40 @@ const LiveQueryPage: React.FC = () => {
           const collection = await database.collection(collectionName, scopeName);
           if (collection != null){
               try {
-                  const queryString = `SELECT * FROM ${scopeName}.${collectionName} AS testCollection`;
-                  const query = database.createQuery(queryString);
-                  const token = await query.addChangeListener((change) => {
-                    if (change.error !== null && change.error.length > 0) {
-                        setResultsMessage([`${new Date().toISOString()} Error in Change Listener: ${change.error}`]);
-                    } else {
-                        for (const doc of change.results) {
-                            setResultsMessage(prev => [...prev, `${new Date().toISOString()} : ${doc['testCollection']}`]);
-                        }
-                    }
-                  });
-                  setQuery(query);
-                  setToken(token);
-                  //change documents
-                  for(let count = 0; count < 5; count++) {
-                      const doc = new MutableDocument(`doc${count}`);
-                      doc.setString('counter', count.toString());
-                      await collection.save(doc);
+                  if(!isListenerAdded || token ==='') {
+                      const queryString = `SELECT *
+                                           FROM ${scopeName}.${collectionName} AS testCollection`;
+                      const query = database.createQuery(queryString);
+                      const token = await query.addChangeListener((change) => {
+                          if (change.error !== null && change.error !== undefined) {
+                              setResultsMessage([`${new Date().toISOString()} Error in Change Listener: ${change.error}`]);
+                          } else {
+                              if (change.results.length > 0) {
+                                  const results = change.results;
+                                  for (const doc of results) {
+                                      const obj = doc['testCollection'];
+                                      setResultsMessage(prev => [...prev, `${new Date().toISOString()} : ${obj.counter}`]);
+                                  }
+                              } else {
+                                  setResultsMessage([`${new Date().toISOString()} Results have no data)`]);
+                              }
+                          }
+                      });
+                      setIsListenerAdded(true);
+                      setQuery(query);
+                      setToken(token);
+                      //change documents
+                      const saveDocuments = async (start: number, end: number) => {
+                          for (let count = start; count <= end; count++) {
+                              const doc = new MutableDocument(`doc-${count}`);
+                              doc.setString('counter', count.toString());
+                              await collection.save(doc);
+                          }
+                      }
+                      await saveDocuments(1, 10);
+                      await sleep(5000);
+                      await saveDocuments(11, 20);
                   }
-
               } catch(e) {
                   setResultsMessage([`${new Date().toISOString()} Error: ${e}`]);
               }
@@ -69,6 +83,10 @@ const LiveQueryPage: React.FC = () => {
     setResultsMessage([]);
     setToken('');
     setQuery(null);
+  }
+
+  function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   return (

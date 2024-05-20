@@ -1425,8 +1425,7 @@ public class CblIonicPluginPlugin: CAPPlugin {
                             call.reject("Error in query change listener: \(String(describing: change.error?.localizedDescription))")
                         } else if let resultJSONs = change.results?.allResults().map({ $0.toJSON() }) {
                             let jsonArray = "[" + resultJSONs.joined(separator: ",") + "]"
-                            let data: [String: Any] = ["data": jsonArray]
-                            call.resolve(data)
+                            call.resolve(["data": jsonArray])
                         } else {
                             call.reject("Error converting query change listener results data to JSON")
                         }

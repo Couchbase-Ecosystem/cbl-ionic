@@ -67,7 +67,7 @@ CAP_PLUGIN(CblIonicPlugin, "CblIonicPlugin",
            //query functions
            CAP_PLUGIN_METHOD(query_Execute, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(query_Explain, CAPPluginReturnPromise);
-           CAP_PLUGIN_METHOD(query_AddChangeListener, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(query_AddChangeListener, CAPPluginReturnCallback);
            CAP_PLUGIN_METHOD(query_RemoveChangeListener, CAPPluginReturnPromise);
 
            //replicator functions
