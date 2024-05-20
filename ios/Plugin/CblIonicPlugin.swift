@@ -1280,60 +1280,6 @@ public class CblIonicPluginPlugin: CAPPlugin {
         }
     }
     
-    @objc func database_AddChangeListener(_ call: CAPPluginCall) {
-        backgroundQueue.async {
-            guard let name = call.getString("name"),
-                  let changeListenerToken = call.getString("changeListenerToken") else {
-                call.reject("No database name or token provided")
-                return
-            }
-            guard let db = DatabaseManager.shared.getDatabase(name) else {
-                DispatchQueue.main.async {
-                    call.reject("No such open database")
-                }
-                return
-             }
-             
-            call.keepAlive = true
-            do {
-                let listener = try db
-                    .defaultCollection()
-                    .addChangeListener(queue: DispatchQueue.main, listener: { change in
-                        let docIds = change.documentIDs
-                        let data: [String: Any] = ["documentIDs": docIds]
-                        call.resolve(data)
-                    })
-                self.databaseChangeListeners[changeListenerToken] = listener
-            } catch {
-                DispatchQueue.main.async {
-                    call.reject("Error in adding database change listener \(error.localizedDescription)")
-                    return
-                }
-            }
-        }
-    }
-    
-    @objc func database_RemoveChangeListener(_ call: CAPPluginCall) {
-        backgroundQueue.async {
-            guard let name = call.getString("name"),
-                  let changeListenerToken = call.getString("changeListenerToken") else {
-                call.reject("No database name or token provided")
-                return
-            }
-            guard let listener = self.databaseChangeListeners[changeListenerToken] as? ListenerToken else {
-                DispatchQueue.main.async {
-                    call.reject("No listener found for the provided token")
-                }
-                return
-             }
-             
-            listener.remove()
-            DispatchQueue.main.async {
-                call.resolve()
-            }
-        }
-    }
-    
     @objc func collection_AddChangeListener(_ call: CAPPluginCall) {
         backgroundQueue.async {
             guard let name = call.getString("name"),
@@ -1413,7 +1359,11 @@ public class CblIonicPluginPlugin: CAPPlugin {
                 let listener = collection
                     .addDocumentChangeListener(id: documentId, queue: DispatchQueue.main, listener: { change in
                         let docId = change.documentID
-                        let data:[String: Any] = ["documentId": docId]
+                        let data:[String: Any] = [
+                            "documentId": docId,
+                            "collectionName": change.collection.name,
+                            "scopeName": change.collection.scope.name,
+                            "databaseName": name]
                         call.resolve(data)
                     })
                 self.collectionChangeListeners[changeListenerToken] = listener
@@ -1436,6 +1386,68 @@ public class CblIonicPluginPlugin: CAPPlugin {
                 return
             }
             guard let listener = self.collectionDocumentChangeListeners[changeListenerToken] as? ListenerToken else {
+                DispatchQueue.main.async {
+                    call.reject("No listener found for the provided token")
+                }
+                return
+            }
+            
+            listener.remove()
+            DispatchQueue.main.async {
+                call.resolve()
+            }
+        }
+    }
+   
+    @objc func query_AddChangeListener(_ call: CAPPluginCall) {
+        backgroundQueue.async {
+            guard let name = call.getString("name"),
+                  let queryString = call.getString("query"),
+                  let changeListenerToken = call.getString("changeListenerToken"),
+                  let database = DatabaseManager.shared.getDatabase(name) else {
+                call.reject("No database 'name' or 'token' provided")
+                return
+            }
+            do {
+                //create query
+                let query = try database.createQuery(queryString)
+                if let parameters = call.getObject("parameters"),
+                   let queryParams = try QueryHelper.getParamatersFromJson(parameters){
+                        query.parameters = queryParams
+                    }
+                
+                call.keepAlive = true
+                
+                //add listener
+                let listener = query
+                    .addChangeListener(withQueue: DispatchQueue.main, { change in
+                        if change.error != nil {
+                            call.reject("Error in query change listener: \(String(describing: change.error?.localizedDescription))")
+                        } else if let resultJSONs = change.results?.allResults().map({ $0.toJSON() }) {
+                            let jsonArray = "[" + resultJSONs.joined(separator: ",") + "]"
+                            call.resolve(["data": jsonArray])
+                        } else {
+                            call.reject("Error converting query change listener results data to JSON")
+                        }
+                    })
+                self.queryChangeListeners[changeListenerToken] = listener
+            } catch {
+                DispatchQueue.main.async {
+                    call.reject("Error setting query listener \(error.localizedDescription)")
+                    return
+                }
+            }
+        }
+    }
+    
+    @objc func query_RemoveChangeListener(_ call: CAPPluginCall) {
+        backgroundQueue.async {
+            guard let name = call.getString("name"),
+                  let changeListenerToken = call.getString("changeListenerToken") else {
+                call.reject("No database name or token provided")
+                return
+            }
+            guard let listener = self.queryChangeListeners[changeListenerToken] as? ListenerToken else {
                 DispatchQueue.main.async {
                     call.reject("No listener found for the provided token")
                 }

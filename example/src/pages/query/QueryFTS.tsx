@@ -24,7 +24,6 @@ const QueryFTSPage: React.FC = () => {
     const [indexName, setIndexName] = useState<string>('');
     const [propertyValue, setPropertyValue] = useState<string>('');
     const [resultsMessage, setResultsMessage] = useState<string[]>([]);
-    const [resultsCount, setResultsCount] = useState<string>('');
 
     async function update() {
         if (databaseName in databases) {
@@ -48,15 +47,15 @@ const QueryFTSPage: React.FC = () => {
                         ]);
                     }
                 } else {
-                    setResultsMessage([
-                        'Error: Property Name or Property Value not defined',
+                    setResultsMessage(prev => [...prev,
+                        `${new Date().toISOString()} Error: Property Name or Property Value not defined`,
                     ]);
                 }
             } else {
-                setResultsMessage(['Error: Index name or field is not defined']);
+                setResultsMessage(prev => [...prev, `${new Date().toISOString()} Error: Index name or field is not defined`]);
             }
         } else {
-            setResultsMessage(prev => ['Error: Database is not setup (defined)']);
+            setResultsMessage( prev => [...prev, `${new Date().toISOString()} Error: Database is not setup (defined)`]);
         }
     }
 
@@ -72,7 +71,7 @@ const QueryFTSPage: React.FC = () => {
             navigationTitle="Query Builder FTS"
             collapseTitle="Query Builder FTS"
             onReset={reset}
-            resultsCount={resultsCount}
+            resultsCount="0"
             children={
                 <>
                     <DatabaseNameForm

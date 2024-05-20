@@ -67,15 +67,9 @@ CAP_PLUGIN(CblIonicPlugin, "CblIonicPlugin",
            //query functions
            CAP_PLUGIN_METHOD(query_Execute, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(query_Explain, CAPPluginReturnPromise);
-           
-           //older query builder
-           //CAP_PLUGIN_METHOD(query_Execute, CAPPluginReturnPromise);
-           CAP_PLUGIN_METHOD(resultSet_Next, CAPPluginReturnPromise);
-           CAP_PLUGIN_METHOD(resultSet_NextBatch, CAPPluginReturnPromise);
-           CAP_PLUGIN_METHOD(resultSet_AllResults, CAPPluginReturnCallback);
-           CAP_PLUGIN_METHOD(resultSet_AllResults2, CAPPluginReturnCallback);
-           CAP_PLUGIN_METHOD(resultSet_Cleanup, CAPPluginReturnPromise);
-           
+           CAP_PLUGIN_METHOD(query_AddChangeListener, CAPPluginReturnCallback);
+           CAP_PLUGIN_METHOD(query_RemoveChangeListener, CAPPluginReturnPromise);
+
            //replicator functions
            CAP_PLUGIN_METHOD(replicator_Create, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(replicator_Start, CAPPluginReturnPromise);

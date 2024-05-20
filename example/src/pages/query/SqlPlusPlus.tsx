@@ -10,7 +10,6 @@ import {
     IonItemDivider,
     IonLabel,
     IonCard,
-    IonText, IonSelect, IonSelectOption
 } from "@ionic/react";
 
 const SqlPlusPlusPage: React.FC = () => {
