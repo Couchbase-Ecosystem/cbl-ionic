@@ -23,11 +23,6 @@ export interface IonicCouchbaseLitePlugin
   plugin_Configure(args: PluginConfigureArgs)
     : Promise<void>;
 
-  replicator_AddChangeListener(
-      args: ReplicatorArgs,
-      cb: PluginCallback)
-      : Promise<PluginListenerHandle>;
-
   replicator_AddDocumentListener(
       args: ReplicatorArgs,
       cb: PluginCallback)

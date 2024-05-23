@@ -1,0 +1,48 @@
+{
+  "api": {
+    "adminInterface": ":4985",
+    "admin_interface_authentication": true,
+    "public_interface": ":4984"
+  },
+  "bootstrap": {
+    "server_tls_skip_verify": true,
+    "use_tls_server": false,
+    "username": "admin",
+    "password": "P@$w0rd12"
+  },
+  "bucket_credentials": {
+    "username": "admin",
+    "password": "P@$$w0rd"
+  },
+  "logging": {
+    "log_file_path": "/var/tmp/sglogs",
+    "console": {
+      "log_level": "debug",
+      "log_keys": ["*"]
+    },
+    "error": {
+      "enabled": true,
+      "rotation": {
+        "max_size": 20,
+        "max_age": 180
+      }
+    },
+    "warn": {
+      "enabled": true,
+      "rotation": {
+        "max_size": 20,
+        "max_age": 90
+      }
+    },
+    "info": {
+      "enabled": false
+    },
+    "debug": {
+      "enabled": true,
+      "rotation": {
+        "max_size": 20,
+        "max_age": 90
+      }
+    }
+  }
+}
