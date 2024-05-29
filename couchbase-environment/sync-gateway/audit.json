@@ -1,0 +1,16 @@
+{ 
+		"bucket": "inventoryDemo", 
+		"num_index_replicas": 0,
+		"scopes": {
+			"audit": {
+				"collections": {
+					"projects":{
+						"sync": "function(doc, oldDoc) { channel(doc.channels); 
+						}", 
+						"import_filter": "function(doc) {
+							return true; }"
+						}
+				}
+
+			}
+		} }
