@@ -40,11 +40,10 @@ import {
   ReplicatorStatus,
   Scope,
   ScopeArgs,
-  ScopesResult,
+  ScopesResult, ReplicationChangeListenerArgs, ReplicatorCollectionArgs,
 } from "cblite";
 
 import { IonicCouchbaseLite } from "../ionic-couchbase-lite";
-import { PluginCallback, PluginListenerHandle } from "@capacitor/core";
 import { IonicCouchbaseLitePlugin } from "../definitions";
 
 export class CapacitorEngine implements IonicCouchbaseLitePlugin {
@@ -382,17 +381,17 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
   }
 
   replicator_AddChangeListener(
-      args: ReplicatorArgs,
-      cb: PluginCallback
-  ): Promise<PluginListenerHandle> {
+      args: ReplicationChangeListenerArgs,
+      cb: ListenerCallback
+  ): Promise<ListenerHandle> {
     return IonicCouchbaseLite.replicator_AddChangeListener(args, cb);
   }
 
-  replicator_AddDocumentListener(
-      args: ReplicatorArgs,
-      cb: PluginCallback
-  ): Promise<PluginListenerHandle> {
-    return IonicCouchbaseLite.replicator_AddDocumentListener(args, cb);
+  replicator_AddDocumentChangeListener(
+      args: ReplicationChangeListenerArgs,
+      cb: ListenerCallback
+  ): Promise<ListenerHandle> {
+    return IonicCouchbaseLite.replicator_AddDocumentChangeListener(args, cb);
   }
 
   async replicator_Cleanup(args: ReplicatorArgs): Promise<void> {
@@ -402,19 +401,25 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
   async replicator_Create(
     args: ReplicatorCreateArgs
   ): Promise<ReplicatorArgs> {
-    return IonicCouchbaseLite.replicator_Create(args);
+    return await IonicCouchbaseLite.replicator_Create(args);
   }
 
   async replicator_GetStatus(args: ReplicatorArgs): Promise<ReplicatorStatus> {
     return IonicCouchbaseLite.replicator_GetStatus(args);
   }
 
+  async replicator_GetPendingDocumentIds(args: ReplicatorCollectionArgs): Promise<{ pendingDocumentIds: string[] }>{
+    return IonicCouchbaseLite.replicator_GetPendingDocumentIds(args);
+  }
+
   async replicator_ResetCheckpoint(args: ReplicatorArgs): Promise<void> {
     return IonicCouchbaseLite.replicator_ResetCheckpoint(args);
   }
 
-  async replicator_Restart(args: ReplicatorArgs): Promise<void> {
-    return IonicCouchbaseLite.replicator_Restart(args);
+  async replicator_RemoveChangeListener(
+      args: ReplicationChangeListenerArgs
+  ): Promise<void> {
+    return IonicCouchbaseLite.replicator_RemoveChangeListener(args);
   }
 
   async replicator_Start(args: ReplicatorArgs): Promise<void> {

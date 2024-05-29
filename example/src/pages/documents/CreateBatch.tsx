@@ -103,13 +103,13 @@ const CreateBatchPage: React.FC = () => {
       const collection = await database.collection(collectionName, scopeName);
       if (database != null && collection != null) {
         setResultsMessage([]);
-        const queryString = "SELECT * FROM " + collection.scope.name + "." + collection.name + " WHERE documentType = 'product'";
+        const queryString = "SELECT testData.*, META().id as docId FROM " + collection.scope.name + "." + collection.name + " AS testData WHERE documentType = 'product'";
         try {
           const query = database.createQuery(queryString);
           const resultSet = await query.execute();
           //TODO FIX Query Results
           for (const result of resultSet) {
-            const doc = result[collection.name];
+            const doc = result["testData"];
             const id = doc.id;
             const name = doc.name;
             setResultsMessage(prev => [
@@ -117,8 +117,8 @@ const CreateBatchPage: React.FC = () => {
               `${new Date().toISOString()} Document Validated: ${id} ${name}`,
             ]);
           }
-        } catch (e) {
-          setResultsMessage(prev => [...prev, `${new Date().toISOString()} {error}`]);
+        } catch (error) {
+          setResultsMessage(prev => [...prev, `${new Date().toISOString()} ${error}`]);
         }
       }
     }

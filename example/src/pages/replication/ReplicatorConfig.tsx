@@ -71,7 +71,7 @@ const ReplicatorConfigPage: React.FC = () => {
 
   const [resultsMessage, setResultsMessage] = useState<string[]>([]);
 
-  function update() {
+  async function update() {
     setResultsMessage([]);
     if (databaseName in databases) {
       const db = databases[databaseName];
@@ -111,7 +111,7 @@ const ReplicatorConfigPage: React.FC = () => {
             break;
         }
         //cert section
-        config.setSelfSignedCerts(selfSignedCerts);
+        config.setAcceptOnlySelfSignedCerts(selfSignedCerts);
         config.setPinnedServerCertificate(pinnedServerCertBase64);
 
         //channel section
@@ -120,7 +120,8 @@ const ReplicatorConfigPage: React.FC = () => {
         config.setChannels(channelArray);
          */
 
-        const replicator = new Replicator(config);
+        const replicator = await Replicator.create(config);
+        await replicator.start(false);
       }
     } else {
      setResultsMessage(['Error: Database is not setup (defined)']);

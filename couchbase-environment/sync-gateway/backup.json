@@ -1,3 +1,10 @@
+"bootstrap": {
+    "password": "P@33w0rdApi",
+    "server": "couchbase://couchbase-server",
+    "server_tls_skip_verify": true,
+    "use_tls_server": false,
+    "username": "admin"
+},
 "bucket_credentials": {
     "inventoryDemo": {
       "password": "P@33w0rdS7nc",

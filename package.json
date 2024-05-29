@@ -30,7 +30,7 @@
     "native"
   ],
   "scripts": {
-    "verify": "npm run verify:ios && npm run verify:android",
+    "verify": "npm run build && npm run verify:ios && npm run verify:android",
     "verify:ios": "cd ios && pod install && xcodebuild -workspace Plugin.xcworkspace -scheme Plugin -destination generic/platform=iOS && cd ..",
     "verify:android": "cd android && ./gradlew clean build test && cd ..",
     "lint": "npm run eslint && npm run prettier -- --check && npm run swiftlint -- lint",
@@ -46,10 +46,10 @@
   },
   "devDependencies": {
     "cblite": "file:../cblite-js/cblite",
-    "@capacitor/android": "^5.7.4",
-    "@capacitor/core": "^5.7.4",
+    "@capacitor/android": "^5.7.5",
+    "@capacitor/core": "^5.7.5",
+    "@capacitor/ios": "^5.7.5",
     "@capacitor/docgen": "^0.0.18",
-    "@capacitor/ios": "^5.7.4",
     "@ionic/prettier-config": "^1.0.1",
     "@ionic/swiftlint-config": "^1.1.2",
     "@typescript-eslint/eslint-plugin": "^7.4.0",
@@ -64,7 +64,7 @@
     "typescript": "5.4.2"
   },
   "peerDependencies": {
-    "@capacitor/core": "^5.7.4"
+    "@capacitor/core": "^5.7.5"
   },
   "swiftlint": "@ionic/swiftlint-config",
   "capacitor": {
