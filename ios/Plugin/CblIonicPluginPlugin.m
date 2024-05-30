@@ -76,9 +76,9 @@ CAP_PLUGIN(CblIonicPlugin, "CblIonicPlugin",
            CAP_PLUGIN_METHOD(replicator_Stop, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(replicator_ResetCheckpoint, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(replicator_GetStatus, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(replicator_GetPendingDocumentIds, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(replicator_AddChangeListener, CAPPluginReturnCallback);
            CAP_PLUGIN_METHOD(replicator_RemoveChangeListener, CAPPluginReturnPromise);
-           CAP_PLUGIN_METHOD(replicator_AddDocumentListener, CAPPluginReturnCallback);
-           CAP_PLUGIN_METHOD(replicator_RemoveDocumentListener, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(replicator_AddDocumentChangeListener, CAPPluginReturnCallback);
            CAP_PLUGIN_METHOD(replicator_Cleanup, CAPPluginReturnPromise);
 )

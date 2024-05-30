@@ -2,11 +2,8 @@
 /* eslint-disable no-unused-vars */
 
 import {
-  ICoreEngine,
-  ReplicatorArgs
+  ICoreEngine
 } from 'cblite';
-
-import { PluginCallback, PluginListenerHandle } from '@capacitor/core';
 
 export interface PluginConfigureArgs {
   config: any;
@@ -22,15 +19,4 @@ export interface IonicCouchbaseLitePlugin
   //Plugin Configuration
   plugin_Configure(args: PluginConfigureArgs)
     : Promise<void>;
-
-  replicator_AddChangeListener(
-      args: ReplicatorArgs,
-      cb: PluginCallback)
-      : Promise<PluginListenerHandle>;
-
-  replicator_AddDocumentListener(
-      args: ReplicatorArgs,
-      cb: PluginCallback)
-      : Promise<PluginListenerHandle>;
-
 }

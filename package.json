@@ -1,6 +1,6 @@
 {
   "name": "cbl-ionic",
-  "version": "3.1.0",
+  "version": "0.1.6",
   "description": "Ionic Capacitor plugin for Couchbase Lite Enterprise (3.x+)",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -13,14 +13,14 @@
     "ios/Plugin/",
     "CblIonic.podspec"
   ],
-  "author": "Deveveloper Integrations  @ Couchbase",
+  "author": "Developer Experience/Ecosystem Team @ Couchbase",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/couchbaselabs/cbl-ionic.git"
+    "url": "git+https://github.com/Couchbase-Ecosystem/cbl-ionic.git"
   },
   "bugs": {
-    "url": "https://github.com/couchbaselabs/cbl-ionic/issues"
+    "url": "https://github.com/Couchbase-Ecosystem/cbl-ionic/issues"
   },
   "keywords": [
     "couchbase",
@@ -30,7 +30,7 @@
     "native"
   ],
   "scripts": {
-    "verify": "npm run verify:ios && npm run verify:android",
+    "verify": "npm run build && npm run verify:ios && npm run verify:android",
     "verify:ios": "cd ios && pod install && xcodebuild -workspace Plugin.xcworkspace -scheme Plugin -destination generic/platform=iOS && cd ..",
     "verify:android": "cd android && ./gradlew clean build test && cd ..",
     "lint": "npm run eslint && npm run prettier -- --check && npm run swiftlint -- lint",
@@ -46,10 +46,10 @@
   },
   "devDependencies": {
     "cblite": "file:../cblite-js/cblite",
-    "@capacitor/android": "^5.7.4",
-    "@capacitor/core": "^5.7.4",
+    "@capacitor/android": "^5.7.5",
+    "@capacitor/core": "^5.7.5",
+    "@capacitor/ios": "^5.7.5",
     "@capacitor/docgen": "^0.0.18",
-    "@capacitor/ios": "^5.7.4",
     "@ionic/prettier-config": "^1.0.1",
     "@ionic/swiftlint-config": "^1.1.2",
     "@typescript-eslint/eslint-plugin": "^7.4.0",
@@ -64,7 +64,7 @@
     "typescript": "5.4.2"
   },
   "peerDependencies": {
-    "@capacitor/core": "^5.7.4"
+    "@capacitor/core": "^5.7.5"
   },
   "swiftlint": "@ionic/swiftlint-config",
   "capacitor": {

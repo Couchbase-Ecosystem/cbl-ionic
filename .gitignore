@@ -80,3 +80,4 @@ captures
 
 # VS Code
 .vscode
+example/ios/App/App/Info.plist.orig

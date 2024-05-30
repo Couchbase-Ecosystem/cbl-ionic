@@ -1,0 +1,49 @@
+version: "3.9"
+services:
+  couchbase-server:
+    build: ./couchbase-server
+    ports:
+     - 8091-8096:8091-8096
+     - 11210-11211:11210-11211
+    environment:  
+      - CLUSTER_NAME=couchbase-demo
+      - COUCHBASE_ADMINISTRATOR_USERNAME=Administrator
+      - COUCHBASE_ADMINISTRATOR_PASSWORD=P@33w0rd12
+      - COUCHBASE_BUCKET=inventoryDemo
+      - COUCHBASE_BUCKET_RAMSIZE=1024
+      - COUCHBASE_RBAC_USERNAME=sync
+      - COUCHBASE_RBAC_PASSWORD=P@33w0rdS7nc
+      - COUCHBASE_RBAC_NAME=sync
+      - COUCHBASE_RAM_SIZE=4096
+      - COUCHBASE_EVENTING_RAM_SIZE=512
+      - COUCHBASE_ANALYTICS_RAM_SIZE=1024
+      - COUCHBASE_INDEX_RAM_SIZE=512
+    hostname: couchbase-server
+    container_name: couchbase-server
+    working_dir: /opt/couchbase
+    stdin_open: true
+    tty: true      
+    networks:
+      - workshop
+    entrypoint: [""]
+    command: sh -c "/opt/couchbase/init/init-cbserver.sh"
+
+  sync-gateway:
+    build: ./sync-gateway
+    ports:
+      - 4984-4986:4984-4986
+    hostname: sync-gateway
+    container_name: sync-gateway
+    depends_on:
+      - couchbase-server
+    working_dir: /docker-syncgateway
+    stdin_open: true
+    tty: true      
+    networks:
+      - workshop
+    entrypoint: [""]
+    command: sh -c "/opt/couchbase-sync-gateway/init/init-syncgateway.sh"
+
+networks:
+  workshop:
+    driver: bridge

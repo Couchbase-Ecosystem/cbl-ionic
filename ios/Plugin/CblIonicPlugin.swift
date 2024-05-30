@@ -3,6 +3,14 @@ import Capacitor
 import CouchbaseLiteSwift
 import CbliteSwiftJsLib
 
+enum ReplicatorError: Error {
+    case configurationError(message: String)
+    case unableToFindReplicator(replicatorId: String)
+    case unknownError(message: String)
+    case fatalError(message: String)
+    case invalidState(message: String)
+}
+
 @objc(CblIonicPlugin)
 public class CblIonicPluginPlugin: CAPPlugin {
     
@@ -14,7 +22,6 @@ public class CblIonicPluginPlugin: CAPPlugin {
     var queryChangeListeners = [String: Any]()
     
     var replicatorChangeListeners = [String: Any]()
-    var replicatorDocumentListeners = [String: Any]()
     
     var queryCount: Int = 0
     var replicatorCount: Int = 0
@@ -27,7 +34,6 @@ public class CblIonicPluginPlugin: CAPPlugin {
         
         // Change listeners
         replicatorChangeListeners = [:]
-        replicatorDocumentListeners = [:]
         databaseChangeListeners = [:]
         collectionDocumentChangeListeners = [:]
         queryChangeListeners = [:]
@@ -1016,28 +1022,40 @@ public class CblIonicPluginPlugin: CAPPlugin {
     
     @objc func replicator_Create(_ call: CAPPluginCall) {
         backgroundQueue.async {
-            guard let config = (call.getObject("config") as [String: Any]?) else {
+            guard let config = (call.getObject("config") as [String: Any]?),
+                  let collectionConfigJson = config["collectionConfig"] as? String
+            else {
                 DispatchQueue.main.async {
-                    call.reject("Error: Missing required parameter 'config'")
+                    call.reject("Error: Missing required parameter 'config' or collection configuration")
                 }
                 return
             }
             do {
-                let replicatorId = try ReplicatorManager
-                    .shared
-                    .replicator(config)
-                DispatchQueue.main.async {
-                    call.resolve(["replicatorId": replicatorId])
-                    return
-                }
-            } catch {
-                DispatchQueue.main.async {
-                    call.reject("Error creating replicator \(error.localizedDescription)")
-                    return
+                if let data = collectionConfigJson.data(using: .utf8) {
+                    
+                    let decoder = JSONDecoder()
+                    let collectionConfig = try decoder.decode([CollectionConfigItem].self, from: data)
+                    let replicatorId = try ReplicatorManager
+                        .shared
+                        .replicator(config, collectionConfiguration: collectionConfig)
+                    DispatchQueue.main.async {
+                        call.resolve(["replicatorId": replicatorId])
+                        return
+                    }
+                    
+                } else {
+                    call.reject("Error:  Couldn't deserialize collection config")
                 }
             }
+            catch {
+                DispatchQueue.main.async {
+                    call.reject("Error:  \(error)")
+                    }
+                return
+                }
         }
     }
+
     
     @objc func replicator_Start(_ call: CAPPluginCall) {
         backgroundQueue.async {
@@ -1128,7 +1146,43 @@ public class CblIonicPluginPlugin: CAPPlugin {
                 }
             } catch {
                 DispatchQueue.main.async {
-                    call.reject("Error resetting checkpoint \(error.localizedDescription)")
+                    call.reject("Error getting status \(error.localizedDescription)")
+                    return
+                }
+            }
+        }
+    }
+    
+    @objc func replicator_GetPendingDocumentIds(_ call: CAPPluginCall) {
+        backgroundQueue.async {
+            guard let replicatorId = call.getString("replicatorId"),
+                let name = call.getString("name"),
+                let scopeName = call.getString("scopeName"),
+                let collectionName = call.getString("collectionName")
+            else {
+                DispatchQueue.main.async {
+                    call.reject("Error: No replicatorId or collection supplied")
+                }
+                return
+            }
+            do {
+                if let collection = try CollectionManager.shared.getCollection(collectionName, scopeName: scopeName, databaseName: name) {
+                    let documentIds = try ReplicatorManager
+                        .shared
+                        .getPendingDocumentIds(replicatorId, collection: collection)
+                    DispatchQueue.main.async {
+                        call.resolve(documentIds)
+                        return
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        call.reject("Error can't find collection for getting pending documentIds from replicator")
+                        return
+                    }
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    call.reject("Error getting pending documentIds \(error.localizedDescription)")
                     return
                 }
             }
@@ -1150,10 +1204,6 @@ public class CblIonicPluginPlugin: CAPPlugin {
                         self.replicatorChangeListeners.removeValue(forKey: replicatorId)
                     }
                     
-                    if let documentListener = self.replicatorDocumentListeners[replicatorId] as? ListenerToken {
-                        replicator.removeChangeListener(withToken: documentListener)
-                        self.replicatorDocumentListeners.removeValue(forKey: replicatorId)
-                    }
                     DispatchQueue.main.async {
                         call.resolve()
                     }
@@ -1170,9 +1220,10 @@ public class CblIonicPluginPlugin: CAPPlugin {
     
     @objc func replicator_AddChangeListener(_ call: CAPPluginCall) {
         backgroundQueue.async {
-            guard let replicatorId = call.getString("replicatorId") else {
+            guard let replicatorId = call.getString("replicatorId"),
+            let token = call.getString("changeListenerToken") else {
                 DispatchQueue.main.async {
-                    call.reject("Error: No replicatorId supplied")
+                    call.reject("Error: No replicatorId or token supplied")
                 }
                 return
             }
@@ -1192,14 +1243,15 @@ public class CblIonicPluginPlugin: CAPPlugin {
                     .generateReplicatorStatusJson(change.status)
                     call.resolve(statusJson)
             })
-            self.replicatorChangeListeners[replicatorId] = listener
+            self.replicatorChangeListeners[token] = listener
         }
     }
     
     @objc func replicator_RemoveChangeListener(_ call: CAPPluginCall) {
         backgroundQueue.async {
-            guard let replicatorId = call.getString("replicatorId") else {
-                call.reject("Error: No replicatorId supplied")
+            guard let replicatorId = call.getString("replicatorId"),
+                  let token = call.getString("changeListenerToken") else {
+                call.reject("Error: No replicatorId or token supplied")
                 return
             }
             guard let replicator = ReplicatorManager.shared.getReplicator(replicatorId: replicatorId) else {
@@ -1208,9 +1260,9 @@ public class CblIonicPluginPlugin: CAPPlugin {
                 }
                 return
             }
-            if let listener = self.replicatorChangeListeners[replicatorId] as? ListenerToken {
+            if let listener = self.replicatorChangeListeners[token] as? ListenerToken {
                 replicator.removeChangeListener(withToken: listener)
-                self.replicatorChangeListeners.removeValue(forKey: replicatorId)
+                self.replicatorChangeListeners.removeValue(forKey: token)
                 DispatchQueue.main.async {
                     return call.resolve()
                 }
@@ -1223,10 +1275,11 @@ public class CblIonicPluginPlugin: CAPPlugin {
         }
     }
     
-    @objc func replicator_AddDocumentListener(_ call: CAPPluginCall) {
+    @objc func replicator_AddDocumentChangeListener(_ call: CAPPluginCall) {
         backgroundQueue.async {
-            guard let replicatorId = call.getString("replicatorId") else {
-                call.reject("Error: No replicatorId supplied")
+            guard let replicatorId = call.getString("replicatorId"),
+                  let token = call.getString("changeListenerToken") else {
+                call.reject("Error: No replicatorId or token supplied")
                 return
             }
             
@@ -1245,38 +1298,7 @@ public class CblIonicPluginPlugin: CAPPlugin {
                     .generateReplicationJson(change.documents, isPush: change.isPush)
                     call.resolve(statusJson)
             })
-            self.replicatorDocumentListeners[replicatorId] = listener
-        }
-    }
-    
-    @objc func replicator_RemoveDocumentListener(_ call: CAPPluginCall) {
-        backgroundQueue.async {
-            guard let replicatorId = call.getString("replicatorId") else {
-                call.reject("Error: No replicatorId supplied")
-                return
-            }
-            DispatchQueue.main.async {
-                if let replicator = ReplicatorManager.shared.getReplicator(replicatorId: replicatorId) {
-                    ReplicatorManager.shared.removeReplicator(replicatorId: replicatorId)
-                    
-                    if let documentListener = self.replicatorDocumentListeners[replicatorId] as? ListenerToken {
-                        replicator.removeChangeListener(withToken: documentListener)
-                        self.replicatorDocumentListeners.removeValue(forKey: replicatorId)
-                        DispatchQueue.main.async {
-                            call.resolve()
-                        }
-                    } else {
-                        DispatchQueue.main.async {
-                            call.reject("No such replicator document listener")
-                        }
-                    }
-                    
-                } else {
-                    DispatchQueue.main.async {
-                        call.reject("No such replicator")
-                    }
-                }
-            }
+            self.replicatorChangeListeners[token] = listener
         }
     }
     

@@ -1,0 +1,67 @@
+{
+  "api": {
+    "admin_interface_authentication": false,
+    "metrics_interface_authentication": false
+  },
+  "bootstrap": {
+    "password": "P@33w0rdS7nc",
+    "server": "couchbase://couchbase-server",
+    "server_tls_skip_verify": true,
+    "use_tls_server": false,
+    "username": "sync"
+  },
+  "bucket_credentials": {
+    "inventoryDemo": {
+      "password": "P@33w0rdS7nc",
+      "username": "sync"
+    }
+  },
+  "logging": {
+    "console": {
+      "log_level": "debug",
+      "log_keys": ["*"]
+    },
+    "debug": {
+      "enabled": true,
+      "rotation": {
+        "max_size": 20,
+        "max_age": 90
+      }
+    },
+    "error": {
+      "enabled": true,
+      "rotation": {
+        "max_size": 20,
+        "max_age": 180
+      }
+    },
+    "info": {
+      "enabled": false,
+      "rotation": {
+        "max_size": 20,
+        "max_age": 90
+      }
+    },
+    "stats": {
+      "enabled": true,
+      "rotation": {
+        "max_size": 20,
+        "max_age": 90
+      }
+    },
+    "trace": {
+      "enabled": false,
+      "rotation": {
+        "max_size": 20,
+        "max_age": 90
+      }
+    },
+    "warn": {
+      "enabled": true,
+      "rotation": {
+        "max_size": 20,
+        "max_age": 90
+      }
+    }
+  }
+}

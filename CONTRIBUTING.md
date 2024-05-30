@@ -28,14 +28,14 @@ This guide provides instructions for contributing to this Capacitor plugin.
 
 ## Plugin Project Structure
 
-- **`src/definitions.ts`** - interface defintions for the plugin.  This defines the interface `IonicCouchbaseLitePlugin` that inherrits from the interface `ICoreEngine`.  `IonicCouchbaseLitePlugin` is used by Capacitor to connect to the Engine that implements the bridge between the Javascript code in cblite JS npm package and the native code in the iOS and Android projects.  This file is used to define the methods that the plugin supports.  The names of the methods in this file must match the names of the methods in the native implementation which are defined in both interface files.  
-- **`src/ionic-couchbase-lite.ts`** -   This maps the defines the interface `IonicCouchbaseLitePlugin` and registers the plugin for mapping to the native code with the code 'CblInoicPlugin'.  This MUST match what's defined in the native implementation files or the mapping will not work. 
-- **`src/couchbase-lite/engine/capacitor-engine.ts`** - the main implementation of methods that are defined in the plugin for Ionic.  Names MUST match the names from the native inmplementation in Swift/Java/Kotlin.  The Typescript code will usually call implementations that try to match the Couchbase Lite SDK.  Example the Database.ts file tries to separate out things like opening and closing a database to match the Couchbase Lite SDK.  
+- **`src/definitions.ts`** - interface definition for the plugin.  This defines the interface `IonicCouchbaseLitePlugin` that inherits from the interface `ICoreEngine`.  `IonicCouchbaseLitePlugin` is used by Capacitor to connect to the Engine that implements the bridge between the Javascript code in cblite JS npm package and the native code in the iOS and Android projects.  This file is used to define the methods that the plugin supports.  The names of the methods in this file must match the names of the methods in the native implementation which are defined in both interface files.  
+- **`src/ionic-couchbase-lite.ts`** -   This maps the defines the interface `IonicCouchbaseLitePlugin` and registers the plugin for mapping to the native code with the code 'CblIonicPlugin'.  This MUST match what's defined in the native implementation files or the mapping will not work. 
+- **`src/couchbase-lite/engine/capacitor-engine.ts`** - the main implementation of methods that are defined in the plugin for Ionic.  Names MUST match the names from the native implementation in Swift/Java/Kotlin.  The Typescript code will usually call implementations that try to match the Couchbase Lite SDK.  Example the Database.ts file tries to separate out things like opening and closing a database to match the Couchbase Lite SDK.  
 - **`ios/Plugin/`** this is the iOS native implementation of the plugin.  The file brakedown is:
     - **`ios/CblIonicPluginPlugin.h`** - the interface for the main plugin.  The name must match the name of the plugin.
     - **`ios/CblIonicPluginPlugin.m`** - the main implementation of the plugin. This defines the plugin using the CAP_PLUGIN Macro, and
     each method the plugin supports using the CAP_PLUGIN_METHOD macro. 
-    - **`ios/CblIonicPlugin.swift`** - the main implementation of the plugin bridge to Native code.
+    - **`ios/CblIonicPlugin.swift`** - the main implementation of the plugin bridge to Native code.  Note this mostly calls shared code from the cbl-js-swift repo that is used to share the implementation between various frameworks like Ionic, React Native, etc.  
 - **`android/src/`** this is the Android native implementation of the plugin.  The file brakedown is:
     - **`main/java/io/ionic/enterprise/couchbaselite/IonicCouchbaseLitePlugin.java`** - the main implementation of the plugin and bridge.  The name must match the name of the plugin.
 
@@ -56,7 +56,7 @@ This is the Swift implementation of the Couchbase Lite SDK which includes defini
     - cbl-js-swift
     - this repo
  
-2. Setup cblite-js by installing dependicies for both the cblite and cblite-tests npm packages.  Run the following commands from the root of the cblite-js repo:
+2. Setup cblite-js by installing dependencies for both the cblite and cblite-tests npm packages.  Run the following commands from the root of the cblite-js repo:
     ```shell
     cd cblite-js
     cd cblite
@@ -67,7 +67,7 @@ This is the Swift implementation of the Couchbase Lite SDK which includes defini
     npm run build
     cd ../..
     ```
-3. **Future Step** Update the package.json and package-lock.json file to point to the local repo instead of pulling down from Github's NPM repository.
+3. **Future Step - not currently required** Update the package.json and package-lock.json file to point to the local repo instead of pulling down from GitHub's NPM repository.
 4. Install the dependencies on main project.
 
     ```shell
@@ -79,12 +79,12 @@ This is the Swift implementation of the Couchbase Lite SDK which includes defini
     ```shell
     brew install swiftlint
     ```
-6. **Future Step** Update Cocopods to use local repo for cbl-js-swift if you are going to work on iOS.  Update the following to the Podfile in the ios directory:
+6. **Future Step, not required right now** Update CocoaPods to use local repo for cbl-js-swift if you are going to work on iOS.  Update the following to the Podfile in the ios directory:
 
     ```shell
     pod 'CbliteSwiftJsLib', :path => '../../cbl-js-swift'
     ```
-7. Install Cocopods if you are going to work on iOS. 
+7. Install CocoaPods if you are going to work on iOS. 
 
     ```shell
     cd ios
@@ -114,8 +114,15 @@ To test the plugin an Example app has been provided.  To build the example app f
     cd ..
     ```
 3. Run the example app.  From the root of the example directory run the following command:
+    
+    **iOS** 
     ```shell
     ionic capacitor run ios -l --external
+    ```
+
+    **Android**
+    ```shell
+    ionic capacitor run android -l --external
     ```
 
 ### Scripts
@@ -136,42 +143,12 @@ This is useful to run in CI to verify that the plugin builds for all platforms.
 
 #### `npm run lint` / `npm run fmt`
 
-Check formatting and code quality, autoformat/autofix if possible.
+Check formatting and code quality, auto format/autofix if possible.
 
 This template is integrated with ESLint, Prettier, and SwiftLint. Using these tools is completely optional, but the [Capacitor Community](https://github.com/capacitor-community/) strives to have consistent code style and structure for easier cooperation.
 
-### Running the example app
-From your terminal, change into the example app's directory and run npm build
 
-```shell
-cd example
-npm install
-npm run build
-```
 
-Now you can use ionic capacitor to run iOS or Android with hot reload support
-
-**iOS**
-
-First time running requires doing a pod install in the ios/App directory of the example folder.  After that you can run the app with the following command. 
-
-```shell
-cd ios
-cd App
-pod install
-cd ../..
-```
-
-Once the pod files are installed from the root of the example app folder you can do:
-
-```shell
-ionic capacitor run ios -l --external
-```
-
-**Android**
-```shell
-ionic capacitor run android -l --external
-```
 
 Any new features should be published with e2e tests that are ran against the example app.
 
