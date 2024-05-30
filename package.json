@@ -1,6 +1,6 @@
 {
   "name": "cbl-ionic",
-  "version": "3.1.0",
+  "version": "0.1.6",
   "description": "Ionic Capacitor plugin for Couchbase Lite Enterprise (3.x+)",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -13,14 +13,14 @@
     "ios/Plugin/",
     "CblIonic.podspec"
   ],
-  "author": "Deveveloper Integrations  @ Couchbase",
+  "author": "Developer Experience/Ecosystem Team @ Couchbase",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/couchbaselabs/cbl-ionic.git"
+    "url": "git+https://github.com/Couchbase-Ecosystem/cbl-ionic.git"
   },
   "bugs": {
-    "url": "https://github.com/couchbaselabs/cbl-ionic/issues"
+    "url": "https://github.com/Couchbase-Ecosystem/cbl-ionic/issues"
   },
   "keywords": [
     "couchbase",
