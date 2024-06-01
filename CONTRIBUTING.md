@@ -51,9 +51,11 @@ This is the Swift implementation of the Couchbase Lite SDK which includes defini
 
 ### How to Build the Plugin
 
-1. Fork and clone this repo.  You will need to also clone all the submodules for the shared libraries and tests.  Run the following commands from the root of the cbl-ionic repo:
+1. Fork and clone this repo.  You will need to also clone all the submodules for the shared libraries and tests and update them with the latest version of each of those modules code.  Run the following commands from the root of the cbl-ionic repo:
     ```shell
     git clone --recurse-submodules git@github.com:Couchbase-Ecosystem/cbl-ionic.git
+    cd cbl-ionic
+    git submodule update --remote
     ```  
  
 2. Install the dependencies on main project.
