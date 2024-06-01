@@ -8,6 +8,15 @@
 
 /* Begin PBXBuildFile section */
 		03FC29A292ACC40490383A1F /* Pods_Plugin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B2A61DA5A1F2DD4F959604D /* Pods_Plugin.framework */; };
+		0D301E892C0B86C200C5CECF /* ReplicatorHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D301E802C0B86C200C5CECF /* ReplicatorHelper.swift */; };
+		0D301E8A2C0B86C200C5CECF /* CollectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D301E812C0B86C200C5CECF /* CollectionManager.swift */; };
+		0D301E8B2C0B86C200C5CECF /* MapHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D301E822C0B86C200C5CECF /* MapHelper.swift */; };
+		0D301E8C2C0B86C200C5CECF /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D301E832C0B86C200C5CECF /* DatabaseManager.swift */; };
+		0D301E8D2C0B86C200C5CECF /* ReplicatorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D301E842C0B86C200C5CECF /* ReplicatorManager.swift */; };
+		0D301E8E2C0B86C200C5CECF /* IndexHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D301E852C0B86C200C5CECF /* IndexHelper.swift */; };
+		0D301E8F2C0B86C200C5CECF /* FileSystemHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D301E862C0B86C200C5CECF /* FileSystemHelper.swift */; };
+		0D301E902C0B86C200C5CECF /* LoggingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D301E872C0B86C200C5CECF /* LoggingManager.swift */; };
+		0D301E912C0B86C200C5CECF /* QueryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D301E882C0B86C200C5CECF /* QueryHelper.swift */; };
 		20C0B05DCFC8E3958A738AF2 /* Pods_PluginTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F6753A823D3815DB436415E3 /* Pods_PluginTests.framework */; };
 		50ADFF92201F53D600D50D53 /* Plugin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50ADFF88201F53D600D50D53 /* Plugin.framework */; };
 		50ADFF97201F53D600D50D53 /* CblIonicPluginTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50ADFF96201F53D600D50D53 /* CblIonicPluginTests.swift */; };
@@ -28,6 +37,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0D301E802C0B86C200C5CECF /* ReplicatorHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ReplicatorHelper.swift; path = "cbl-js-swift/ReplicatorHelper.swift"; sourceTree = "<group>"; };
+		0D301E812C0B86C200C5CECF /* CollectionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CollectionManager.swift; path = "cbl-js-swift/CollectionManager.swift"; sourceTree = "<group>"; };
+		0D301E822C0B86C200C5CECF /* MapHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MapHelper.swift; path = "cbl-js-swift/MapHelper.swift"; sourceTree = "<group>"; };
+		0D301E832C0B86C200C5CECF /* DatabaseManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DatabaseManager.swift; path = "cbl-js-swift/DatabaseManager.swift"; sourceTree = "<group>"; };
+		0D301E842C0B86C200C5CECF /* ReplicatorManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ReplicatorManager.swift; path = "cbl-js-swift/ReplicatorManager.swift"; sourceTree = "<group>"; };
+		0D301E852C0B86C200C5CECF /* IndexHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = IndexHelper.swift; path = "cbl-js-swift/IndexHelper.swift"; sourceTree = "<group>"; };
+		0D301E862C0B86C200C5CECF /* FileSystemHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FileSystemHelper.swift; path = "cbl-js-swift/FileSystemHelper.swift"; sourceTree = "<group>"; };
+		0D301E872C0B86C200C5CECF /* LoggingManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = LoggingManager.swift; path = "cbl-js-swift/LoggingManager.swift"; sourceTree = "<group>"; };
+		0D301E882C0B86C200C5CECF /* QueryHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = QueryHelper.swift; path = "cbl-js-swift/QueryHelper.swift"; sourceTree = "<group>"; };
 		3B2A61DA5A1F2DD4F959604D /* Pods_Plugin.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Plugin.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		50ADFF88201F53D600D50D53 /* Plugin.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Plugin.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		50ADFF8B201F53D600D50D53 /* CblIonicPluginPlugin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CblIonicPluginPlugin.h; sourceTree = "<group>"; };
@@ -90,6 +108,15 @@
 		50ADFF8A201F53D600D50D53 /* Plugin */ = {
 			isa = PBXGroup;
 			children = (
+				0D301E812C0B86C200C5CECF /* CollectionManager.swift */,
+				0D301E832C0B86C200C5CECF /* DatabaseManager.swift */,
+				0D301E862C0B86C200C5CECF /* FileSystemHelper.swift */,
+				0D301E852C0B86C200C5CECF /* IndexHelper.swift */,
+				0D301E872C0B86C200C5CECF /* LoggingManager.swift */,
+				0D301E822C0B86C200C5CECF /* MapHelper.swift */,
+				0D301E882C0B86C200C5CECF /* QueryHelper.swift */,
+				0D301E802C0B86C200C5CECF /* ReplicatorHelper.swift */,
+				0D301E842C0B86C200C5CECF /* ReplicatorManager.swift */,
 				50E1A94720377CB70090CE1A /* CblIonicPlugin.swift */,
 				50ADFF8B201F53D600D50D53 /* CblIonicPluginPlugin.h */,
 				50ADFFA72020EE4F00D50D53 /* CblIonicPluginPlugin.m */,
@@ -267,14 +294,12 @@
 				"${PODS_ROOT}/Target Support Files/Pods-PluginTests/Pods-PluginTests-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Capacitor/Capacitor.framework",
 				"${BUILT_PRODUCTS_DIR}/CapacitorCordova/Cordova.framework",
-				"${BUILT_PRODUCTS_DIR}/CbliteSwiftJsLib/CbliteSwiftJsLib.framework",
 				"${PODS_XCFRAMEWORKS_BUILD_DIR}/CouchbaseLite-Swift-Enterprise/CouchbaseLiteSwift.framework/CouchbaseLiteSwift",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Capacitor.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Cordova.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CbliteSwiftJsLib.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CouchbaseLiteSwift.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -307,8 +332,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0D301E8B2C0B86C200C5CECF /* MapHelper.swift in Sources */,
 				50E1A94820377CB70090CE1A /* CblIonicPlugin.swift in Sources */,
+				0D301E8C2C0B86C200C5CECF /* DatabaseManager.swift in Sources */,
+				0D301E8A2C0B86C200C5CECF /* CollectionManager.swift in Sources */,
+				0D301E8E2C0B86C200C5CECF /* IndexHelper.swift in Sources */,
+				0D301E902C0B86C200C5CECF /* LoggingManager.swift in Sources */,
 				50ADFFA82020EE4F00D50D53 /* CblIonicPluginPlugin.m in Sources */,
+				0D301E8F2C0B86C200C5CECF /* FileSystemHelper.swift in Sources */,
+				0D301E8D2C0B86C200C5CECF /* ReplicatorManager.swift in Sources */,
+				0D301E892C0B86C200C5CECF /* ReplicatorHelper.swift in Sources */,
+				0D301E912C0B86C200C5CECF /* QueryHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

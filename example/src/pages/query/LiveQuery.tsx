@@ -2,7 +2,7 @@
 import React, { useState, useContext } from 'react';
 import DatabaseContext from '../../providers/DatabaseContext';
 import DetailPageDatabaseCollectionRun from '../../components/DetailPageDatabaseCollectionRun/DetailPageDatabaseCollectionRun';
-import { MutableDocument, Query} from 'cblite';
+import { MutableDocument, Query} from 'cbl-ionic';
 
 const LiveQueryPage: React.FC = () => {
 

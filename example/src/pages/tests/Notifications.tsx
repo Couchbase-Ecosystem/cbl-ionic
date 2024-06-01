@@ -2,7 +2,7 @@
 import React from 'react';
 import DetailPageTestContainerRunner from '../../components/DetailPageTestRunnerContainer/DetailPageTestRunnerContainer';
 
-import { ListenerTests } from 'cblite-tests';
+import { ListenerTests } from 'cbl-ionic';
 
 const NotificationsTestPage: React.FC = () => {
 

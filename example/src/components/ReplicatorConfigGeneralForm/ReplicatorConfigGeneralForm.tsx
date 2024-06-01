@@ -11,7 +11,7 @@ import {
     IonToggle
 } from '@ionic/react';
 
-import {ReplicatorType} from 'cblite';
+import {ReplicatorType} from 'cbl-ionic';
 
 export type ReplicatorConfigGeneralFormType = {
     connectionString: string;

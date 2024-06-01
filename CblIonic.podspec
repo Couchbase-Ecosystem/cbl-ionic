@@ -14,6 +14,5 @@ Pod::Spec.new do |s|
   s.ios.deployment_target  = '13.0'
   s.dependency 'Capacitor'
   s.dependency 'CouchbaseLite-Swift-Enterprise', '~> 3.1'
-  s.dependency 'CbliteSwiftJsLib'
   s.swift_version = '5.5'
 end

@@ -1,7 +1,7 @@
 import {
     Meta,
     Collection,
-} from 'cblite';
+} from 'cbl-ionic';
 
 export interface QueryDictionary {
     [key: string]: string;

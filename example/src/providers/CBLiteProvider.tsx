@@ -2,11 +2,11 @@ import React, { useState, ReactNode, useMemo } from 'react';
 
 import {
   Database,
-} from 'cblite';
+  CapacitorEngine
+} from 'cbl-ionic';
 
 import DatabaseContext from './DatabaseContext';
 import ReplicatorContext from './ReplicatorContext';
-import { CapacitorEngine } from 'cbl-ionic';
 
 type CBLiteProviderProps = {
   children: ReactNode;

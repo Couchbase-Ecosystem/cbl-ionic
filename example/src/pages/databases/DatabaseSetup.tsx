@@ -14,7 +14,7 @@ import {
   Database, 
   DatabaseConfiguration, 
   FileSystem 
-} from 'cblite';
+} from 'cbl-ionic';
 
 const DatabaseSetupPage: React.FC = () => {
   const { databases, setDatabases } = useContext(DatabaseContext)!;
@@ -80,7 +80,7 @@ const DatabaseSetupPage: React.FC = () => {
             padding: '0px 2px 0px 25px',
           }}
       >
-        <i className="fa-duotone fa-folder-gear"></i>
+        <i className='fa-duotone fa-folder-gear'></i>
       </IonButton>}
       sectionTitle={'Database Configuration'}
       onReset={reset}
@@ -91,7 +91,7 @@ const DatabaseSetupPage: React.FC = () => {
     >
       <IonItem key={1}>
         <IonInput
-          placeholder="File Location"
+          placeholder='File Location'
           onInput={(e: any) => setPath(e.target.value)}
           value={path}
         ></IonInput>
@@ -99,7 +99,7 @@ const DatabaseSetupPage: React.FC = () => {
       <IonItem key={2}>
         <IonInput
           onInput={(e: any) => setEncryptionKey(e.target.value)}
-          placeholder="Encryption Key"
+          placeholder='Encryption Key'
           value={encryptionKey}
         ></IonInput>
       </IonItem>

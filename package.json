@@ -1,6 +1,6 @@
 {
   "name": "cbl-ionic",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Ionic Capacitor plugin for Couchbase Lite Enterprise (3.x+)",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -25,6 +25,7 @@
   "keywords": [
     "couchbase",
     "couchbase-lite",
+    "ionic",
     "capacitor",
     "plugin",
     "native"
@@ -39,13 +40,12 @@
     "prettier": "prettier \"**/*.{css,html,ts,js,java}\"",
     "swiftlint": "node-swiftlint",
     "docgen": "docgen --api IonicCouchbaseLitePlugin --output-readme README.md --output-json dist/docs.json",
-    "build": "npm run clean && tsc && rollup -c rollup.config.js",
+    "build": "npm run clean && tsc && rollup -c rollup.config.mjs",
     "clean": "rimraf ./dist",
     "watch": "tsc --watch",
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
-    "cblite": "file:../cblite-js/cblite",
     "@capacitor/android": "^5.7.5",
     "@capacitor/core": "^5.7.5",
     "@capacitor/ios": "^5.7.5",
@@ -61,7 +61,8 @@
     "rollup": "^2.32.0",
     "swiftlint": "^1.0.1",
     "tslib": "^2.6.2",
-    "typescript": "5.4.2"
+    "typescript": "5.4.2",
+    "chai": "^5.1.0"
   },
   "peerDependencies": {
     "@capacitor/core": "^5.7.5"

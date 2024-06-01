@@ -14,7 +14,7 @@ import {
     IonSelectOption,
 } from '@ionic/react';
 
-import {MutableDocument, Blob} from 'cblite';
+import {MutableDocument, Blob} from 'cbl-ionic';
 
 const EditDocumentPage: React.FC = () => {
         //database stuff

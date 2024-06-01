@@ -1,0 +1,4 @@
+.wrap-text {
+    white-space: normal !important;
+    word-wrap: break-word;
+}

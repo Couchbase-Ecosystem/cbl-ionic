@@ -1,15 +1,6 @@
 import Foundation
 import Capacitor
 import CouchbaseLiteSwift
-import CbliteSwiftJsLib
-
-enum ReplicatorError: Error {
-    case configurationError(message: String)
-    case unableToFindReplicator(replicatorId: String)
-    case unknownError(message: String)
-    case fatalError(message: String)
-    case invalidState(message: String)
-}
 
 @objc(CblIonicPlugin)
 public class CblIonicPluginPlugin: CAPPlugin {

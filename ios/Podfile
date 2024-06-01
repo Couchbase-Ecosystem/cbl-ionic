@@ -10,7 +10,6 @@ end
 def couchbase_pods
   use_frameworks!
   pod 'CouchbaseLite-Swift-Enterprise', '~> 3.1'
-  pod 'CbliteSwiftJsLib', :path => '../../cbl-js-swift'
 end
 
 target 'Plugin' do

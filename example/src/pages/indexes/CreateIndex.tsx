@@ -7,7 +7,7 @@ import DatabaseNameForm from '../../components/DatabaseNameForm/DatabaseNameForm
 import { IonItemDivider, IonLabel, IonItem, IonInput, IonButton } from '@ionic/react';
 
 //import the database in order to create/open a database
-import { IndexBuilder, ValueIndexItem } from 'cblite';
+import { IndexBuilder, ValueIndexItem } from 'cbl-ionic';
 
 const CreateIndexPage: React.FC = () => {
   const { databases } = useContext(DatabaseContext)!;

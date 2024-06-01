@@ -16,7 +16,7 @@ import {
 
 import {
   MutableDocument,
-} from 'cblite';
+} from 'cbl-ionic';
 
 const CreateBatchPage: React.FC = () => {
   const { databases } = useContext(DatabaseContext)!;
