@@ -41,14 +41,14 @@ import {
   Scope,
   ScopeArgs,
   ScopesResult, ReplicationChangeListenerArgs, ReplicatorCollectionArgs,
-} from "cblite";
+} from '../cblite-js/cblite';
 
-import { IonicCouchbaseLite } from "../ionic-couchbase-lite";
-import { IonicCouchbaseLitePlugin } from "../definitions";
+import { IonicCouchbaseLite } from '../ionic-couchbase-lite';
+import { IonicCouchbaseLitePlugin } from '../definitions';
 
 export class CapacitorEngine implements IonicCouchbaseLitePlugin {
-  _defaultCollectionName = "_default";
-  _defaultScopeName = "_default";
+  _defaultCollectionName = '_default';
+  _defaultScopeName = '_default';
 
   constructor(config: any = {}) {
     EngineLocator.registerEngine(EngineLocator.key, this);

@@ -3,7 +3,7 @@
 
 import {
   ICoreEngine
-} from 'cblite';
+} from './cblite-js/cblite';
 
 export interface PluginConfigureArgs {
   config: any;

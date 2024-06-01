@@ -41,57 +41,41 @@ This guide provides instructions for contributing to this Capacitor plugin.
 
 ## Shared Libraries and Tests
 ### [cblite-js](https://github.com/Couchbase-Ecosystem/cblite-js)
-- `cblite` this is the Javascript implementation of the Couchbase Lite SDK which includes definitions for the main classes and methods in the Couchbase Lite SDK.  This is used by the plugin to call the native code.
-- `cblite-tests` this is the Javascript end to end (e2e) test that are used to fully test the plugin to validate that all functionality works.  This includes a custom test runner that can be used by any UI to run the tests.
+- `cblite` this is the Javascript implementation of the Couchbase Lite SDK which includes definitions for the main classes and methods in the Couchbase Lite SDK.  This is used by the plugin to call the native code.  This is added to the project via Git Submodule to the /src/cblite-js directory.
+- `cblite-tests` this is the Javascript end to end (e2e) test that are used to fully test the plugin to validate that all functionality works.  This includes a custom test runner that can be used by any UI to run the tests.  This is added to the project via Git Submodule to the /src/cblite-js directory.
 
 ### [cbl-js-swift](https://github.com/Couchbase-Ecosystem/cbl-js-swift)
-This is the Swift implementation of the Couchbase Lite SDK which includes definitions for the main classes and methods in the Couchbase Lite SDK.  This is used by the plugin to call the native code.
+This is the Swift implementation of the Couchbase Lite SDK which includes definitions for the main classes and methods in the Couchbase Lite SDK.  This is used by the plugin to call the native code.  This is added to the project via Git Submodule to the /src/ios/Plugin/cbl-js-swift directory.
 
 ## Local Setup
 
 ### How to Build the Plugin
 
-1. Fork and clone these repos.  Note that they all should be in the same root directory.  The repos are:
-    - cblite-js
-    - cbl-js-swift
-    - this repo
- 
-2. Setup cblite-js by installing dependencies for both the cblite and cblite-tests npm packages.  Run the following commands from the root of the cblite-js repo:
+1. Fork and clone this repo.  You will need to also clone all the submodules for the shared libraries and tests.  Run the following commands from the root of the cbl-ionic repo:
     ```shell
-    cd cblite-js
-    cd cblite
-    npm install
-    npm run build
-    cd ../cblite-tests
-    npm install
-    npm run build
-    cd ../..
-    ```
-3. **Future Step - not currently required** Update the package.json and package-lock.json file to point to the local repo instead of pulling down from GitHub's NPM repository.
-4. Install the dependencies on main project.
+    git clone git@github.com:Couchbase-Ecosystem/cbl-ionic.git —recursive-submodules
+    ```  
+ 
+2. Install the dependencies on main project.
 
     ```shell
     cd cbl-ionic
     npm install
     ```
-5. Install SwiftLint if you're on macOS.
+3. Install SwiftLint if you're on macOS.
 
     ```shell
     brew install swiftlint
     ```
-6. **Future Step, not required right now** Update CocoaPods to use local repo for cbl-js-swift if you are going to work on iOS.  Update the following to the Podfile in the ios directory:
-
-    ```shell
-    pod 'CbliteSwiftJsLib', :path => '../../cbl-js-swift'
-    ```
-7. Install CocoaPods if you are going to work on iOS. 
+   
+4. Install CocoaPods if you are going to work on iOS. 
 
     ```shell
     cd ios
     pod install 
     cd ..
     ```
-8. Run npm build to build Javascript - from project root.
+5. Run npm build to build Javascript - from project root.
 
     ```shell
     npm run build
@@ -131,7 +115,7 @@ To test the plugin an Example app has been provided.  To build the example app f
 
 Build npm module and the plugin web assets.
 
-It will compile the TypeScript code from the `cblite`, `cblite-tests`, and `src/` into ESM JavaScript in `dist/esm/`. These files are used in apps with bundlers when your plugin is imported.
+It will compile the TypeScript code from the `src/` into ESM JavaScript in `dist/esm/`. These files are used in apps with bundlers when your plugin is imported.
 
 Then, Rollup will bundle the code `dist/plugin.js` with the other two npm packages included. This file is used in apps without bundlers by including it as a script in `index.html`.
 
@@ -146,9 +130,6 @@ This is useful to run in CI to verify that the plugin builds for all platforms.
 Check formatting and code quality, auto format/autofix if possible.
 
 This template is integrated with ESLint, Prettier, and SwiftLint. Using these tools is completely optional, but the [Capacitor Community](https://github.com/capacitor-community/) strives to have consistent code style and structure for easier cooperation.
-
-
-
 
 Any new features should be published with e2e tests that are ran against the example app.
 

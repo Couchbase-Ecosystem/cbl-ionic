@@ -1,7 +1,7 @@
 {
-  "name": "example",
+  "name": "Ionic Example",
   "private": true,
-  "version": "0.1.6",
+  "version": "0.1.7",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -14,6 +14,8 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
+    "cbl-ionic": "file:..",
+
     "@capacitor/android": "5.7.5",
     "@capacitor/app": "5.0.7",
     "@capacitor/core": "5.7.5",
@@ -26,8 +28,7 @@
     "@monaco-editor/react": "^4.6.0",
     "@types/react-router": "^5.1.20",
     "@types/react-router-dom": "^5.3.3",
-    "cbl-ionic": "file:..",
-    "cblite-tests": "file:../../cblite-js/cblite-tests/",
+
     "chai": "^5.1.0",
     "ionicons": "^7.3.0",
     "postcss": "^8.4.35",

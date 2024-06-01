@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import DetailPageTestContainerRunner from '../../components/DetailPageTestRunnerContainer/DetailPageTestRunnerContainer';
 
-import { CustomLoggingTests } from 'cblite-tests';
+import { CustomLoggingTests } from 'cbl-ionic';
 
 const CustomLoggingTestsPage: React.FC = () => {
 

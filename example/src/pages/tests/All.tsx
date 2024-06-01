@@ -16,7 +16,7 @@ import {
 	PredicateQueryTests,
 	QueryTests,
 	ReplicatorTests
-} from 'cblite-tests';
+} from 'cbl-ionic';
 
 const AllTestsPage: React.FC = () => {
   return (

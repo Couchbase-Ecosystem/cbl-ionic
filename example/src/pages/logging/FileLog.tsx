@@ -19,7 +19,7 @@ import {
   DatabaseFileLoggingConfiguration,
   LogLevel,
   FileSystem,
-} from 'cblite';
+} from 'cbl-ionic';
 
 const FileLogPage: React.FC = () => {
   const { databases } = useContext(DatabaseContext)!;

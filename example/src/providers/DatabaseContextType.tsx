@@ -1,4 +1,4 @@
-import { Database } from 'cblite';
+import { Database } from 'cbl-ionic';
 import React from "react";
 
 export type DatabaseContextType = {

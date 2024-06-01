@@ -2,7 +2,7 @@
 import React, {useState, useContext} from 'react';
 import DatabaseContext from '../../providers/DatabaseContext';
 import DetailPageContainerRun from '../../components/DetailPageContainerRun/DetailPageContainerRun';
-import {MutableDocument, Collection} from 'cblite';
+import {MutableDocument, Collection} from 'cbl-ionic';
 import {IonInput, IonItem} from '@ionic/react';
 
 const ChangeDocumentPage: React.FC = () => {

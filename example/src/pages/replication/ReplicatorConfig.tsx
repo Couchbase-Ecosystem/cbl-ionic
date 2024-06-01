@@ -28,8 +28,9 @@ import {
   BasicAuthenticator,
   SessionAuthenticator,
   ReplicatorConfiguration,
-  URLEndpoint, Replicator
-} from 'cblite';
+  URLEndpoint,
+  Replicator
+} from 'cbl-ionic';
 
 
 const ReplicatorConfigPage: React.FC = () => {

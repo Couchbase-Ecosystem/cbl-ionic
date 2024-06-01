@@ -1,5 +1,5 @@
 // QueryFTS.tsx
-import './QueryBuilder.css';
+import './LiveQuery.css';
 import React, {useState, useContext} from 'react';
 import DatabaseContext from '../../providers/DatabaseContext';
 import DetailPageContainerItemResults

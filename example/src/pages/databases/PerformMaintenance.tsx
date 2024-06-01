@@ -4,7 +4,7 @@ import DatabaseContext from '../../providers/DatabaseContext';
 import DetailPageContainerRun from '../../components/DetailPageContainerRun/DetailPageContainerRun';
 
 import {IonItem, IonLabel, IonSelect, IonSelectOption,} from '@ionic/react';
-import {MaintenanceType} from "cblite/dist/esm/src";
+import {MaintenanceType} from 'cbl-ionic';
 
 const PerformMaintenancePage: React.FC = () => {
   const { databases } = useContext(DatabaseContext)!;

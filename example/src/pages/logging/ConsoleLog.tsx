@@ -11,7 +11,7 @@ import {
 import DetailPageContainer from '../../components/DetailPageContainer/DetailPageContainer';
 
 //import the database which has a list of log levels and domains
-import { LogLevel, LogDomain, Database } from 'cblite';
+import { LogLevel, LogDomain, Database } from 'cbl-ionic';
 
 const ConsoleLogPage: React.FC = () => {
   //load load levels and domains from couchbase lite plugin

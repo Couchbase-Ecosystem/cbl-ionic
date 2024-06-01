@@ -11,7 +11,7 @@ import {
 import DetailPageContainerRun from '../../components/DetailPageContainerRun/DetailPageContainerRun';
 
 //import the database in order to create/open a database
-import {DatabaseConfiguration, FileSystem} from 'cblite';
+import {DatabaseConfiguration, FileSystem} from 'cbl-ionic';
 
 const DatabaseCopyPage: React.FC = () => {
     const {databases} = useContext(DatabaseContext)!;
