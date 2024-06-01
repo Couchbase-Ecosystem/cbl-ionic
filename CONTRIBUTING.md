@@ -55,7 +55,7 @@ This is the Swift implementation of the Couchbase Lite SDK which includes defini
     ```shell
     git clone --recurse-submodules git@github.com:Couchbase-Ecosystem/cbl-ionic.git
     cd cbl-ionic
-    git submodule update --remote
+    git submodule update --remote --recursive
     ```  
  
 2. Install the dependencies on main project.
