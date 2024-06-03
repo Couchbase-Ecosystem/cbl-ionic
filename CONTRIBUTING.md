@@ -61,7 +61,6 @@ This is the Swift implementation of the Couchbase Lite SDK which includes defini
 2. Install the dependencies on main project.
 
     ```shell
-    cd cbl-ionic
     npm install
     ```
 3. Install SwiftLint if you're on macOS.
