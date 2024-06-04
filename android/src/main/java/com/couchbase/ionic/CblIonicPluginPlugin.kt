@@ -392,8 +392,7 @@ class CblIonicPluginPlugin : Plugin() {
         GlobalScope.launch {
             withContext(Dispatchers.IO) {
                 try {
-
-                    val scope = DatabaseManager.scope(scopeDao.databaseName, scopeDao.scopeName)
+                    val scope = DatabaseManager.getScope(scopeDao.databaseName, scopeDao.scopeName)
                     scope?.let {
                         val results = JSObject()
                         results.put("name", scope.name)
@@ -487,7 +486,6 @@ class CblIonicPluginPlugin : Plugin() {
     }
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
     fun collection_GetCollections(call: PluginCall) {
         val scopeDao = getScopeDaoFromCall(call)
         if (scopeDao == null || scopeDao.isError) {
@@ -496,44 +494,24 @@ class CblIonicPluginPlugin : Plugin() {
         GlobalScope.launch {
             withContext(Dispatchers.IO) {
                 try {
-
-                }
-                catch (e: Exception) {
-                    return@withContext withContext(Dispatchers.Main) {
-                        call.reject("${e.message}")
-                    }
-            }
-        }
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun collection_GetCollection(call: PluginCall) {
-        val collectionDao = getCollectionDaoFromCall(call)
-        if (collectionDao == null || collectionDao.isError) {
-            return
-        }
-        GlobalScope.launch {
-            withContext(Dispatchers.IO) {
-                try {
-                    val collection = DatabaseManager.getCollection(
-                        collectionDao.collectionName,
-                        collectionDao.scopeName,
-                        collectionDao.databaseName
-                    )
-                    collection?.let { col ->
-                        val colResult = JSObject()
-                        val scopeResult = JSObject()
-                        colResult.put("name", col.name)
-                        scopeResult.put("name", col.scope.name)
-                        scopeResult.put("databaseName", collectionDao.databaseName)
-                        colResult.put("scope", scopeResult)
-                        return@withContext withContext(Dispatchers.Main) {
-                            call.resolve(colResult)
+                    val results = JSObject()
+                    val collectionArray = JSArray()
+                    val collections =
+                        DatabaseManager.getCollections(scopeDao.scopeName, scopeDao.databaseName)
+                    collections?.let { cols ->
+                        for (collection in cols) {
+                            val collectionObject = JSObject()
+                            collectionObject.put("name", collection.name)
+                            val scopeObject = JSObject()
+                            scopeObject.put("name", collection.scope.name)
+                            scopeObject.put("databaseName", scopeDao.databaseName)
+                            collectionObject.put("scope", scopeObject)
+                            collectionArray.put(collectionObject)
+                            results.put("collections", collectionArray)
                         }
                     }
                     return@withContext withContext(Dispatchers.Main) {
-                        call.reject("Error: Collection not created")
+                        results.put("collections", collectionArray)
                     }
                 } catch (e: Exception) {
                     return@withContext withContext(Dispatchers.Main) {
@@ -542,209 +520,245 @@ class CblIonicPluginPlugin : Plugin() {
                 }
             }
         }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        fun collection_GetCollection(call: PluginCall) {
+            val collectionDao = getCollectionDaoFromCall(call)
+            if (collectionDao == null || collectionDao.isError) {
+                return
+            }
+            GlobalScope.launch {
+                withContext(Dispatchers.IO) {
+                    try {
+                        val collection = DatabaseManager.getCollection(
+                            collectionDao.collectionName,
+                            collectionDao.scopeName,
+                            collectionDao.databaseName
+                        )
+                        collection?.let { col ->
+                            val colResult = JSObject()
+                            val scopeResult = JSObject()
+                            colResult.put("name", col.name)
+                            scopeResult.put("name", col.scope.name)
+                            scopeResult.put("databaseName", collectionDao.databaseName)
+                            colResult.put("scope", scopeResult)
+                            return@withContext withContext(Dispatchers.Main) {
+                                call.resolve(colResult)
+                            }
+                        }
+                        return@withContext withContext(Dispatchers.Main) {
+                            call.reject("Error: Collection not created")
+                        }
+                    } catch (e: Exception) {
+                        return@withContext withContext(Dispatchers.Main) {
+                            call.reject("${e.message}")
+                        }
+                    }
+                }
+            }
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun collection_DeleteCollections(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun collection_CreateIndex(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun collection_DeleteIndex(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun collection_GetIndexes(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun collection_Save(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun collection_GetCount(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun collection_DeleteDocument(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun collection_PurgeDocument(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun collection_GetDocument(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun collection_GetBlobContent(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun collection_SetDocumentExpiration(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun collection_GetDocumentExpiration(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
+        @Throws(JSONException::class)
+        fun collection_AddChangeListener(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun collection_RemoveChangeListener(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
+        @Throws(JSONException::class)
+        fun collection_AddDocumentChangeListener(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun collection_RemoveDocumentChangeListener(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun database_SetLogLevel(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun database_GetLogLevel(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun database_GetLogDomain(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun database_SetFileLoggingConfig(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun query_Execute(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun query_Explain(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
+        @Throws(JSONException::class)
+        fun query_AddChangeListener(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun query_RemoveChangeListener(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun replicator_Create(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun replicator_Start(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun replicator_Stop(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun replicator_ResetCheckpoint(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun replicator_GetStatus(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun replicator_GetPendingDocumentIds(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
+        @Throws(JSONException::class)
+        fun replicator_AddChangeListener(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun replicator_RemoveChangeListener(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
+        @Throws(JSONException::class)
+        fun replicator_AddDocumentChangeListenerr(call: PluginCall) {
+
+        }
+
+        @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+        @Throws(JSONException::class)
+        fun replicator_Cleanup(call: PluginCall) {
+
+        }
     }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun collection_DeleteCollections(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun collection_CreateIndex(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun collection_DeleteIndex(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun collection_GetIndexes(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun collection_Save(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun collection_GetCount(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun collection_DeleteDocument(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun collection_PurgeDocument(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun collection_GetDocument(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun collection_GetBlobContent(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun collection_SetDocumentExpiration(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun collection_GetDocumentExpiration(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
-    @Throws(JSONException::class)
-    fun collection_AddChangeListener(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun collection_RemoveChangeListener(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
-    @Throws(JSONException::class)
-    fun collection_AddDocumentChangeListener(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun collection_RemoveDocumentChangeListener(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun database_SetLogLevel(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun database_GetLogLevel(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun database_GetLogDomain(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun database_SetFileLoggingConfig(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun query_Execute(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun query_Explain(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
-    @Throws(JSONException::class)
-    fun query_AddChangeListener(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun query_RemoveChangeListener(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun replicator_Create(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun replicator_Start(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun replicator_Stop(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun replicator_ResetCheckpoint(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun replicator_GetStatus(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun replicator_GetPendingDocumentIds(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
-    @Throws(JSONException::class)
-    fun replicator_AddChangeListener(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun replicator_RemoveChangeListener(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
-    @Throws(JSONException::class)
-    fun replicator_AddDocumentChangeListenerr(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun replicator_Cleanup(call: PluginCall) {
-
-    }
-}

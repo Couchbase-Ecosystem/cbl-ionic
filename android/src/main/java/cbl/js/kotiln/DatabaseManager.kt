@@ -1,9 +1,8 @@
 package cbl.js.kotiln
 import android.content.Context
 import com.couchbase.lite.*
+import com.couchbase.lite.Collection
 
-import org.json.JSONArray
-import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
 typealias CBLCollection = com.couchbase.lite.Collection
@@ -105,7 +104,7 @@ object DatabaseManager {
         return db?.scopes ?: setOf()
     }
 
-    fun scope(databaseName: String, scopeName: String): Scope? {
+    fun getScope(databaseName: String, scopeName: String): Scope? {
         val db = getDatabase(databaseName)
         return db?.getScope(scopeName)
     }
@@ -127,6 +126,12 @@ object DatabaseManager {
                          databaseName: String) : CBLCollection? {
         val db = getDatabase(databaseName)
         return db?.getCollection(collectionName, scopeName)
+    }
+
+    fun getCollections(scopeName: String,
+                       databaseName: String): MutableSet<Collection>? {
+       val db = getDatabase(databaseName)
+       return db?.getCollections(scopeName)
     }
 
 
