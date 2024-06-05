@@ -13,12 +13,10 @@ object DatabaseManager {
     private val openDatabases: MutableMap<String, Database> = mutableMapOf()
 
     //change listeners
-    private val databaseChangeListener = mutableMapOf<String, ListenerToken>()
-
     private val defaultCollectionName: String = "_default"
     private val defaultScopeName: String = "_default"
 
-    private fun getDatabase(databaseName: String): Database? {
+    fun getDatabase(databaseName: String): Database? {
         synchronized(openDatabases){
             if (openDatabases.containsKey(databaseName)) {
                 return openDatabases[databaseName]!!
@@ -38,7 +36,10 @@ object DatabaseManager {
                 databaseConfig.directory = defaultDirectory
             }
             if (jsonConfig.has("encryptionKey")) {
-                databaseConfig.setEncryptionKey(EncryptionKey(jsonConfig.getString("encryptionKey")))
+                val encryptionKey = jsonConfig.getString("encryptionKey")
+                if (encryptionKey.isNotEmpty()) {
+                    databaseConfig.setEncryptionKey(EncryptionKey(encryptionKey))
+                }
             }
         }
         return databaseConfig
@@ -134,5 +135,11 @@ object DatabaseManager {
        return db?.getCollections(scopeName)
     }
 
+    fun deleteCollection(collectionName: String,
+                         scopeName: String,
+                         databaseName: String) {
+        val db = getDatabase(databaseName)
+        db?.deleteCollection(collectionName, scopeName)
+    }
 
 }
