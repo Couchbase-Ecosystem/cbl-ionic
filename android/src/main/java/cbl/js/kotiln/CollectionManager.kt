@@ -2,8 +2,11 @@ package cbl.js.kotiln
 
 import com.couchbase.lite.ConcurrencyControl
 import com.couchbase.lite.Document
+import com.couchbase.lite.Index
 import com.couchbase.lite.MutableDocument
+import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 
 object CollectionManager {
     private val defaultCollectionName: String = "_default"
@@ -128,9 +131,11 @@ object CollectionManager {
                               collectionName: String,
                               scopeName: String,
                               databaseName: String,
-                              expiration: Date?) {
+                              expiration: String) {
         val col = this.getCollection(collectionName, scopeName, databaseName)
-        col?.setDocumentExpiration(documentId, expiration)
+        val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        val expirationDate = format.parse(expiration)
+        col?.setDocumentExpiration(documentId, expirationDate)
     }
 
     fun getDocumentExpiration(documentId: String,
@@ -140,4 +145,29 @@ object CollectionManager {
         val col = this.getCollection(collectionName, scopeName, databaseName)
         return col?.getDocumentExpiration(documentId)
     }
+
+    fun createIndex(indexName: String,
+                    index: Index,
+                    collectionName: String,
+                    scopeName: String,
+                    databaseName: String) {
+        val col = this.getCollection(collectionName, scopeName, databaseName)
+        col?.createIndex(indexName, index)
+    }
+
+    fun deleteIndex(indexName: String,
+                    collectionName: String,
+                    scopeName: String,
+                    databaseName: String) {
+        val col = this.getCollection(collectionName, scopeName, databaseName)
+        col?.deleteIndex(indexName)
+    }
+
+    fun getIndexes(collectionName: String,
+                   scopeName: String,
+                   databaseName: String): Set<String>? {
+        val col = this.getCollection(collectionName, scopeName, databaseName)
+        return col?.getIndexes()
+    }
+
 }

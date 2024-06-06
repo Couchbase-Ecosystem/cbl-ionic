@@ -2,12 +2,10 @@
 
 package com.couchbase.ionic
 
-import cbl.js.kotiln.CollectionDao
 import cbl.js.kotiln.CollectionManager
 import cbl.js.kotiln.DatabaseManager
 import cbl.js.kotiln.FileSystemHelper
 import cbl.js.kotiln.LoggingManager
-import cbl.js.kotiln.ScopeDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -24,167 +22,21 @@ import kotlinx.coroutines.launch
 import org.json.JSONArray
 
 import org.json.JSONException
-import org.json.JSONObject
 
 @CapacitorPlugin(name = "CblIonicPlugin")
 @Suppress("FunctionName")
 class CblIonicPluginPlugin : Plugin() {
 
+    private val collectionChangeListeners: MutableMap<String, ListenerToken> = mutableMapOf()
+    private val collectionDocumentChangeListeners: MutableMap<String, ListenerToken> =
+        mutableMapOf()
+    private val queryChangeListeners: MutableMap<String, ListenerToken> = mutableMapOf()
+    private val replicationChangeListeners: MutableMap<String, ListenerToken> = mutableMapOf()
+
     override fun load() {
         CouchbaseLite.init(bridge.context)
     }
 
-    /**
-     * getStringFromCall - used to get a string value from a call JSON object
-     * passed in from Ionic
-     *
-     * @param call PluginCall object from Ionic
-     * @param varName string value of the value to get out of the call object
-     * @return Pair<String?, Boolean> A pair of the string value and
-     * a boolean indicating if there is an error or not - if true then
-     * error, if false, no error
-     */
-    private fun getStringFromCall(call: PluginCall, varName: String): Pair<String?, Boolean> {
-        val value: String? = call.getString(varName)
-        if (value.isNullOrEmpty()) {
-            call.reject("Error: No $varName provided in call")
-            return Pair(null, true)
-        }
-        return Pair(value, false)
-    }
-
-    /**
-     * getIntFromCall - used to get a int value from a call JSON object
-     * passed in from Ionic
-     *
-     * @param call PluginCall object from Ionic
-     * @param varName int value of the value to get out of the call object
-     * @return Pair<Int?, Boolean> A pair of the int value and
-     * a boolean indicating if there is an error or not - if true then
-     * error, if false, no error
-     */
-    private fun getIntFromCall(call: PluginCall, varName: String): Pair<Int?, Boolean> {
-        val value: Int? = call.getInt(varName)
-        if (value == null) {
-            call.reject("Error: No $varName provided in call")
-            return Pair(null, true)
-        }
-        return Pair(value, false)
-    }
-
-    private fun getCollectionDaoFromCall(call: PluginCall): CollectionDao? {
-        var isError = false
-        val (databaseName, isDatabaseNameError) = getStringFromCall(call, "name")
-        val (collectionName, isCollectionNameError) = getStringFromCall(call, "collectionName")
-        val (scopeName, isScopeNameError) = getStringFromCall(call, "scopeName")
-        if (isDatabaseNameError || isCollectionNameError || isScopeNameError) {
-            isError = true
-        }
-        collectionName?.let { colName ->
-            scopeName?.let { scpName ->
-                databaseName?.let { dbName ->
-                    return CollectionDao(colName, scpName, dbName, isError)
-                }
-            }
-        }
-        return null
-    }
-
-    private fun getScopeDaoFromCall(call: PluginCall): ScopeDao? {
-        var isError = false
-        val (databaseName, isDatabaseNameError) = getStringFromCall(call, "name")
-        val (scopeName, isScopeNameError) = getStringFromCall(call, "scopeName")
-        if (isDatabaseNameError || isScopeNameError) {
-            isError = true
-        }
-        scopeName?.let { scpName ->
-            databaseName?.let { dbName ->
-                return ScopeDao(scpName, dbName, isError)
-            }
-        }
-        return null
-    }
-
-    private fun getConcurrencyControlFromInt(concurrencyControlValue: Int)
-    : ConcurrencyControl {
-        return when (concurrencyControlValue) {
-            0 -> ConcurrencyControl.LAST_WRITE_WINS
-            1 -> ConcurrencyControl.FAIL_ON_CONFLICT
-            else -> ConcurrencyControl.LAST_WRITE_WINS
-        }
-    }
-
-    @Throws(JSONException::class)
-    private fun toMap(jsonObject: JSONObject): Map<String, Any?> {
-        val items: MutableMap<String, Any?> = HashMap()
-        val keys = jsonObject.keys()
-        while (keys.hasNext()) {
-            val key = keys.next()
-            val value = jsonObject[key]
-            if (value is JSONObject) {
-                val type = value.optString("_type")
-                // Handle blobs
-                if (type == "blob") {
-                    val blobData = value.getJSONObject("data")
-                    val contentType = blobData.getString("contentType")
-                    val byteData = blobData.getJSONArray("data")
-                    val data = ByteArray(byteData.length())
-                    for (i in 0 until byteData.length()) {
-                        data[i] = (byteData[i] as Int).toByte()
-                    }
-                    items[key] = Blob(contentType, data)
-                } else {
-                    val d = MutableDictionary(toMap(value))
-                    items[key] = d
-                }
-            } else if (value is JSONArray) {
-                val mutArray = MutableArray()
-                for (i in 0 until value.length()) {
-                    when (val objValue = value[i]) {
-                        null -> {
-                            mutArray.addValue(null)
-                        }
-                        is JSONObject -> {
-                            val dict = MutableDictionary(toMap(objValue))
-                            mutArray.addDictionary(dict)
-                        }
-
-                        else -> {
-                            mutArray.addValue(objValue)
-                        }
-                    }
-                }
-                items[key] = mutArray
-            } else {
-                items[key] = jsonObject[key]
-            }
-        }
-        return items
-    }
-
-    private fun documentToMap(document: Document): JSObject? {
-        try {
-            val docJson = JSONObject(document.toMap())
-            val keys: Iterator<*> = docJson.keys()
-            while (keys.hasNext()) {
-                val key = keys.next() as String
-                val value = docJson[key]
-                if (value is Blob) {
-                    val blobProps = JSONObject(value.getProperties())
-                    docJson.put(key, blobProps)
-                } else {
-                    docJson.put(key, value)
-                }
-            }
-            val docMap = JSObject()
-            docMap.put("_data", docJson)
-            docMap.put("_id", document.id)
-            docMap.put("_sequence", document.sequence)
-            return docMap
-        } catch (ex: Exception) {
-            return null
-        }
-    }
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class, CouchbaseLiteException::class)
@@ -209,7 +61,7 @@ class CblIonicPluginPlugin : Plugin() {
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     fun database_Open(call: PluginCall) {
-        val (name, isError) = getStringFromCall(call, "name")
+        val (name, isError) = PluginHelper.getStringFromCall(call, "name")
         if (isError) {
             return
         }
@@ -239,8 +91,8 @@ class CblIonicPluginPlugin : Plugin() {
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun database_Exists(call: PluginCall) {
-        val (name, isNameError) = getStringFromCall(call, "existsName")
-        val (path, isPathError) = getStringFromCall(call, "directory")
+        val (name, isNameError) = PluginHelper.getStringFromCall(call, "existsName")
+        val (path, isPathError) = PluginHelper.getStringFromCall(call, "directory")
         if (isNameError || isPathError) {
             return
         }
@@ -263,7 +115,7 @@ class CblIonicPluginPlugin : Plugin() {
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     fun database_Close(call: PluginCall) {
-        val (name, isError) = getStringFromCall(call, "name")
+        val (name, isError) = PluginHelper.getStringFromCall(call, "name")
         if (isError) {
             return
         }
@@ -287,7 +139,7 @@ class CblIonicPluginPlugin : Plugin() {
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     fun database_Delete(call: PluginCall) {
-        val (name, isError) = getStringFromCall(call, "name")
+        val (name, isError) = PluginHelper.getStringFromCall(call, "name")
         if (isError) {
             return
         }
@@ -311,7 +163,7 @@ class CblIonicPluginPlugin : Plugin() {
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     fun database_GetPath(call: PluginCall) {
-        val (name, isError) = getStringFromCall(call, "name")
+        val (name, isError) = PluginHelper.getStringFromCall(call, "name")
         if (isError) {
             return
         }
@@ -341,8 +193,8 @@ class CblIonicPluginPlugin : Plugin() {
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     fun database_Copy(call: PluginCall) {
-        val (newName, isNewNameError) = getStringFromCall(call, "newName")
-        val (path, isPathError) = getStringFromCall(call, "path")
+        val (newName, isNewNameError) = PluginHelper.getStringFromCall(call, "newName")
+        val (path, isPathError) = PluginHelper.getStringFromCall(call, "path")
         if (isNewNameError || isPathError) {
             return
         }
@@ -375,8 +227,8 @@ class CblIonicPluginPlugin : Plugin() {
     fun database_PerformMaintenance(call: PluginCall) {
         GlobalScope.launch {
             withContext(Dispatchers.IO) {
-                val (name, isNameError) = getStringFromCall(call, "name")
-                val (maintenanceTypeInt, isMaintenanceTypeError) = getIntFromCall(
+                val (name, isNameError) = PluginHelper.getStringFromCall(call, "name")
+                val (maintenanceTypeInt, isMaintenanceTypeError) = PluginHelper.getIntFromCall(
                     call,
                     "maintenanceType"
                 )
@@ -415,8 +267,8 @@ class CblIonicPluginPlugin : Plugin() {
     fun database_SetLogLevel(call: PluginCall) {
         GlobalScope.launch {
             withContext(Dispatchers.IO) {
-                val (domain, isDomainError) = getStringFromCall(call, "domain")
-                val (levelInt, isLevelError) = getIntFromCall(
+                val (domain, isDomainError) = PluginHelper.getStringFromCall(call, "domain")
+                val (levelInt, isLevelError) = PluginHelper.getIntFromCall(
                     call,
                     "logLevel"
                 )
@@ -441,7 +293,7 @@ class CblIonicPluginPlugin : Plugin() {
                     }
                 }
             }
-       }
+        }
     }
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
@@ -458,7 +310,7 @@ class CblIonicPluginPlugin : Plugin() {
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     fun scope_GetDefault(call: PluginCall) {
-        val (name, isNameError) = getStringFromCall(call, "name")
+        val (name, isNameError) = PluginHelper.getStringFromCall(call, "name")
         if (isNameError) {
             return
         }
@@ -491,7 +343,7 @@ class CblIonicPluginPlugin : Plugin() {
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun scope_GetScopes(call: PluginCall) {
-        val (name, isNameError) = getStringFromCall(call, "name")
+        val (name, isNameError) = PluginHelper.getStringFromCall(call, "name")
         if (isNameError) {
             return
         }
@@ -528,7 +380,7 @@ class CblIonicPluginPlugin : Plugin() {
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun scope_GetScope(call: PluginCall) {
-        val scopeDao = getScopeDaoFromCall(call)
+        val scopeDao = PluginHelper.getScopeDtoFromCall(call)
         if (scopeDao == null || scopeDao.isError) {
             return
         }
@@ -559,7 +411,7 @@ class CblIonicPluginPlugin : Plugin() {
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun collection_CreateCollection(call: PluginCall) {
-        val collectionDao = getCollectionDaoFromCall(call)
+        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
         if (collectionDao == null || collectionDao.isError) {
             return
         }
@@ -597,7 +449,7 @@ class CblIonicPluginPlugin : Plugin() {
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun collection_GetDefault(call: PluginCall) {
-        val (name, isNameError) = getStringFromCall(call, "name")
+        val (name, isNameError) = PluginHelper.getStringFromCall(call, "name")
         if (isNameError) {
             return
         }
@@ -633,7 +485,7 @@ class CblIonicPluginPlugin : Plugin() {
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     fun collection_GetCollections(call: PluginCall) {
-        val scopeDao = getScopeDaoFromCall(call)
+        val scopeDao = PluginHelper.getScopeDtoFromCall(call)
         if (scopeDao == null || scopeDao.isError) {
             return
         }
@@ -671,7 +523,7 @@ class CblIonicPluginPlugin : Plugin() {
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     fun collection_GetCollection(call: PluginCall) {
-        val collectionDao = getCollectionDaoFromCall(call)
+        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
         if (collectionDao == null || collectionDao.isError) {
             return
         }
@@ -709,7 +561,7 @@ class CblIonicPluginPlugin : Plugin() {
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun collection_DeleteCollection(call: PluginCall) {
-        val collectionDao = getCollectionDaoFromCall(call)
+        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
         if (collectionDao == null || collectionDao.isError) {
             return
         }
@@ -735,12 +587,12 @@ class CblIonicPluginPlugin : Plugin() {
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     fun collection_Save(call: PluginCall) {
-        var docConcurrencyControl : ConcurrencyControl? = null
-        val collectionDao = getCollectionDaoFromCall(call)
+        var docConcurrencyControl: ConcurrencyControl? = null
+        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
         if (collectionDao == null || collectionDao.isError) {
             return
         }
-        val (documentId, isError) = getStringFromCall(call, "id")
+        val (documentId, isError) = PluginHelper.getStringFromCall(call, "id")
         val docId: String = if (isError || documentId.isNullOrEmpty()) {
             ""
         } else {
@@ -751,11 +603,11 @@ class CblIonicPluginPlugin : Plugin() {
                 try {
                     val concurrencyControlValue = call.getInt("concurrencyControl")
                     concurrencyControlValue?.let {
-                        docConcurrencyControl = getConcurrencyControlFromInt(it)
+                        docConcurrencyControl = PluginHelper.getConcurrencyControlFromInt(it)
                     }
                     val document = call.getObject("document")
                     document?.let {
-                        val documentMap = toMap(document)
+                        val documentMap = PluginHelper.toMap(document)
                         val (resultDocId, concurrencyResult) = CollectionManager.saveDocument(
                             docId,
                             documentMap,
@@ -786,7 +638,7 @@ class CblIonicPluginPlugin : Plugin() {
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun collection_GetCount(call: PluginCall) {
-        val collectionDao = getCollectionDaoFromCall(call)
+        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
         if (collectionDao == null || collectionDao.isError) {
             return
         }
@@ -814,11 +666,11 @@ class CblIonicPluginPlugin : Plugin() {
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     fun collection_GetDocument(call: PluginCall) {
-        val collectionDao = getCollectionDaoFromCall(call)
+        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
         if (collectionDao == null || collectionDao.isError) {
             return
         }
-        val (documentId, isError) = getStringFromCall(call, "docId")
+        val (documentId, isError) = PluginHelper.getStringFromCall(call, "docId")
         if (isError || documentId.isNullOrEmpty()) {
             return
         }
@@ -832,7 +684,7 @@ class CblIonicPluginPlugin : Plugin() {
                         collectionDao.databaseName
                     )
                     document?.let {
-                        val results = documentToMap(it)
+                        val results = PluginHelper.documentToMap(it)
                         return@withContext withContext(Dispatchers.Main) {
                             if (results == null) {
                                 call.reject("Error mapping document data")
@@ -854,15 +706,33 @@ class CblIonicPluginPlugin : Plugin() {
         }
     }
 
+    /**
+     * collection_DeleteDocument - used to delete a document from the collection
+     *
+     * requires the following key/value pairs in the PluginCall:
+     *
+     * docId - the document id
+     *
+     * concurrencyControl - value of the concurrency control enum
+     *
+     * name - name of the database
+     *
+     * collectionName - name of the collection
+     *
+     * scopeName - name of the scope
+     *
+     * @param call PluginCall object from Ionic
+     * @return concurrency results if used if successful, error message if not
+     */
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun collection_DeleteDocument(call: PluginCall) {
-        var docConcurrencyControl : ConcurrencyControl? = null
-        val collectionDao = getCollectionDaoFromCall(call)
+        var docConcurrencyControl: ConcurrencyControl? = null
+        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
         if (collectionDao == null || collectionDao.isError) {
             return
         }
-        val (documentId, isError) = getStringFromCall(call, "docId")
+        val (documentId, isError) = PluginHelper.getStringFromCall(call, "docId")
         if (isError || documentId.isNullOrEmpty()) {
             return
         }
@@ -872,15 +742,16 @@ class CblIonicPluginPlugin : Plugin() {
                     var result: Boolean? = null
                     val concurrencyControlValue = call.getInt("concurrencyControl")
                     if (concurrencyControlValue != null) {
-                            docConcurrencyControl = getConcurrencyControlFromInt(concurrencyControlValue)
-                            docConcurrencyControl?.let { conControl ->
-                                result = CollectionManager.deleteDocument(
-                                    documentId,
-                                    collectionDao.collectionName,
-                                    collectionDao.scopeName,
-                                    collectionDao.databaseName,
-                                    conControl
-                                )
+                        docConcurrencyControl =
+                            PluginHelper.getConcurrencyControlFromInt(concurrencyControlValue)
+                        docConcurrencyControl?.let { conControl ->
+                            result = CollectionManager.deleteDocument(
+                                documentId,
+                                collectionDao.collectionName,
+                                collectionDao.scopeName,
+                                collectionDao.databaseName,
+                                conControl
+                            )
 
                         }
                     } else {
@@ -906,34 +777,447 @@ class CblIonicPluginPlugin : Plugin() {
         }
     }
 
+    /**
+     * collection_PurgeDocument - used to purge a document from the collection
+     *
+     * requires the following key/value pairs in the PluginCall:
+     *
+     * docId - the document id
+     *
+     * name - name of the database
+     *
+     * collectionName - name of the collection
+     *
+     * scopeName - name of the scope
+     *
+     * @param call PluginCall object from Ionic
+     * @return nothing if successful, error message if not
+     */
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun collection_PurgeDocument(call: PluginCall) {
-
+        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
+        if (collectionDao == null || collectionDao.isError) {
+            return
+        }
+        val (documentId, isError) = PluginHelper.getStringFromCall(call, "docId")
+        if (isError || documentId.isNullOrEmpty()) {
+            return
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    CollectionManager.purgeDocument(
+                        documentId,
+                        collectionDao.collectionName,
+                        collectionDao.scopeName,
+                        collectionDao.databaseName
+                    )
+                    return@withContext withContext(Dispatchers.Main) {
+                        call.resolve()
+                    }
+                } catch (e: Exception) {
+                    return@withContext withContext(Dispatchers.Main) {
+                        call.reject("${e.message}")
+                    }
+                }
+            }
+        }
     }
 
+    /**
+     * collection_GetBlobContent - used to get blob content in an document
+     *
+     * requires the following key/value pairs in the PluginCall:
+     *
+     * documentId - the document id
+     *
+     * key - the key that the blob is stored under in the document
+     *
+     * name - name of the database
+     *
+     * collectionName - name of the collection
+     *
+     * scopeName - name of the scope
+     *
+     * @param call PluginCall object from Ionic
+     * @return nothing if successful, error message if not
+     */
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun collection_GetBlobContent(call: PluginCall) {
-
+        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
+        if (collectionDao == null || collectionDao.isError) {
+            return
+        }
+        val (key, isKeyError) = PluginHelper.getStringFromCall(call, "key")
+        if (isKeyError || key.isNullOrEmpty()) {
+            return
+        }
+        val (documentId, isDocumentIdError) = PluginHelper.getStringFromCall(call, "documentId")
+        if (isDocumentIdError || documentId.isNullOrEmpty()) {
+            return
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    val blobData = CollectionManager.getBlobContent(
+                        key,
+                        documentId,
+                        collectionDao.collectionName,
+                        collectionDao.scopeName,
+                        collectionDao.databaseName
+                    )
+                    return@withContext withContext(Dispatchers.Main) {
+                        val results = JSObject()
+                        if (blobData == null) {
+                            results.put("data", emptyArray<Byte>())
+                        } else {
+                            results.put("data", blobData)
+                        }
+                        call.resolve(results)
+                    }
+                } catch (e: Exception) {
+                    return@withContext withContext(Dispatchers.Main) {
+                        call.reject("${e.message}")
+                    }
+                }
+            }
+        }
     }
 
+    /**
+     * collection_SetDocumentExpiration - used to set the document expiration
+     * passed in from Ionic
+     *
+     * requires the following key/value pairs in the PluginCall:
+     *
+     * docId - the document id
+     *
+     * expiration - the expiration date to set on the document - must
+     * be in a string in the format `yyyy-MM-dd HH:mm:ss`
+     *
+     * name - name of the database
+     *
+     * collectionName - name of the collection
+     *
+     * scopeName - name of the scope
+     *
+     * @param call PluginCall object from Ionic
+     * @return nothing if successful, error message if not
+     */
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun collection_SetDocumentExpiration(call: PluginCall) {
+        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
+        if (collectionDao == null || collectionDao.isError) {
+            return
+        }
+        val (expiration, isExpirationError) = PluginHelper.getStringFromCall(call, "expiration")
+        if (isExpirationError || expiration.isNullOrEmpty()) {
+            return
+        }
+        val (documentId, isDocumentIdError) = PluginHelper.getStringFromCall(call, "docId")
+        if (isDocumentIdError || documentId.isNullOrEmpty()) {
+            return
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    CollectionManager.setDocumentExpiration(
+                        documentId,
+                        expiration,
+                        collectionDao.collectionName,
+                        collectionDao.scopeName,
+                        collectionDao.databaseName
+                    )
+                    return@withContext withContext(Dispatchers.Main) {
+                        call.resolve()
+                    }
+                } catch (e: Exception) {
+                    return@withContext withContext(Dispatchers.Main) {
+                        call.reject("${e.message}")
+                    }
+                }
+            }
+        }
+    }
 
+    /**
+     * collection_GetDocumentExpiration - used to get the document expiration
+     * date
+     *
+     * requires the following key/value pairs in the PluginCall:
+     *
+     * docId - the document id to set the expiration on
+     *
+     * name - name of the database
+     *
+     * collectionName - name of the collection
+     *
+     * scopeName - name of the scope
+     *
+     * @param call PluginCall object from Ionic
+     * @return date of expiration if successful, error message if not
+     */
+    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+    fun collection_GetDocumentExpiration(call: PluginCall) {
+        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
+        if (collectionDao == null || collectionDao.isError) {
+            return
+        }
+        val (documentId, isDocumentIdError) = PluginHelper.getStringFromCall(call, "docId")
+        if (isDocumentIdError || documentId.isNullOrEmpty()) {
+            return
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    val expiration = CollectionManager.getDocumentExpiration(
+                        documentId,
+                        collectionDao.collectionName,
+                        collectionDao.scopeName,
+                        collectionDao.databaseName
+                    )
+                    return@withContext withContext(Dispatchers.Main) {
+                        val results = JSObject()
+                        results.put("date", expiration)
+                        call.resolve(results)
+                    }
+                } catch (e: Exception) {
+                    return@withContext withContext(Dispatchers.Main) {
+                        call.reject("${e.message}")
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * collection_CreateIndex - used to create an index in the collection
+     * date
+     *
+     * requires the following key/value pairs in the PluginCall:
+     *
+     * indexName - string name of the index
+     *
+     * type - string name of the type, options must be: "value" or "full-text"
+     *
+     * index - dictionary of the index items
+     *
+     * name - name of the database
+     *
+     * collectionName - name of the collection
+     *
+     * scopeName - name of the scope
+     *
+     * @param call PluginCall object from Ionic
+     * @return date of expiration if successful, error message if not
+     */
+    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+    fun collection_CreateIndex(call: PluginCall) {
+        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
+        if (collectionDao == null || collectionDao.isError) {
+            return
+        }
+        val indexDto = PluginHelper.getIndexDtoFromCall(call)
+        if (indexDto == null || indexDto.isError) {
+            return
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    indexDto.indexType?.let { type ->
+                        indexDto.indexName?.let { name ->
+                            indexDto.indexItems?.let { items ->
+                                var index: Index? = null
+                                if (type == "value") {
+                                    val indexes = PluginHelper.makeValueIndexItems(items)
+                                    index = IndexBuilder.valueIndex(*indexes)
+                                } else if (type == "full-text") {
+                                    val indexes = PluginHelper.makeFullTextIndexItems(items)
+                                    index = IndexBuilder.fullTextIndex(*indexes)
+                                }
+                                index?.let { idx ->
+                                    CollectionManager.createIndex(
+                                        name,
+                                        idx,
+                                        collectionDao.collectionName,
+                                        collectionDao.scopeName,
+                                        collectionDao.databaseName
+                                    )
+                                    return@withContext withContext(Dispatchers.Main) {
+                                        call.resolve()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    return@withContext withContext(Dispatchers.Main) {
+                        call.reject("Error: No index type, name, data, or items provided - could not create index")
+                    }
+
+                } catch (e: Exception) {
+                    return@withContext withContext(Dispatchers.Main) {
+                        call.reject("${e.message}")
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * collection_DeleteIndex - used to delete an index in the collection
+     * date
+     *
+     * requires the following key/value pairs in the PluginCall:
+     *
+     * indexName - string name of the index
+     *
+     * name - name of the database
+     *
+     * collectionName - name of the collection
+     *
+     * scopeName - name of the scope
+     *
+     * @param call PluginCall object from Ionic
+     * @return date of expiration if successful, error message if not
+     */
+    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+    @Throws(JSONException::class)
+    fun collection_DeleteIndex(call: PluginCall) {
+        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
+        if (collectionDao == null || collectionDao.isError) {
+            return
+        }
+        val (indexName, isIndexNameError) = PluginHelper.getStringFromCall(call, "indexName")
+        if (isIndexNameError || indexName.isNullOrEmpty()) {
+            return
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    CollectionManager.deleteIndex(
+                        indexName,
+                        collectionDao.collectionName,
+                        collectionDao.scopeName,
+                        collectionDao.databaseName
+                    )
+                    return@withContext withContext(Dispatchers.Main) {
+                        call.resolve()
+                    }
+                } catch (e: Exception) {
+                    return@withContext withContext(Dispatchers.Main) {
+                        call.reject("${e.message}")
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * collection_GetIndexes - used to get an array (string) of indexes
+     * in the collection
+     *
+     * requires the following key/value pairs in the PluginCall:
+     *
+     * name - name of the database
+     *
+     * collectionName - name of the collection
+     *
+     * scopeName - name of the scope
+     *
+     * @param call PluginCall object from Ionic
+     * @return date of expiration if successful, error message if not
+     */
+    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+    @Throws(JSONException::class)
+    fun collection_GetIndexes(call: PluginCall) {
+        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
+        if (collectionDao == null || collectionDao.isError) {
+            return
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    val indexes = CollectionManager.getIndexes(
+                        collectionDao.collectionName,
+                        collectionDao.scopeName,
+                        collectionDao.databaseName
+                    )
+                    val results = JSObject()
+                    val arrayResults = JSArray(indexes)
+                    results.put("indexes", arrayResults)
+                    call.resolve(results)
+                } catch (e: Exception) {
+                    call.reject("${e.message}")
+                }
+            }
+        }
     }
 
     @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
     @Throws(JSONException::class)
     fun collection_AddChangeListener(call: PluginCall) {
-
+        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
+        if (collectionDao == null || collectionDao.isError) {
+            return
+        }
+        val (strToken, isTokenError) = PluginHelper.getStringFromCall(call, "changeListenerToken")
+        if (isTokenError || strToken.isNullOrEmpty()) {
+            return
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    val col = DatabaseManager.getCollection(
+                        collectionDao.collectionName,
+                        collectionDao.scopeName,
+                        collectionDao.databaseName
+                    )
+                    call.setKeepAlive(true)
+                    withContext(Dispatchers.Main) {
+                        col?.let { collection ->
+                            val listenerToken = collection.addChangeListener { change ->
+                                val results = JSObject()
+                                results.put("documentIDs", JSONArray(change.documentIDs))
+                                call.resolve(results)
+                            }
+                            collectionChangeListeners.put(strToken, listenerToken)
+                        }
+                    }
+                } catch (e: Exception) {
+                    call.reject("${e.message}")
+                }
+            }
+        }
     }
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun collection_RemoveChangeListener(call: PluginCall) {
-
+        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
+        if (collectionDao == null || collectionDao.isError) {
+            return
+        }
+        val (strToken, isTokenError) = PluginHelper.getStringFromCall(call, "changeListenerToken")
+        if (isTokenError || strToken.isNullOrEmpty()) {
+            return
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    val token = collectionChangeListeners[strToken]
+                    token?.remove()
+                    collectionChangeListeners.remove(strToken)
+                    return@withContext withContext(Dispatchers.Main) {
+                        call.resolve()
+                    }
+                } catch (e: Exception) {
+                    call.reject("${e.message}")
+                }
+            }
+        }
     }
 
     @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
@@ -947,28 +1231,6 @@ class CblIonicPluginPlugin : Plugin() {
     fun collection_RemoveDocumentChangeListener(call: PluginCall) {
 
     }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun collection_CreateIndex(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun collection_DeleteIndex(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun collection_GetIndexes(call: PluginCall) {
-
-    }
-
-
-
-
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)

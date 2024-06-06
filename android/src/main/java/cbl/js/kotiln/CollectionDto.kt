@@ -1,6 +1,6 @@
 package cbl.js.kotiln
 
-data class CollectionDao(
+data class CollectionDto(
     val collectionName: String,
     val scopeName: String,
     val databaseName: String,
