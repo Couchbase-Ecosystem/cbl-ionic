@@ -380,18 +380,18 @@ class CblIonicPluginPlugin : Plugin() {
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun scope_GetScope(call: PluginCall) {
-        val scopeDao = PluginHelper.getScopeDtoFromCall(call)
-        if (scopeDao == null || scopeDao.isError) {
+        val scopeDto = PluginHelper.getScopeDtoFromCall(call)
+        if (scopeDto == null || scopeDto.isError) {
             return
         }
         GlobalScope.launch {
             withContext(Dispatchers.IO) {
                 try {
-                    val scope = DatabaseManager.getScope(scopeDao.databaseName, scopeDao.scopeName)
+                    val scope = DatabaseManager.getScope(scopeDto.databaseName, scopeDto.scopeName)
                     scope?.let {
                         val results = JSObject()
                         results.put("name", scope.name)
-                        results.put("databaseName", scopeDao.databaseName)
+                        results.put("databaseName", scopeDto.databaseName)
                         return@withContext withContext(Dispatchers.Main) {
                             call.resolve(results)
                         }
@@ -411,24 +411,24 @@ class CblIonicPluginPlugin : Plugin() {
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun collection_CreateCollection(call: PluginCall) {
-        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
-        if (collectionDao == null || collectionDao.isError) {
+        val collectionDto = PluginHelper.getCollectionDtoFromCall(call)
+        if (collectionDto == null || collectionDto.isError) {
             return
         }
         GlobalScope.launch {
             withContext(Dispatchers.IO) {
                 try {
                     val collection = DatabaseManager.createCollection(
-                        collectionDao.collectionName,
-                        collectionDao.scopeName,
-                        collectionDao.databaseName
+                        collectionDto.collectionName,
+                        collectionDto.scopeName,
+                        collectionDto.databaseName
                     )
                     collection?.let { col ->
                         val colResult = JSObject()
                         val scopeResult = JSObject()
                         colResult.put("name", col.name)
                         scopeResult.put("name", col.scope.name)
-                        scopeResult.put("databaseName", collectionDao.databaseName)
+                        scopeResult.put("databaseName", collectionDto.databaseName)
                         colResult.put("scope", scopeResult)
                         return@withContext withContext(Dispatchers.Main) {
                             call.resolve(colResult)
@@ -485,8 +485,8 @@ class CblIonicPluginPlugin : Plugin() {
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     fun collection_GetCollections(call: PluginCall) {
-        val scopeDao = PluginHelper.getScopeDtoFromCall(call)
-        if (scopeDao == null || scopeDao.isError) {
+        val scopeDto = PluginHelper.getScopeDtoFromCall(call)
+        if (scopeDto == null || scopeDto.isError) {
             return
         }
         GlobalScope.launch {
@@ -495,14 +495,14 @@ class CblIonicPluginPlugin : Plugin() {
                     val results = JSObject()
                     val collectionArray = JSArray()
                     val collections =
-                        DatabaseManager.getCollections(scopeDao.scopeName, scopeDao.databaseName)
+                        DatabaseManager.getCollections(scopeDto.scopeName, scopeDto.databaseName)
                     collections?.let { cols ->
                         for (collection in cols) {
                             val collectionObject = JSObject()
                             collectionObject.put("name", collection.name)
                             val scopeObject = JSObject()
                             scopeObject.put("name", collection.scope.name)
-                            scopeObject.put("databaseName", scopeDao.databaseName)
+                            scopeObject.put("databaseName", scopeDto.databaseName)
                             collectionObject.put("scope", scopeObject)
                             collectionArray.put(collectionObject)
                             results.put("collections", collectionArray)
@@ -523,24 +523,24 @@ class CblIonicPluginPlugin : Plugin() {
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     fun collection_GetCollection(call: PluginCall) {
-        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
-        if (collectionDao == null || collectionDao.isError) {
+        val collectionDto = PluginHelper.getCollectionDtoFromCall(call)
+        if (collectionDto == null || collectionDto.isError) {
             return
         }
         GlobalScope.launch {
             withContext(Dispatchers.IO) {
                 try {
                     val collection = DatabaseManager.getCollection(
-                        collectionDao.collectionName,
-                        collectionDao.scopeName,
-                        collectionDao.databaseName
+                        collectionDto.collectionName,
+                        collectionDto.scopeName,
+                        collectionDto.databaseName
                     )
                     collection?.let { col ->
                         val colResult = JSObject()
                         val scopeResult = JSObject()
                         colResult.put("name", col.name)
                         scopeResult.put("name", col.scope.name)
-                        scopeResult.put("databaseName", collectionDao.databaseName)
+                        scopeResult.put("databaseName", collectionDto.databaseName)
                         colResult.put("scope", scopeResult)
                         return@withContext withContext(Dispatchers.Main) {
                             call.resolve(colResult)
@@ -561,17 +561,17 @@ class CblIonicPluginPlugin : Plugin() {
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun collection_DeleteCollection(call: PluginCall) {
-        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
-        if (collectionDao == null || collectionDao.isError) {
+        val collectionDto = PluginHelper.getCollectionDtoFromCall(call)
+        if (collectionDto == null || collectionDto.isError) {
             return
         }
         GlobalScope.launch {
             withContext(Dispatchers.IO) {
                 try {
                     DatabaseManager.deleteCollection(
-                        collectionDao.collectionName,
-                        collectionDao.scopeName,
-                        collectionDao.databaseName
+                        collectionDto.collectionName,
+                        collectionDto.scopeName,
+                        collectionDto.databaseName
                     )
                     return@withContext withContext(Dispatchers.Main) {
                         call.resolve()
@@ -588,8 +588,8 @@ class CblIonicPluginPlugin : Plugin() {
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     fun collection_Save(call: PluginCall) {
         var docConcurrencyControl: ConcurrencyControl? = null
-        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
-        if (collectionDao == null || collectionDao.isError) {
+        val collectionDto = PluginHelper.getCollectionDtoFromCall(call)
+        if (collectionDto == null || collectionDto.isError) {
             return
         }
         val (documentId, isError) = PluginHelper.getStringFromCall(call, "id")
@@ -612,9 +612,9 @@ class CblIonicPluginPlugin : Plugin() {
                             docId,
                             documentMap,
                             docConcurrencyControl,
-                            collectionDao.collectionName,
-                            collectionDao.scopeName,
-                            collectionDao.databaseName
+                            collectionDto.collectionName,
+                            collectionDto.scopeName,
+                            collectionDto.databaseName
                         )
                         val results = JSObject()
                         results.put("_id", resultDocId)
@@ -638,17 +638,17 @@ class CblIonicPluginPlugin : Plugin() {
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun collection_GetCount(call: PluginCall) {
-        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
-        if (collectionDao == null || collectionDao.isError) {
+        val collectionDto = PluginHelper.getCollectionDtoFromCall(call)
+        if (collectionDto == null || collectionDto.isError) {
             return
         }
         GlobalScope.launch {
             withContext(Dispatchers.IO) {
                 try {
                     val count = CollectionManager.documentsCount(
-                        collectionDao.collectionName,
-                        collectionDao.scopeName,
-                        collectionDao.databaseName
+                        collectionDto.collectionName,
+                        collectionDto.scopeName,
+                        collectionDto.databaseName
                     )
                     val results = JSObject()
                     results.put("count", count)
@@ -666,8 +666,8 @@ class CblIonicPluginPlugin : Plugin() {
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     fun collection_GetDocument(call: PluginCall) {
-        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
-        if (collectionDao == null || collectionDao.isError) {
+        val collectionDto = PluginHelper.getCollectionDtoFromCall(call)
+        if (collectionDto == null || collectionDto.isError) {
             return
         }
         val (documentId, isError) = PluginHelper.getStringFromCall(call, "docId")
@@ -679,9 +679,9 @@ class CblIonicPluginPlugin : Plugin() {
                 try {
                     val document = CollectionManager.getDocument(
                         documentId,
-                        collectionDao.collectionName,
-                        collectionDao.scopeName,
-                        collectionDao.databaseName
+                        collectionDto.collectionName,
+                        collectionDto.scopeName,
+                        collectionDto.databaseName
                     )
                     document?.let {
                         val results = PluginHelper.documentToMap(it)
@@ -728,8 +728,8 @@ class CblIonicPluginPlugin : Plugin() {
     @Throws(JSONException::class)
     fun collection_DeleteDocument(call: PluginCall) {
         var docConcurrencyControl: ConcurrencyControl? = null
-        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
-        if (collectionDao == null || collectionDao.isError) {
+        val collectionDto = PluginHelper.getCollectionDtoFromCall(call)
+        if (collectionDto == null || collectionDto.isError) {
             return
         }
         val (documentId, isError) = PluginHelper.getStringFromCall(call, "docId")
@@ -747,9 +747,9 @@ class CblIonicPluginPlugin : Plugin() {
                         docConcurrencyControl?.let { conControl ->
                             result = CollectionManager.deleteDocument(
                                 documentId,
-                                collectionDao.collectionName,
-                                collectionDao.scopeName,
-                                collectionDao.databaseName,
+                                collectionDto.collectionName,
+                                collectionDto.scopeName,
+                                collectionDto.databaseName,
                                 conControl
                             )
 
@@ -757,9 +757,9 @@ class CblIonicPluginPlugin : Plugin() {
                     } else {
                         result = CollectionManager.deleteDocument(
                             documentId,
-                            collectionDao.collectionName,
-                            collectionDao.scopeName,
-                            collectionDao.databaseName
+                            collectionDto.collectionName,
+                            collectionDto.scopeName,
+                            collectionDto.databaseName
                         )
                     }
                     return@withContext withContext(Dispatchers.Main) {
@@ -796,8 +796,8 @@ class CblIonicPluginPlugin : Plugin() {
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun collection_PurgeDocument(call: PluginCall) {
-        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
-        if (collectionDao == null || collectionDao.isError) {
+        val collectionDto = PluginHelper.getCollectionDtoFromCall(call)
+        if (collectionDto == null || collectionDto.isError) {
             return
         }
         val (documentId, isError) = PluginHelper.getStringFromCall(call, "docId")
@@ -809,9 +809,9 @@ class CblIonicPluginPlugin : Plugin() {
                 try {
                     CollectionManager.purgeDocument(
                         documentId,
-                        collectionDao.collectionName,
-                        collectionDao.scopeName,
-                        collectionDao.databaseName
+                        collectionDto.collectionName,
+                        collectionDto.scopeName,
+                        collectionDto.databaseName
                     )
                     return@withContext withContext(Dispatchers.Main) {
                         call.resolve()
@@ -846,8 +846,8 @@ class CblIonicPluginPlugin : Plugin() {
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun collection_GetBlobContent(call: PluginCall) {
-        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
-        if (collectionDao == null || collectionDao.isError) {
+        val collectionDto = PluginHelper.getCollectionDtoFromCall(call)
+        if (collectionDto == null || collectionDto.isError) {
             return
         }
         val (key, isKeyError) = PluginHelper.getStringFromCall(call, "key")
@@ -864,9 +864,9 @@ class CblIonicPluginPlugin : Plugin() {
                     val blobData = CollectionManager.getBlobContent(
                         key,
                         documentId,
-                        collectionDao.collectionName,
-                        collectionDao.scopeName,
-                        collectionDao.databaseName
+                        collectionDto.collectionName,
+                        collectionDto.scopeName,
+                        collectionDto.databaseName
                     )
                     return@withContext withContext(Dispatchers.Main) {
                         val results = JSObject()
@@ -909,8 +909,8 @@ class CblIonicPluginPlugin : Plugin() {
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun collection_SetDocumentExpiration(call: PluginCall) {
-        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
-        if (collectionDao == null || collectionDao.isError) {
+        val collectionDto = PluginHelper.getCollectionDtoFromCall(call)
+        if (collectionDto == null || collectionDto.isError) {
             return
         }
         val (expiration, isExpirationError) = PluginHelper.getStringFromCall(call, "expiration")
@@ -927,9 +927,9 @@ class CblIonicPluginPlugin : Plugin() {
                     CollectionManager.setDocumentExpiration(
                         documentId,
                         expiration,
-                        collectionDao.collectionName,
-                        collectionDao.scopeName,
-                        collectionDao.databaseName
+                        collectionDto.collectionName,
+                        collectionDto.scopeName,
+                        collectionDto.databaseName
                     )
                     return@withContext withContext(Dispatchers.Main) {
                         call.resolve()
@@ -962,8 +962,8 @@ class CblIonicPluginPlugin : Plugin() {
      */
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     fun collection_GetDocumentExpiration(call: PluginCall) {
-        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
-        if (collectionDao == null || collectionDao.isError) {
+        val collectionDto = PluginHelper.getCollectionDtoFromCall(call)
+        if (collectionDto == null || collectionDto.isError) {
             return
         }
         val (documentId, isDocumentIdError) = PluginHelper.getStringFromCall(call, "docId")
@@ -975,9 +975,9 @@ class CblIonicPluginPlugin : Plugin() {
                 try {
                     val expiration = CollectionManager.getDocumentExpiration(
                         documentId,
-                        collectionDao.collectionName,
-                        collectionDao.scopeName,
-                        collectionDao.databaseName
+                        collectionDto.collectionName,
+                        collectionDto.scopeName,
+                        collectionDto.databaseName
                     )
                     return@withContext withContext(Dispatchers.Main) {
                         val results = JSObject()
@@ -1016,8 +1016,8 @@ class CblIonicPluginPlugin : Plugin() {
      */
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     fun collection_CreateIndex(call: PluginCall) {
-        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
-        if (collectionDao == null || collectionDao.isError) {
+        val collectionDto = PluginHelper.getCollectionDtoFromCall(call)
+        if (collectionDto == null || collectionDto.isError) {
             return
         }
         val indexDto = PluginHelper.getIndexDtoFromCall(call)
@@ -1042,9 +1042,9 @@ class CblIonicPluginPlugin : Plugin() {
                                     CollectionManager.createIndex(
                                         name,
                                         idx,
-                                        collectionDao.collectionName,
-                                        collectionDao.scopeName,
-                                        collectionDao.databaseName
+                                        collectionDto.collectionName,
+                                        collectionDto.scopeName,
+                                        collectionDto.databaseName
                                     )
                                     return@withContext withContext(Dispatchers.Main) {
                                         call.resolve()
@@ -1086,8 +1086,8 @@ class CblIonicPluginPlugin : Plugin() {
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun collection_DeleteIndex(call: PluginCall) {
-        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
-        if (collectionDao == null || collectionDao.isError) {
+        val collectionDto = PluginHelper.getCollectionDtoFromCall(call)
+        if (collectionDto == null || collectionDto.isError) {
             return
         }
         val (indexName, isIndexNameError) = PluginHelper.getStringFromCall(call, "indexName")
@@ -1099,9 +1099,9 @@ class CblIonicPluginPlugin : Plugin() {
                 try {
                     CollectionManager.deleteIndex(
                         indexName,
-                        collectionDao.collectionName,
-                        collectionDao.scopeName,
-                        collectionDao.databaseName
+                        collectionDto.collectionName,
+                        collectionDto.scopeName,
+                        collectionDto.databaseName
                     )
                     return@withContext withContext(Dispatchers.Main) {
                         call.resolve()
@@ -1133,17 +1133,17 @@ class CblIonicPluginPlugin : Plugin() {
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun collection_GetIndexes(call: PluginCall) {
-        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
-        if (collectionDao == null || collectionDao.isError) {
+        val collectionDto = PluginHelper.getCollectionDtoFromCall(call)
+        if (collectionDto == null || collectionDto.isError) {
             return
         }
         GlobalScope.launch {
             withContext(Dispatchers.IO) {
                 try {
                     val indexes = CollectionManager.getIndexes(
-                        collectionDao.collectionName,
-                        collectionDao.scopeName,
-                        collectionDao.databaseName
+                        collectionDto.collectionName,
+                        collectionDto.scopeName,
+                        collectionDto.databaseName
                     )
                     val results = JSObject()
                     val arrayResults = JSArray(indexes)
@@ -1159,8 +1159,8 @@ class CblIonicPluginPlugin : Plugin() {
     @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
     @Throws(JSONException::class)
     fun collection_AddChangeListener(call: PluginCall) {
-        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
-        if (collectionDao == null || collectionDao.isError) {
+        val collectionDto = PluginHelper.getCollectionDtoFromCall(call)
+        if (collectionDto == null || collectionDto.isError) {
             return
         }
         val (strToken, isTokenError) = PluginHelper.getStringFromCall(call, "changeListenerToken")
@@ -1171,9 +1171,9 @@ class CblIonicPluginPlugin : Plugin() {
             withContext(Dispatchers.IO) {
                 try {
                     val col = DatabaseManager.getCollection(
-                        collectionDao.collectionName,
-                        collectionDao.scopeName,
-                        collectionDao.databaseName
+                        collectionDto.collectionName,
+                        collectionDto.scopeName,
+                        collectionDto.databaseName
                     )
                     call.setKeepAlive(true)
                     withContext(Dispatchers.Main) {
@@ -1196,8 +1196,8 @@ class CblIonicPluginPlugin : Plugin() {
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun collection_RemoveChangeListener(call: PluginCall) {
-        val collectionDao = PluginHelper.getCollectionDtoFromCall(call)
-        if (collectionDao == null || collectionDao.isError) {
+        val collectionDto = PluginHelper.getCollectionDtoFromCall(call)
+        if (collectionDto == null || collectionDto.isError) {
             return
         }
         val (strToken, isTokenError) = PluginHelper.getStringFromCall(call, "changeListenerToken")
@@ -1223,43 +1223,253 @@ class CblIonicPluginPlugin : Plugin() {
     @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
     @Throws(JSONException::class)
     fun collection_AddDocumentChangeListener(call: PluginCall) {
-
+        val collectionDto = PluginHelper.getCollectionDtoFromCall(call)
+        if (collectionDto == null || collectionDto.isError) {
+            return
+        }
+        val (documentId, isDocumentIdError) = PluginHelper.getStringFromCall(call, "documentId")
+        val (strToken, isTokenError) = PluginHelper.getStringFromCall(call, "changeListenerToken")
+        if (isTokenError || strToken.isNullOrEmpty() || isDocumentIdError || documentId.isNullOrEmpty()) {
+            return
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    val col = DatabaseManager.getCollection(
+                        collectionDto.collectionName,
+                        collectionDto.scopeName,
+                        collectionDto.databaseName
+                    )
+                    call.setKeepAlive(true)
+                    withContext(Dispatchers.Main) {
+                        col?.let { collection ->
+                            val listenerToken =
+                                collection.addDocumentChangeListener(documentId) { change ->
+                                    val results = JSObject()
+                                    results.put("documentID", change.documentID)
+                                    results.put("collectionName", change.collection.name)
+                                    results.put("scopeName", change.collection.scope.name)
+                                    results.put("databaseName", collectionDto.databaseName)
+                                    call.resolve(results)
+                                }
+                            collectionDocumentChangeListeners.put(strToken, listenerToken)
+                        }
+                    }
+                } catch (e: Exception) {
+                    call.reject("${e.message}")
+                }
+            }
+        }
     }
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun collection_RemoveDocumentChangeListener(call: PluginCall) {
-
+        val collectionDto = PluginHelper.getCollectionDtoFromCall(call)
+        if (collectionDto == null || collectionDto.isError) {
+            return
+        }
+        val (strToken, isTokenError) = PluginHelper.getStringFromCall(call, "changeListenerToken")
+        if (isTokenError || strToken.isNullOrEmpty()) {
+            return
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    val token = collectionDocumentChangeListeners[strToken]
+                    token?.remove()
+                    collectionDocumentChangeListeners.remove(strToken)
+                    return@withContext withContext(Dispatchers.Main) {
+                        call.resolve()
+                    }
+                } catch (e: Exception) {
+                    call.reject("${e.message}")
+                }
+            }
+        }
     }
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun database_SetFileLoggingConfig(call: PluginCall) {
-
+        val (databaseName, isDatabaseNameError) = PluginHelper.getStringFromCall(call, "name")
+        val config = call.getObject("config")
+        if (isDatabaseNameError || databaseName.isNullOrEmpty() || config == null) {
+            return
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    //if we don't have a valid directory, fail
+                    val directory = config.getString("directory")
+                    if (directory.isNullOrEmpty()) {
+                        return@withContext withContext(Dispatchers.Main) {
+                            call.reject("Error: No directory provided")
+                        }
+                    }
+                    val fileConfig = LogFileConfiguration(directory)
+                    val maxRotateCount = config.optInt("maxRotateCount", -1)
+                    if (maxRotateCount > 0) {
+                        fileConfig.maxRotateCount = maxRotateCount
+                    }
+                    val maxSize = config.optLong("maxSize", -1)
+                    if (maxSize > 0) {
+                        fileConfig.maxSize = maxSize
+                    }
+                    val usePlainText = config.optBoolean("usePlainText", false)
+                    fileConfig.setUsePlaintext(usePlainText)
+                    val levelValue = config.optInt("level", 0)
+                    val logLevel = LoggingManager.getLogLevel(levelValue)
+                    Database.log.file.let {
+                        it.config = fileConfig
+                        it.level = logLevel
+                    }
+                    return@withContext withContext(Dispatchers.Main) {
+                        call.resolve()
+                    }
+                } catch (e: Exception) {
+                    call.reject("${e.message}")
+                }
+            }
+        }
     }
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun query_Execute(call: PluginCall) {
-
+        val (databaseName, isDatabaseNameError) = PluginHelper.getStringFromCall(call, "name")
+        val (query, isQueryError) = PluginHelper.getStringFromCall(call, "query")
+        if (isDatabaseNameError || databaseName.isNullOrEmpty() || isQueryError || query.isNullOrEmpty()) {
+            return
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    var queryParameters: Parameters? = null
+                    val parametersObj = call.getObject("parameters")
+                    if (parametersObj != null && parametersObj.length() > 0) {
+                        queryParameters = PluginHelper.getQueryParameters(parametersObj)
+                    }
+                    val results = DatabaseManager.executeQuery(query, databaseName, queryParameters)
+                    return@withContext withContext(Dispatchers.Main) {
+                        val resultsObj = JSObject()
+                        resultsObj.put("data", results)
+                        call.resolve(resultsObj)
+                    }
+                } catch (e: Exception) {
+                    call.reject("${e.message}")
+                }
+            }
+        }
     }
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun query_Explain(call: PluginCall) {
-
+        val (databaseName, isDatabaseNameError) = PluginHelper.getStringFromCall(call, "name")
+        val (query, isQueryError) = PluginHelper.getStringFromCall(call, "query")
+        if (isDatabaseNameError || databaseName.isNullOrEmpty() || isQueryError || query.isNullOrEmpty()) {
+            return
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    var queryParameters: Parameters? = null
+                    val parametersObj = call.getObject("parameters")
+                    if (parametersObj != null && parametersObj.length() > 0) {
+                        queryParameters = PluginHelper.getQueryParameters(parametersObj)
+                    }
+                    val results = DatabaseManager.explainQuery(query, databaseName, queryParameters)
+                    return@withContext withContext(Dispatchers.Main) {
+                        val resultsObj = JSObject()
+                        resultsObj.put("data", results)
+                        call.resolve(resultsObj)
+                    }
+                } catch (e: Exception) {
+                    call.reject("${e.message}")
+                }
+            }
+        }
     }
 
     @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
     @Throws(JSONException::class)
     fun query_AddChangeListener(call: PluginCall) {
+        val (databaseName, isDatabaseNameError) = PluginHelper.getStringFromCall(call, "name")
+        val (token, isTokenError) = PluginHelper.getStringFromCall(call, "changeListenerToken")
+        val (strQuery, isQueryError) = PluginHelper.getStringFromCall(call, "query")
+        if (isDatabaseNameError || databaseName.isNullOrEmpty()
+            || isQueryError || strQuery.isNullOrEmpty()
+            || isTokenError || token.isNullOrEmpty()
+        ) {
+            return
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    var queryParameters: Parameters? = null
+                    val parametersObj = call.getObject("parameters")
+                    if (parametersObj != null && parametersObj.length() > 0) {
+                        queryParameters = PluginHelper.getQueryParameters(parametersObj)
+                    }
+                    val db = DatabaseManager.getDatabase(databaseName)
+                    db?.let { database ->
 
+                        //keep the call alive for callback
+                        call.setKeepAlive(true)
+
+                        val query = database.createQuery(strQuery)
+                        queryParameters?.let {
+                            query.parameters = it
+                        }
+                        withContext(Dispatchers.Main) {
+                            val listener = query.addChangeListener { change ->
+                                change.error?.let { error ->
+                                    call.reject("${error.message}")
+                                }
+                                    change.results?.let { resultSet ->
+                                        val results = JSObject()
+                                        val jsonResults = resultSet.map { it.toJSON() }
+                                        val stringResults = jsonResults.joinToString(",")
+                                        val returnResults = "[$stringResults]"
+                                        results.put("data", returnResults)
+
+                                        call.resolve(results)
+                                    }
+                                }
+                            queryChangeListeners.put(token, listener)
+                            }
+                    }
+                } catch (e: Exception) {
+                    call.reject("${e.message}")
+                }
+            }
+        }
     }
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun query_RemoveChangeListener(call: PluginCall) {
-
+        val (databaseName, isDatabaseNameError) = PluginHelper.getStringFromCall(call, "name")
+        val (strToken, isTokenError) = PluginHelper.getStringFromCall(call, "changeListenerToken")
+        if (isDatabaseNameError || databaseName.isNullOrEmpty() ||
+            isTokenError || strToken.isNullOrEmpty()) {
+            return
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    val token = queryChangeListeners[strToken]
+                    token?.remove()
+                    queryChangeListeners.remove(strToken)
+                    return@withContext withContext(Dispatchers.Main) {
+                        call.resolve()
+                    }
+                } catch (e: Exception) {
+                    call.reject("${e.message}")
+                }
+            }
+        }
     }
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)

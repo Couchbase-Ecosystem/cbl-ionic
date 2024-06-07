@@ -12,14 +12,19 @@ object LoggingManager {
             "QUERY" -> Database.log.console.domains = EnumSet.of(LogDomain.QUERY)
             "REPLICATOR" -> Database.log.console.domains = EnumSet.of(LogDomain.REPLICATOR)
         }
-        when (logLevel) {
-            0 -> Database.log.console.level = LogLevel.DEBUG
-            1 -> Database.log.console.level = LogLevel.VERBOSE
-            2 -> Database.log.console.level = LogLevel.INFO
-            3 -> Database.log.console.level = LogLevel.WARNING
-            4 -> Database.log.console.level = LogLevel.ERROR
-            5 -> Database.log.console.level = LogLevel.NONE
-        }
+        val loggingValue = getLogLevel(logLevel)
+        Database.log.console.level = loggingValue
+    }
 
+    fun getLogLevel(logLevelValue: Int): LogLevel {
+        when (logLevelValue) {
+            0 -> return LogLevel.DEBUG
+            1 -> return LogLevel.VERBOSE
+            2 -> return LogLevel.INFO
+            3 -> return LogLevel.WARNING
+            4 -> return LogLevel.ERROR
+            5 -> return LogLevel.NONE
+        }
+        return LogLevel.DEBUG
     }
 }

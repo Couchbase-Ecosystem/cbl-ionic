@@ -142,4 +142,33 @@ object DatabaseManager {
         db?.deleteCollection(collectionName, scopeName)
     }
 
+    fun executeQuery(strQuery: String, databaseName: String, parameters: Parameters?): String {
+        val db = getDatabase(databaseName)
+        db?.let {database ->
+            val query = database.createQuery(strQuery)
+            if (parameters != null) {
+                query.parameters = parameters
+            }
+            val results = query.execute().allResults()
+            val jsonResults = results.map { it.toJSON() }
+            val stringResults = jsonResults.joinToString(",")
+            val returnResults = "[$stringResults]"
+            return returnResults
+        }
+        return ""
+    }
+
+    fun explainQuery(strQuery: String, databaseName: String, parameters: Parameters?): String {
+        val db = getDatabase(databaseName)
+        db?.let { database ->
+            val query = database.createQuery(strQuery)
+            if (parameters != null) {
+                query.parameters = parameters
+            }
+            val results = query.explain()
+            return results
+        }
+        return ""
+    }
+
 }

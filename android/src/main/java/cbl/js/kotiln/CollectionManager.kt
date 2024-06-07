@@ -4,6 +4,7 @@ import com.couchbase.lite.ConcurrencyControl
 import com.couchbase.lite.Document
 import com.couchbase.lite.Index
 import com.couchbase.lite.MutableDocument
+import org.json.JSONException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -12,6 +13,7 @@ object CollectionManager {
     private val defaultCollectionName: String = "_default"
     private val defaultScopeName: String = "_default"
 
+    @Throws(Exception::class)
     private fun getCollection(
         collectionName: String,
         scopeName: String,
@@ -20,6 +22,7 @@ object CollectionManager {
         return DatabaseManager.getDatabase(databaseName)?.getCollection(collectionName, scopeName)
     }
 
+    @Throws(Exception::class)
     fun documentsCount(
         collectionName: String,
         scopeName: String,
@@ -33,7 +36,7 @@ object CollectionManager {
         return count
     }
 
-    @Throws(Error::class)
+    @Throws(Exception::class)
     fun saveDocument(
         documentId: String,
         document: Map<String, Any?>,
@@ -60,6 +63,7 @@ object CollectionManager {
         throw Error("Error: Document not saved")
     }
 
+    @Throws(Exception::class)
     fun getDocument(documentId: String,
                     collectionName: String,
                     scopeName: String,
@@ -72,6 +76,7 @@ object CollectionManager {
         return null
     }
 
+    @Throws(Exception::class)
     fun getBlobContent(key: String,
                        documentId: String,
                        collectionName: String,
@@ -88,6 +93,7 @@ object CollectionManager {
         return null
     }
 
+    @Throws(Exception::class)
     fun deleteDocument(documentId: String,
                        collectionName: String,
                        scopeName: String,
@@ -99,15 +105,17 @@ object CollectionManager {
                 collection.delete(document)
                 return true
             }
+            throw Exception("Error: Document not found")
         }
-        return false
+        throw Exception("Error: Collection not found")
     }
 
+    @Throws(Exception::class)
     fun deleteDocument(documentId: String,
                        collectionName: String,
                        scopeName: String,
                        databaseName: String,
-                       concurrencyControl: ConcurrencyControl): Boolean? {
+                       concurrencyControl: ConcurrencyControl): Boolean {
         val col = this.getCollection(collectionName, scopeName, databaseName)
         col?.let { collection ->
             val doc = collection.getDocument(documentId)
@@ -115,10 +123,12 @@ object CollectionManager {
                 val result = collection.delete(document, concurrencyControl)
                 return result
             }
+            throw Exception("Error: Document not found")
         }
-        return null
+        throw Exception("Error: Collection not found")
     }
 
+    @Throws(Exception::class)
     fun purgeDocument(documentId: String,
                       collectionName: String,
                       scopeName: String,
@@ -127,6 +137,7 @@ object CollectionManager {
         col?.purge(documentId)
     }
 
+    @Throws(Exception::class)
     fun setDocumentExpiration(documentId: String,
                               collectionName: String,
                               scopeName: String,
@@ -138,6 +149,7 @@ object CollectionManager {
         col?.setDocumentExpiration(documentId, expirationDate)
     }
 
+    @Throws(Exception::class)
     fun getDocumentExpiration(documentId: String,
                               collectionName: String,
                               scopeName: String,
@@ -146,6 +158,7 @@ object CollectionManager {
         return col?.getDocumentExpiration(documentId)
     }
 
+    @Throws(Exception::class)
     fun createIndex(indexName: String,
                     index: Index,
                     collectionName: String,
@@ -155,6 +168,7 @@ object CollectionManager {
         col?.createIndex(indexName, index)
     }
 
+    @Throws(Exception::class)
     fun deleteIndex(indexName: String,
                     collectionName: String,
                     scopeName: String,
@@ -163,6 +177,7 @@ object CollectionManager {
         col?.deleteIndex(indexName)
     }
 
+    @Throws(Exception::class)
     fun getIndexes(collectionName: String,
                    scopeName: String,
                    databaseName: String): Set<String>? {

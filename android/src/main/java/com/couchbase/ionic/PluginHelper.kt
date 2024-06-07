@@ -8,12 +8,15 @@ import com.couchbase.lite.Document
 import com.couchbase.lite.FullTextIndexItem
 import com.couchbase.lite.MutableArray
 import com.couchbase.lite.MutableDictionary
+import com.couchbase.lite.Parameters
 import com.couchbase.lite.ValueIndexItem
 import com.getcapacitor.JSObject
 import com.getcapacitor.PluginCall
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 object PluginHelper {
     /**
@@ -92,10 +95,10 @@ object PluginHelper {
 
     fun getIndexDtoFromCall(call: PluginCall): IndexDto? {
         val (indexName, isIndexNameError) = getStringFromCall(call, "indexName")
-        val (indexType, isIndexTypeError) = getStringFromCall(call, "type")
         val indexData = call.getObject("index")
         val items = indexData?.getJSONArray("items")
-        if (isIndexNameError || isIndexTypeError || indexData == null || items == null) {
+        val indexType = indexData?.getString("type")
+        if (isIndexNameError || indexData == null || items == null || indexType.isNullOrEmpty()){
             call.reject("Error: No couldn't parse indexName, type, or index, or items")
             return IndexDto(
                 null,
@@ -129,7 +132,16 @@ object PluginHelper {
         while (keys.hasNext()) {
             val key = keys.next()
             val value = jsonObject[key]
-            if (value is JSONObject) {
+            if (value.equals(null)) {
+                items[key] = null
+            } else if (value is JSONObject && value.has("_data")) {
+                val data = value.getJSONObject("_data")
+                val doc = MutableDictionary(toMap(data))
+                doc.setString("_id", value.getString("_id"))
+                doc.setLong("_sequence", value.getLong("_sequence"))
+                items[key] = doc
+            }
+            else if (value is JSONObject) {
                 val type = value.optString("_type")
                 // Handle blobs
                 if (type == "blob") {
@@ -215,5 +227,56 @@ object PluginHelper {
                 .substring(1)
             FullTextIndexItem.property(propName)
         }
+    }
+
+    fun getQueryParameters(jsObject: JSObject): Parameters {
+        val queryParameters = Parameters()
+        for(key in jsObject.keys()){
+            val nestedObject = jsObject.getJSObject(key)
+            nestedObject?.let {
+                val type = it.getString("type")
+                val valueKey = "value"
+                when(type){
+                    "string" -> {
+                        val strValue = it.getString(valueKey)
+                        queryParameters.setString(key, strValue)
+                    }
+                    "float" -> {
+                        val floatValue = it.getDouble(valueKey).toFloat()
+                        queryParameters.setFloat(key, floatValue)
+                    }
+                    "boolean" -> {
+                        val boolValue = it.getBoolean(valueKey)
+                        queryParameters.setBoolean(key, boolValue)
+                    }
+                    "double" -> {
+                        val doubleValue = it.getDouble(valueKey)
+                        queryParameters.setDouble(key, doubleValue)
+                    }
+                    "date" -> {
+                        val dateValue = it.getString(valueKey)
+                        dateValue?.let { strValue ->
+                            val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+                            val date = dateFormat.parse(strValue)
+                            queryParameters.setDate(key, date)
+                        }
+                    }
+                    "int" -> {
+                        val intValue = it.getInt(valueKey)
+                        queryParameters.setInt(key, intValue)
+                    }
+                    "long" -> {
+                        val longValue = it.getLong(valueKey)
+                        queryParameters.setLong(key, longValue)
+                    }
+                    "value" -> {
+                        val value = it.get(valueKey)
+                        queryParameters.setValue(key, value)
+                    }
+                    else -> throw Exception("Invalid type sent")
+                }
+            }
+        }
+        return queryParameters
     }
 }
