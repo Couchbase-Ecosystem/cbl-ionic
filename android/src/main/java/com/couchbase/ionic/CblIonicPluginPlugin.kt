@@ -6,6 +6,7 @@ import cbl.js.kotiln.CollectionManager
 import cbl.js.kotiln.DatabaseManager
 import cbl.js.kotiln.FileSystemHelper
 import cbl.js.kotiln.LoggingManager
+import cbl.js.kotiln.ReplicatorManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -34,7 +35,7 @@ class CblIonicPluginPlugin : Plugin() {
     private val replicationChangeListeners: MutableMap<String, ListenerToken> = mutableMapOf()
 
     override fun load() {
-        CouchbaseLite.init(bridge.context)
+        CouchbaseLite.init(bridge.context, true)
     }
 
 
@@ -1475,39 +1476,154 @@ class CblIonicPluginPlugin : Plugin() {
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun replicator_Create(call: PluginCall) {
+        val (replicatorId, isReplicatorIdError) = PluginHelper.getStringFromCall(call, "replicatorId")
+        if (isReplicatorIdError || replicatorId.isNullOrEmpty()) {
+            return
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
 
+                } catch (e: Exception) {
+                    call.reject("${e.message}")
+                }
+            }
+        }
     }
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun replicator_Start(call: PluginCall) {
-
+        val (replicatorId, isReplicatorIdError) = PluginHelper.getStringFromCall(call, "replicatorId")
+        if (isReplicatorIdError || replicatorId.isNullOrEmpty()) {
+            return
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    ReplicatorManager.start(replicatorId)
+                    call.resolve()
+                } catch (e: Exception) {
+                    call.reject("${e.message}")
+                }
+            }
+        }
     }
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun replicator_Stop(call: PluginCall) {
-
+        val (replicatorId, isReplicatorIdError) = PluginHelper.getStringFromCall(call, "replicatorId")
+        if (isReplicatorIdError || replicatorId.isNullOrEmpty()) {
+            return
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    ReplicatorManager.stop(replicatorId)
+                    call.resolve()
+                } catch (e: Exception) {
+                    call.reject("${e.message}")
+                }
+            }
+        }
     }
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun replicator_ResetCheckpoint(call: PluginCall) {
-
+        val (replicatorId, isReplicatorIdError) = PluginHelper.getStringFromCall(call, "replicatorId")
+        if (isReplicatorIdError || replicatorId.isNullOrEmpty()) {
+            return
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    ReplicatorManager.resetCheckpoint(replicatorId)
+                    call.resolve()
+                } catch (e: Exception) {
+                    call.reject("${e.message}")
+                }
+            }
+        }
     }
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun replicator_GetStatus(call: PluginCall) {
+        val (replicatorId, isReplicatorIdError) = PluginHelper.getStringFromCall(call, "replicatorId")
+        if (isReplicatorIdError || replicatorId.isNullOrEmpty()) {
+            return
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    val status = ReplicatorManager.getStatus(replicatorId)
+                    val jsonStatus = PluginHelper.generateReplicatorStatusJson(status)
+                    call.resolve(jsonStatus)
+                } catch (e: Exception) {
+                    call.reject("${e.message}")
+                }
+            }
+        }
+    }
 
+    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+    @Throws(JSONException::class)
+    fun replicator_Cleanup(call: PluginCall) {
+        val (replicatorId, isReplicatorIdError) = PluginHelper.getStringFromCall(call, "replicatorId")
+        if (isReplicatorIdError || replicatorId.isNullOrEmpty()) {
+            return
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    ReplicatorManager.getReplicator(replicatorId)?.let { replicator ->
+                        replicator.stop()
+                        ReplicatorManager.removeChangeListener(replicatorId)
+                        ReplicatorManager.removeReplicator(replicatorId)
+                    }
+                    call.resolve()
+                } catch (e: Exception) {
+                    call.reject("${e.message}")
+                }
+            }
+        }
     }
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun replicator_GetPendingDocumentIds(call: PluginCall) {
-
+        val (replicatorId, isReplicatorIdError) = PluginHelper.getStringFromCall(call, "replicatorId")
+        if (isReplicatorIdError || replicatorId.isNullOrEmpty()) {
+            return
+        }
+        val collectionDto = PluginHelper.getCollectionDtoFromCall(call)
+        if (collectionDto == null || collectionDto.isError) {
+            return
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    val pendingDocIds = ReplicatorManager.pendingDocIs(
+                        replicatorId,
+                        collectionDto.collectionName,
+                        collectionDto.scopeName,
+                        collectionDto.databaseName
+                    )
+                    if (pendingDocIds.isNotEmpty()) {
+                        val results = JSObject()
+                        results.put("documentIDs", pendingDocIds)
+                        call.resolve(results)
+                    } else {
+                        call.resolve()
+                    }
+                } catch (e: Exception) {
+                    call.reject("${e.message}")
+                }
+            }
+        }
     }
-
     @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
     @Throws(JSONException::class)
     fun replicator_AddChangeListener(call: PluginCall) {
@@ -1522,13 +1638,7 @@ class CblIonicPluginPlugin : Plugin() {
 
     @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
     @Throws(JSONException::class)
-    fun replicator_AddDocumentChangeListenerr(call: PluginCall) {
-
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun replicator_Cleanup(call: PluginCall) {
+    fun replicator_AddDocumentChangeListener(call: PluginCall) {
 
     }
 }

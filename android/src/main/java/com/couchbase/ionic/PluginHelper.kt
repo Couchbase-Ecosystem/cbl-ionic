@@ -9,6 +9,7 @@ import com.couchbase.lite.FullTextIndexItem
 import com.couchbase.lite.MutableArray
 import com.couchbase.lite.MutableDictionary
 import com.couchbase.lite.Parameters
+import com.couchbase.lite.ReplicatorStatus
 import com.couchbase.lite.ValueIndexItem
 import com.getcapacitor.JSObject
 import com.getcapacitor.PluginCall
@@ -278,5 +279,20 @@ object PluginHelper {
             }
         }
         return queryParameters
+    }
+
+    fun generateReplicatorStatusJson(status: ReplicatorStatus): JSObject {
+        val json = JSObject()
+        val progressJson = JSObject()
+        val errorJson = JSObject()
+        status.error?.let {
+            errorJson.put("message", it.message)
+        }
+        progressJson.put("completed", status.progress.completed)
+        progressJson.put("total", status.progress.total)
+        json.put("activity", status.activityLevel.name)
+        json.put("progress", progressJson)
+        json.put("error", errorJson)
+        return json
     }
 }
