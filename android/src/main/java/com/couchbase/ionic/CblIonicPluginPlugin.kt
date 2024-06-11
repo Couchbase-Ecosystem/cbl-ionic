@@ -1580,7 +1580,6 @@ class CblIonicPluginPlugin : Plugin() {
                 try {
                     ReplicatorManager.getReplicator(replicatorId)?.let { replicator ->
                         replicator.stop()
-                        ReplicatorManager.removeChangeListener(replicatorId)
                         ReplicatorManager.removeReplicator(replicatorId)
                     }
                     call.resolve()
@@ -1627,18 +1626,87 @@ class CblIonicPluginPlugin : Plugin() {
     @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
     @Throws(JSONException::class)
     fun replicator_AddChangeListener(call: PluginCall) {
+        val (replicatorId, isReplicatorIdError) = PluginHelper.getStringFromCall(call, "replicatorId")
+        val (token, isTokenError) = PluginHelper.getStringFromCall(call, "changeListenerToken")
+        if (isReplicatorIdError ||
+            replicatorId.isNullOrEmpty() ||
+            isTokenError ||
+            token.isNullOrEmpty()){
+            return
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    val replicator = ReplicatorManager.getReplicator(replicatorId)
+                    replicator?.let {
+                        call.setKeepAlive(true)
+                        val listenerToken = it.addChangeListener { change ->
+                            val result = PluginHelper.generateReplicatorStatusJson(change.status)
+                            call.resolve(result)
+                        }
+                        ReplicatorManager.replicatorChangeListeners.put(token, listenerToken)
+                    }
 
-    }
-
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class)
-    fun replicator_RemoveChangeListener(call: PluginCall) {
-
+                } catch (e: Exception) {
+                    call.reject("${e.message}")
+                }
+            }
+        }
     }
 
     @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
     @Throws(JSONException::class)
     fun replicator_AddDocumentChangeListener(call: PluginCall) {
+        val (replicatorId, isReplicatorIdError) = PluginHelper.getStringFromCall(call, "replicatorId")
+        val (token, isTokenError) = PluginHelper.getStringFromCall(call, "changeListenerToken")
+        if (isReplicatorIdError ||
+            replicatorId.isNullOrEmpty() ||
+            isTokenError ||
+            token.isNullOrEmpty()){
+            return
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    val replicator = ReplicatorManager.getReplicator(replicatorId)
+                    replicator?.let {
+                        call.setKeepAlive(true)
+                        val listenerToken = it.addDocumentReplicationListener { change ->
+                            val result = PluginHelper.generateReplicatorDocumentChangeJson(change)
+                            call.resolve(result)
+                        }
+                        ReplicatorManager.replicatorChangeListeners.put(token, listenerToken)
+                    }
 
+                } catch (e: Exception) {
+                    call.reject("${e.message}")
+                }
+            }
+        }
+    }
+
+    @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
+    @Throws(JSONException::class)
+    fun replicator_RemoveChangeListener(call: PluginCall) {
+        val (replicatorId, isReplicatorIdError) = PluginHelper.getStringFromCall(call, "replicatorId")
+        val (token, isTokenError) = PluginHelper.getStringFromCall(call, "changeListenerToken")
+        if (isReplicatorIdError ||
+            replicatorId.isNullOrEmpty() ||
+            isTokenError ||
+            token.isNullOrEmpty()){
+            return
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    val replicator = ReplicatorManager.getReplicator(replicatorId)
+                    replicator?.let {
+                        ReplicatorManager.removeChangeListener(replicatorId, token)
+                    }
+                } catch (e: Exception) {
+                    call.reject("${e.message}")
+                }
+            }
+        }
     }
 }

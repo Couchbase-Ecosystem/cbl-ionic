@@ -5,12 +5,17 @@ import cbl.js.kotiln.ScopeDto
 import com.couchbase.lite.Blob
 import com.couchbase.lite.ConcurrencyControl
 import com.couchbase.lite.Document
+import com.couchbase.lite.DocumentFlag
+import com.couchbase.lite.DocumentReplication
 import com.couchbase.lite.FullTextIndexItem
 import com.couchbase.lite.MutableArray
 import com.couchbase.lite.MutableDictionary
 import com.couchbase.lite.Parameters
+import com.couchbase.lite.ReplicatedDocument
 import com.couchbase.lite.ReplicatorStatus
 import com.couchbase.lite.ValueIndexItem
+import com.couchbase.lite.internal.utils.JSONUtils
+import com.getcapacitor.JSArray
 import com.getcapacitor.JSObject
 import com.getcapacitor.PluginCall
 import org.json.JSONArray
@@ -257,9 +262,13 @@ object PluginHelper {
                     "date" -> {
                         val dateValue = it.getString(valueKey)
                         dateValue?.let { strValue ->
+                            //
+                            //bug in SDK with Android and Date
                             val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
                             val date = dateFormat.parse(strValue)
-                            queryParameters.setDate(key, date)
+                            date?.let {d ->
+                                queryParameters.setDate(key, d)
+                            }
                         }
                     }
                     "int" -> {
@@ -293,6 +302,29 @@ object PluginHelper {
         json.put("activity", status.activityLevel.name)
         json.put("progress", progressJson)
         json.put("error", errorJson)
+        return json
+    }
+
+    fun generateReplicatorDocumentChangeJson(change: DocumentReplication) :JSObject {
+        val json = JSObject()
+        val docs = JSArray()
+        for (doc in change.documents) {
+            val docJson = JSObject()
+            val flags = JSArray()
+            if (doc.flags.contains(DocumentFlag.DELETED)) {
+                flags.put("DELETED")
+            } else if (doc.flags.contains(DocumentFlag.ACCESS_REMOVED)) {
+                flags.put("ACCESS_REMOVED")
+            }
+            docJson.put("flags", flags)
+            docJson.put("id", doc.id)
+            docJson.put("scopeName", doc.scope)
+            docJson.put("collectionName", doc.collection)
+            docJson.put("error", doc.error?.message)
+            docs.put(docJson)
+        }
+        json.put("documents", docs)
+        json.put("isPush", change.isPush)
         return json
     }
 }

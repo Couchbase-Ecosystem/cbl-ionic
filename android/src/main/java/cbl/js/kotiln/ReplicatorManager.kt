@@ -8,8 +8,8 @@ import com.couchbase.lite.internal.core.C4ReplicatorStatus.ActivityLevel
 
 object ReplicatorManager {
     private val replicators: MutableMap<String, Replicator> = mutableMapOf()
-    private val replicatorChangeListeners: MutableMap<String, ListenerToken> = mutableMapOf()
-    private val replicatorDocumentListners: MutableMap<String, ListenerToken> = mutableMapOf()
+    val replicatorChangeListeners: MutableMap<String, ListenerToken> = mutableMapOf()
+    val replicatorDocumentListners: MutableMap<String, ListenerToken> = mutableMapOf()
 
     fun getReplicator(replicatorId: String): Replicator? {
         return replicators[replicatorId]
@@ -86,10 +86,10 @@ object ReplicatorManager {
         return mutableSet
     }
     
-    fun removeChangeListener(replicatorId: String) {
+    fun removeChangeListener(replicatorId: String, token: String) {
         val replicator = replicators[replicatorId]
         replicator?.let {
-            val listenerToken = replicatorChangeListeners[replicatorId]
+            val listenerToken = replicatorChangeListeners[token]
             listenerToken?.let {
                 listenerToken.remove()
             }
