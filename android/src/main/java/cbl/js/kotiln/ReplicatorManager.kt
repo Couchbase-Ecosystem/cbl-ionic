@@ -2,9 +2,9 @@ package cbl.js.kotiln
 
 import com.couchbase.lite.ListenerToken
 import com.couchbase.lite.Replicator
+import com.couchbase.lite.ReplicatorConfiguration
 import com.couchbase.lite.ReplicatorStatus
-import com.couchbase.lite.internal.core.C4ReplicatorStatus
-import com.couchbase.lite.internal.core.C4ReplicatorStatus.ActivityLevel
+import java.util.UUID
 
 object ReplicatorManager {
     private val replicators: MutableMap<String, Replicator> = mutableMapOf()
@@ -17,6 +17,13 @@ object ReplicatorManager {
 
     fun removeReplicator(replicatorId: String) {
         replicators.remove(replicatorId)
+    }
+
+    fun createReplicator(replicatorConfig: ReplicatorConfiguration): String {
+        val replicator = Replicator(replicatorConfig)
+        val id = UUID.randomUUID().toString()
+        replicators[id] = replicator
+        return id
     }
 
     fun start(replicatorId: String) {

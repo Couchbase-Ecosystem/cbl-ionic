@@ -728,7 +728,7 @@ class CblIonicPluginPlugin : Plugin() {
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun collection_DeleteDocument(call: PluginCall) {
-        var docConcurrencyControl: ConcurrencyControl? = null
+        var docConcurrencyControl: ConcurrencyControl?
         val collectionDto = PluginHelper.getCollectionDtoFromCall(call)
         if (collectionDto == null || collectionDto.isError) {
             return
@@ -1033,10 +1033,10 @@ class CblIonicPluginPlugin : Plugin() {
                             indexDto.indexItems?.let { items ->
                                 var index: Index? = null
                                 if (type == "value") {
-                                    val indexes = PluginHelper.makeValueIndexItems(items)
+                                    val indexes = IndexHelper.makeValueIndexItems(items)
                                     index = IndexBuilder.valueIndex(*indexes)
                                 } else if (type == "full-text") {
-                                    val indexes = PluginHelper.makeFullTextIndexItems(items)
+                                    val indexes = IndexHelper.makeFullTextIndexItems(items)
                                     index = IndexBuilder.fullTextIndex(*indexes)
                                 }
                                 index?.let { idx ->
@@ -1349,7 +1349,7 @@ class CblIonicPluginPlugin : Plugin() {
                     var queryParameters: Parameters? = null
                     val parametersObj = call.getObject("parameters")
                     if (parametersObj != null && parametersObj.length() > 0) {
-                        queryParameters = PluginHelper.getQueryParameters(parametersObj)
+                        queryParameters = QueryHelper.getQueryParameters(parametersObj)
                     }
                     val results = DatabaseManager.executeQuery(query, databaseName, queryParameters)
                     return@withContext withContext(Dispatchers.Main) {
@@ -1378,7 +1378,7 @@ class CblIonicPluginPlugin : Plugin() {
                     var queryParameters: Parameters? = null
                     val parametersObj = call.getObject("parameters")
                     if (parametersObj != null && parametersObj.length() > 0) {
-                        queryParameters = PluginHelper.getQueryParameters(parametersObj)
+                        queryParameters = QueryHelper.getQueryParameters(parametersObj)
                     }
                     val results = DatabaseManager.explainQuery(query, databaseName, queryParameters)
                     return@withContext withContext(Dispatchers.Main) {
@@ -1411,7 +1411,7 @@ class CblIonicPluginPlugin : Plugin() {
                     var queryParameters: Parameters? = null
                     val parametersObj = call.getObject("parameters")
                     if (parametersObj != null && parametersObj.length() > 0) {
-                        queryParameters = PluginHelper.getQueryParameters(parametersObj)
+                        queryParameters = QueryHelper.getQueryParameters(parametersObj)
                     }
                     val db = DatabaseManager.getDatabase(databaseName)
                     db?.let { database ->
@@ -1476,13 +1476,37 @@ class CblIonicPluginPlugin : Plugin() {
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun replicator_Create(call: PluginCall) {
-        val (replicatorId, isReplicatorIdError) = PluginHelper.getStringFromCall(call, "replicatorId")
-        if (isReplicatorIdError || replicatorId.isNullOrEmpty()) {
+        val configObj =  call.getObject("config")
+        if (configObj == null || configObj.length() == 0) {
+            call.reject("Error: No config provided")
             return
         }
         GlobalScope.launch {
             withContext(Dispatchers.IO) {
                 try {
+                    val collectionConfigJson = configObj.getString("collectionConfig")
+                    if (collectionConfigJson.isNullOrEmpty()){
+                        call.reject("Error: No collection config provided")
+                        return@withContext
+                    }
+                    val collectionConfig = JSONArray(collectionConfigJson)
+                    if (collectionConfig.length() == 0) {
+                        call.reject("Error: couldn't parse collection configuration")
+                        return@withContext
+                    }
+                    val replicatorConfig = ReplicatorHelper.replicatorConfigFromJson(configObj, collectionConfig)
+                    val replicatorId = ReplicatorManager.createReplicator(replicatorConfig)
+                    if (replicatorId.isEmpty()) {
+                        return@withContext withContext(Dispatchers.Main) {
+                            call.reject("Error: couldn't create replicator")
+                        }
+                    } else {
+                        return@withContext withContext(Dispatchers.Main) {
+                            val results = JSObject()
+                            results.put("replicatorId", replicatorId)
+                            call.resolve(results)
+                        }
+                    }
 
                 } catch (e: Exception) {
                     call.reject("${e.message}")
@@ -1559,7 +1583,7 @@ class CblIonicPluginPlugin : Plugin() {
             withContext(Dispatchers.IO) {
                 try {
                     val status = ReplicatorManager.getStatus(replicatorId)
-                    val jsonStatus = PluginHelper.generateReplicatorStatusJson(status)
+                    val jsonStatus = ReplicatorHelper.generateReplicatorStatusJson(status)
                     call.resolve(jsonStatus)
                 } catch (e: Exception) {
                     call.reject("${e.message}")
@@ -1641,7 +1665,7 @@ class CblIonicPluginPlugin : Plugin() {
                     replicator?.let {
                         call.setKeepAlive(true)
                         val listenerToken = it.addChangeListener { change ->
-                            val result = PluginHelper.generateReplicatorStatusJson(change.status)
+                            val result = ReplicatorHelper.generateReplicatorStatusJson(change.status)
                             call.resolve(result)
                         }
                         ReplicatorManager.replicatorChangeListeners.put(token, listenerToken)
@@ -1672,7 +1696,7 @@ class CblIonicPluginPlugin : Plugin() {
                     replicator?.let {
                         call.setKeepAlive(true)
                         val listenerToken = it.addDocumentReplicationListener { change ->
-                            val result = PluginHelper.generateReplicatorDocumentChangeJson(change)
+                            val result = ReplicatorHelper.generateReplicatorDocumentChangeJson(change)
                             call.resolve(result)
                         }
                         ReplicatorManager.replicatorChangeListeners.put(token, listenerToken)
