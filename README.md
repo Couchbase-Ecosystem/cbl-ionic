@@ -7,14 +7,14 @@ Please note that this project is still a work in progress and is not officially 
 
 ## Install
 
-Currently, build process doesn't support npm installation.  Please see contributing documentation on the example app which can provide an example of how to install into an app in these repos current state. 
+See the documentation for directions on how to [install](https://cbl-ionic.dev/StartHere/install) the cbl-ionic plugin in your app. 
 
 ## Contributing
 
 See the [Contributing](CONTRIBUTING.md) page for more information.
 
 ## Documentation
-Documentation for this project can be found at [Couchbase Lite for Ionic Plugin documentation](https://cbl-ionic.dev/).
+Full documentation for this project can be found at [Couchbase Lite for Ionic Plugin documentation](https://cbl-ionic.dev/).
 
 ## Migration 
 
