@@ -593,8 +593,8 @@ class CblIonicPluginPlugin : Plugin() {
         if (collectionDto == null || collectionDto.isError) {
             return
         }
-        val (documentId, isError) = PluginHelper.getStringFromCall(call, "id")
-        val docId: String = if (isError || documentId.isNullOrEmpty()) {
+        val documentId =  call.getString("id")
+        val docId = if (documentId.isNullOrEmpty()) {
             ""
         } else {
             documentId
