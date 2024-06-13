@@ -2,6 +2,9 @@
 include ':capacitor-android'
 project(':capacitor-android').projectDir = new File('../node_modules/@capacitor/android/capacitor')
 
+include ':cbl-ionic'
+project(':cbl-ionic').projectDir = new File('../../android')
+
 include ':capacitor-app'
 project(':capacitor-app').projectDir = new File('../node_modules/@capacitor/app/android')
 
@@ -13,6 +16,3 @@ project(':capacitor-keyboard').projectDir = new File('../node_modules/@capacitor
 
 include ':capacitor-status-bar'
 project(':capacitor-status-bar').projectDir = new File('../node_modules/@capacitor/status-bar/android')
-
-include ':cblite-ionic'
-project(':cblite-ionic').projectDir = new File('../../android')
