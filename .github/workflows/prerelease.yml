@@ -15,11 +15,8 @@ jobs:
         with:
           submodules: 'recursive'
 
-      - name: Remove example folder
-        run: rm -rf example
-
       - name: Create Release Archive
-        run: tar --exclude=.git --exclude=*/.git -czvf ../prerelease.tar.gz .
+        run: tar --exclude=./example --exclude=.git --exclude=*/.git -czvf ../prerelease.tar.gz .
 
       - name: Create Release
         id: create_release
