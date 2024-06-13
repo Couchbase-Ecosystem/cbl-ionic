@@ -2,7 +2,10 @@ name: Prerelease
 
 on:
   workflow_dispatch:
-
+    inputs:
+      prerelease_number:
+        description: 'Prerelease number'
+        required: true
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -24,8 +27,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ github.event.inputs.prerelease_number }}
+          release_name: Release ${{ github.event.inputs.prerelease_number }}
           draft: false
           prerelease: true 
 
