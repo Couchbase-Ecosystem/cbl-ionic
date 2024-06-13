@@ -16,7 +16,7 @@ jobs:
           submodules: 'recursive'
 
       - name: Create Release Archive
-        run: tar --exclude=./example --exclude=.git --exclude=*/.git -czvf ../prerelease.tar.gz .
+        run: tar --exclude=./example --exclude=.git --exclude=*/.git -czvf ../cbl-ionic.tar.gz .
 
       - name: Create Release
         id: create_release
@@ -36,6 +36,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ../prerelease.tar.gz
-          asset_name: prerelease.tar.gz
+          asset_path: ../cbl-ionic.tar.gz
+          asset_name: cbl-ionic.tar.gz
           asset_content_type: application/gzip
