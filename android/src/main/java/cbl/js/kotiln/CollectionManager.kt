@@ -47,12 +47,12 @@ object CollectionManager {
     ): Pair<String, Boolean?> {
         val col = this.getCollection(collectionName, scopeName, databaseName)
         col?.let { collection ->
+            val mutableDocument =  if (documentId.isEmpty()) {
+                MutableDocument(document)
+            } else {
+                MutableDocument(documentId, document)
+            }
             concurrencyControl?.let {
-                val mutableDocument = if (documentId.isEmpty()) {
-                    MutableDocument(document)
-                } else {
-                    MutableDocument(documentId, document)
-                }
                 val result = collection.save(mutableDocument, it)
                 if (result) {
                     return Pair(mutableDocument.id, true)
@@ -60,7 +60,6 @@ object CollectionManager {
                     return Pair(mutableDocument.id, false)
                 }
             }
-            val mutableDocument = MutableDocument(documentId, document)
             collection.save(mutableDocument)
             return Pair(mutableDocument.id, null)
         }
