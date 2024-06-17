@@ -31,6 +31,15 @@ const GetDocumentPage: React.FC = () => {
           const doc = await collection.document(documentId);
           if (doc !== null && doc.getId() != null) {
             setResultsMessage(prev => [...prev, `${new Date()} Document Found: ` + JSON.stringify(doc)]);
+            if (doc['textBlob'] !== null){
+               const blobText = await doc.getBlobContent('textBlob', collection);
+               if (blobText !== null) {
+                  const textDecoder = new TextDecoder();
+                  const textBlobResults = textDecoder.decode(blobText);
+                  setResultsMessage(prev => [...prev, textBlobResults]);
+
+               }
+            }
           } else {
             setResultsMessage(prev => [...prev, `${new Date()} Error: Document not found`]);
           }

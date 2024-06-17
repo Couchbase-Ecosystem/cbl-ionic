@@ -71,7 +71,7 @@ const DatabaseSetupPage: React.FC = () => {
       navigationTitle="Database Setup"
       collapseTitle="Define Database"
       titleButtons={<IonButton
-          key="button-action"
+          key="button-action-path"
           onClick={platformPath}
           style={{
             display: 'block',
@@ -89,15 +89,17 @@ const DatabaseSetupPage: React.FC = () => {
       setDatabaseName={setDatabaseName}
       results={resultsMessage}
     >
-      <IonItem key={1}>
-        <IonInput
+      <IonItem key="item-file-location">
+        <IonInput 
+          key="item-input-file-location"
           placeholder='File Location'
           onInput={(e: any) => setPath(e.target.value)}
           value={path}
         ></IonInput>
       </IonItem>
-      <IonItem key={2}>
+      <IonItem key="item-encryption-key">
         <IonInput
+          key="item-input-encryption-key"
           onInput={(e: any) => setEncryptionKey(e.target.value)}
           placeholder='Encryption Key'
           value={encryptionKey}

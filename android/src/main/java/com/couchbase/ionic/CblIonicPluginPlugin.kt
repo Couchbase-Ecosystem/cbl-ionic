@@ -874,7 +874,7 @@ class CblIonicPluginPlugin : Plugin() {
                         if (blobData == null) {
                             results.put("data", emptyArray<Byte>())
                         } else {
-                            results.put("data", blobData)
+                            results.put("data", JSONArray(blobData))
                         }
                         call.resolve(results)
                     }

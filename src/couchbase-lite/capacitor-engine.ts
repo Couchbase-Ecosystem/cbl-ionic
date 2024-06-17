@@ -127,11 +127,11 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
     return IonicCouchbaseLite.collection_GetDocument(args);
   }
 
-  async collection_GetDocumentBlobContent(
+  async collection_GetBlobContent(
       args: CollectionDocumentGetBlobContentArgs
-  ) : Promise<ArrayBuffer> {
-    const data = await IonicCouchbaseLite.collection_GetDocumentBlobContent(args);
-    return new Uint8Array(data).buffer;
+  ) : Promise<{data: ArrayBuffer}> {
+    const data = await IonicCouchbaseLite.collection_GetBlobContent(args);
+    return {data: new Uint8Array(data.data).buffer};
   }
 
   async collection_GetIndexes(
@@ -323,7 +323,7 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
    */
   async document_GetBlobContent(
       args: DocumentGetBlobContentArgs
-  ): Promise<ArrayBuffer> {
+  ): Promise<{data: ArrayBuffer}> {
     const colArgs:CollectionDocumentGetBlobContentArgs = {
       name: args.name,
       collectionName: this._defaultCollectionName,
@@ -331,8 +331,8 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
       documentId: args.documentId,
       key: args.key
     };
-    const data = await IonicCouchbaseLite.collection_GetDocumentBlobContent(colArgs);
-    return new Uint8Array(data).buffer;
+    const data = await IonicCouchbaseLite.collection_GetBlobContent(colArgs);
+    return {data: new Uint8Array(data.data).buffer};
   }
 
   async file_GetDefaultPath(): Promise<{ path: string }> {
