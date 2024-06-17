@@ -74,7 +74,12 @@ const EditDocumentPage: React.FC = () => {
                                 const abBlob = DataGeneratorService.getBlobFromBase64(selectedData.blob);
                                 if (abBlob != null) {
                                     const blob = new Blob("image/jpeg", abBlob);
+                                    const encoder = new TextEncoder();
                                     doc.setBlob('image', blob);
+
+                                    //add text blob to the image also
+                                    const textBlob = new Blob("text/plain", encoder.encode("Hello World"));
+                                    doc.setBlob('textBlob', textBlob);
                                 }
                             }
                         }
@@ -110,29 +115,31 @@ const EditDocumentPage: React.FC = () => {
                 setCollectionName={setCollectionName}
                 sectionTitle="Document Information"
                 titleButtons={undefined}>
-                <IonItem key={1}>
+                <IonItem key="item-document-id">
                     <IonInput
+                        key="input-document-id"
                         onInput={(e: any) => setDocumentId(e.target.value)}
                         placeholder="Document ID"
                         value={documentId}
                     ></IonInput>
                 </IonItem>
-                <IonItem key={2} lines="full">
-                    <IonLabel position="stacked">Document</IonLabel>
-                    <textarea
+                <IonItem key="item-document-textarea" lines="full">
+                    <IonLabel key="item-document-label" position="stacked">Document</IonLabel>
+                    <textarea 
+                        key="item-document-textarea-input"
                         style={{width: '100%', padding: '16px 0px'}}
                         rows={4}
                         value={document}
                         onChange={(e: any) => setDocument(e.detail.value)}
                         placeholder="{ 'message': 'hello world' }">
-          </textarea>
+                    </textarea>
                 </IonItem>
-                <IonItemDivider>
-                    <IonLabel>Generated Data</IonLabel>
+                <IonItemDivider key="item-divider-before-generated-data">
+                    <IonLabel key="item-label-generated-data">Generated Data</IonLabel>
                 </IonItemDivider>
-                <IonItem key={3}>
+                <IonItem key="item-generated-documents-select-list">
                     <IonSelect
-                        key={selectKey}
+                        key="selected-document-select-generated-docs"
                         placeholder='Generated Documents'
                         value={selectedDocument}
                         onIonChange={e => {
@@ -145,7 +152,9 @@ const EditDocumentPage: React.FC = () => {
                         }
                         }>
                         {Object.entries(dictionary).map(([key, value]) => (
-                            <IonSelectOption value={key}>{value}</IonSelectOption>
+                            <IonSelectOption 
+                            key={`select-option-key-${key}`}
+                            value={key}>{value}</IonSelectOption>
                         ))}
                     </IonSelect>
                 </IonItem>

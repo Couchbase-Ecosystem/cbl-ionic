@@ -191,16 +191,18 @@ object PluginHelper {
 
     fun documentToMap(document: Document): JSObject? {
         try {
-            val docJson = JSONObject(document.toMap())
+            val dMap = document.toMap()
+            val docJson = JSONObject(dMap)
             val keys: Iterator<*> = docJson.keys()
             while (keys.hasNext()) {
                 val key = keys.next() as String
-                val value = docJson[key]
+                val value = dMap[key]
+                //only replace the value if it's a blob because
+                //JSONObject will not map in the blob object into the JSON object
+                //since it's not a supported JSON type
                 if (value is Blob) {
                     val blobProps = JSONObject(value.getProperties())
                     docJson.put(key, blobProps)
-                } else {
-                    docJson.put(key, value)
                 }
             }
             val docMap = JSObject()
@@ -209,7 +211,7 @@ object PluginHelper {
             docMap.put("_sequence", document.sequence)
             return docMap
         } catch (ex: Exception) {
-            return null
+            throw ex
         }
     }
 
