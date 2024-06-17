@@ -1162,7 +1162,7 @@ public class CblIonicPluginPlugin: CAPPlugin {
                         .shared
                         .getPendingDocumentIds(replicatorId, collection: collection)
                     DispatchQueue.main.async {
-                        call.resolve(documentIds)
+                        call.resolve(["pendingDocumentIds": documentIds])
                         return
                     }
                 } else {
