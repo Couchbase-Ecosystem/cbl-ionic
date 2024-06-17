@@ -1636,7 +1636,7 @@ class CblIonicPluginPlugin : Plugin() {
                     )
                     if (pendingDocIds.isNotEmpty()) {
                         val results = JSObject()
-                        results.put("documentIDs", pendingDocIds)
+                        results.put("pendingDocumentIds", pendingDocIds)
                         call.resolve(results)
                     } else {
                         call.resolve()
