@@ -6,6 +6,7 @@ import {
   CollectionCreateIndexArgs,
   CollectionDeleteDocumentArgs,
   CollectionDeleteIndexArgs,
+  CollectionDocumentExpirationArgs,
   CollectionDocumentGetBlobContentArgs,
   CollectionDocumentSaveResult,
   CollectionGetDocumentArgs,
@@ -19,6 +20,7 @@ import {
   DatabaseDeleteIndexArgs,
   DatabaseExistsArgs,
   DocumentChangeListenerArgs,
+  DocumentExpirationResult,
   DocumentGetBlobContentArgs,
   DatabaseGetDocumentArgs,
   DatabaseOpenArgs,
@@ -127,6 +129,10 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
     return IonicCouchbaseLite.collection_GetDocument(args);
   }
 
+  async collection_GetDocumentExpiration(args: CollectionGetDocumentArgs): Promise<DocumentExpirationResult> {
+    return IonicCouchbaseLite.collection_GetDocumentExpiration(args);
+  }
+
   async collection_GetBlobContent(
       args: CollectionDocumentGetBlobContentArgs
   ) : Promise<{data: ArrayBuffer}> {
@@ -160,6 +166,10 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
       args: CollectionSaveArgs
   ): Promise<CollectionDocumentSaveResult> {
     return IonicCouchbaseLite.collection_Save(args);
+  }
+
+  async collection_SetDocumentExpiration(args: CollectionDocumentExpirationArgs): Promise<void> {
+    return IonicCouchbaseLite.collection_SetDocumentExpiration(args);
   }
 
   async database_Close(args: DatabaseArgs): Promise<void> {
