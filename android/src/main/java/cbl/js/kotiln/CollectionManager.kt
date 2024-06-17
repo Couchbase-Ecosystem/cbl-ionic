@@ -142,12 +142,12 @@ object CollectionManager {
 
     @Throws(Exception::class)
     fun setDocumentExpiration(documentId: String,
+                              expiration: String,
                               collectionName: String,
                               scopeName: String,
-                              databaseName: String,
-                              expiration: String) {
+                              databaseName: String) {
         val col = this.getCollection(collectionName, scopeName, databaseName)
-        val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
         val expirationDate = format.parse(expiration)
         col?.setDocumentExpiration(documentId, expirationDate)
     }

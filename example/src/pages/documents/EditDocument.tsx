@@ -100,6 +100,8 @@ const EditDocumentPage: React.FC = () => {
             }
         }
 
+ 
+
         return (
             <DetailPageDatabaseCollectionRun
                 navigationTitle="Document Editor"
@@ -114,7 +116,11 @@ const EditDocumentPage: React.FC = () => {
                 collectionName={collectionName}
                 setCollectionName={setCollectionName}
                 sectionTitle="Document Information"
-                titleButtons={undefined}>
+                titleButtons={
+                    <>
+                
+                        </>
+                    }>
                 <IonItem key="item-document-id">
                     <IonInput
                         key="input-document-id"

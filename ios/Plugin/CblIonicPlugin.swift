@@ -916,8 +916,12 @@ public class CblIonicPluginPlugin: CAPPlugin {
                                            collectionName: collectionName,
                                            scopeName: scopeName,
                                            databaseName: name){
+                    
+                    let formatter =  ISO8601DateFormatter()
+                    let dateString = formatter.string(from: date)
+                    
                     DispatchQueue.main.async {
-                        call.resolve(["date": date])
+                        call.resolve(["date": dateString])
                         return
                     }
                     

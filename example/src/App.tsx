@@ -36,6 +36,7 @@ import {
     EditDocumentPage,
     DeleteDocumentPage,
     GetDocumnetPage,
+    SetDocumentExpirationPage, 
     ChangeDocumnetPage,
     CreateBatchPage,
 } from './pages/documents';
@@ -147,6 +148,7 @@ const App: React.FC = () => {
 
                         <Route path="/documents/create" component={EditDocumentPage} exact/>
                         <Route path="/documents/get" component={GetDocumnetPage} exact/>
+                        <Route path="/documents/setExpiration" component={SetDocumentExpirationPage} exact/>
                         <Route path="/documents/change" component={ChangeDocumnetPage} exact/>
                         <Route path="/documents/delete" component={DeleteDocumentPage} exact/>
                         <Route path="/documents/batch/create" component={CreateBatchPage} exact/>

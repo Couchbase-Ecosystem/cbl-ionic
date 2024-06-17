@@ -39,6 +39,14 @@ const DatabaseMenuItems: React.FC = () => {
       <IonItem
         lines="none"
         style={{ marginLeft: 20 }}
+        routerLink="/documents/setExpiration"
+        routerDirection="none"
+      >
+        <IonLabel>Set Expiration</IonLabel>
+      </IonItem>
+      <IonItem
+        lines="none"
+        style={{ marginLeft: 20 }}
         routerLink="/documents/batch/create"
         routerDirection="none"
       >
