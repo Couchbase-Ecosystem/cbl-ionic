@@ -43,6 +43,7 @@ import {
   Scope,
   ScopeArgs,
   ScopesResult, ReplicationChangeListenerArgs, ReplicatorCollectionArgs,
+  DatabaseEncryptionKeyArgs,
 } from '../cblite-js/cblite';
 
 import { IonicCouchbaseLite } from '../ionic-couchbase-lite';
@@ -178,6 +179,10 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
 
   async database_Copy(args: DatabaseCopyArgs): Promise<void> {
     return IonicCouchbaseLite.database_Copy(args);
+  }
+
+  async database_ChangeEncryptionKey(args: DatabaseEncryptionKeyArgs): Promise<void> {
+    return IonicCouchbaseLite.database_ChangeEncryptionKey(args); 
   }
 
   /**

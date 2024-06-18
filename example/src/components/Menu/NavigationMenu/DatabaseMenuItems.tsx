@@ -46,6 +46,13 @@ const DatabaseMenuItems: React.FC = () => {
                 <IonLabel>Delete</IonLabel>
             </IonItem>
             <IonItem
+                style={{marginLeft: 20}}
+                routerLink="/database/changeKey"
+                routerDirection="none"
+            >
+                <IonLabel>Change Encryption Key</IonLabel>
+            </IonItem>
+            <IonItem
                 lines="none"
                 style={{marginLeft: 20}}
                 routerLink="/database/maintenance"

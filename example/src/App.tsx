@@ -20,6 +20,7 @@ import {
     DatabaseClosePage,
     DatabaseCopyPage,
     DatabaseDeletePage,
+    ChangeEncryptionKeyPage,
     PerformMaintenancePage
 } from './pages/databases';
 
@@ -101,6 +102,7 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import ChangeEncryptionKey from "./pages/databases/ChangeEncryptionKey";
 
 setupIonicReact();
 const App: React.FC = () => {
@@ -134,6 +136,7 @@ const App: React.FC = () => {
                         <Route path="/database/open" component={DatabaseOpenPage} exact/>
                         <Route path="/database/close" component={DatabaseClosePage} exact/>
                         <Route path="/database/copy" component={DatabaseCopyPage} exact/>
+                        <Route path="/database/changeKey" component={ChangeEncryptionKeyPage} exact/>
 
                         <Route path="/database/delete" component={DatabaseDeletePage} exact/>
                         <Route path="/database/maintenance" component={PerformMaintenancePage} exact/>

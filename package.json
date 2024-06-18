@@ -1,6 +1,6 @@
 {
   "name": "cbl-ionic",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Ionic Capacitor plugin for Couchbase Lite Enterprise (3.x+)",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
@@ -52,8 +52,8 @@
     "@capacitor/docgen": "^0.0.18",
     "@ionic/prettier-config": "^1.0.1",
     "@ionic/swiftlint-config": "^1.1.2",
-    "@typescript-eslint/eslint-plugin": "^7.4.0",
-    "@typescript-eslint/parser": "^7.4.0",
+    "@typescript-eslint/eslint-plugin": "^7.13.1",
+    "@typescript-eslint/parser": "^7.13.0",
     "eslint": "^8.35.0",
     "prettier": "~2.3.0",
     "prettier-plugin-java": "~1.0.2",

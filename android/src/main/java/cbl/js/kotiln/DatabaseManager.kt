@@ -69,6 +69,16 @@ object DatabaseManager {
         return Database.exists(databaseName, directory)
     }
 
+    fun changeEncryptionKey(databaseName: String, encryptionKey: String?) {
+        val db = getDatabase(databaseName) ?: throw Exception("Error: Database not found.")
+        if (encryptionKey == null) {
+            db.changeEncryptionKey(null)
+            return
+        }
+        val encryptionKeyValue = EncryptionKey(encryptionKey)
+        db.changeEncryptionKey(encryptionKeyValue)
+    }
+
     fun delete(databaseName: String) {
         synchronized(openDatabases) {
             val db = getDatabase(databaseName)
