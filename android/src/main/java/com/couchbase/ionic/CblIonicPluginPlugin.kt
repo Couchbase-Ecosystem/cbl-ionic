@@ -139,6 +139,31 @@ class CblIonicPluginPlugin : Plugin() {
     }
 
     @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+    fun database_ChangeEncryptionKey(call: PluginCall) {
+        val (name, isError) = PluginHelper.getStringFromCall(call, "name")
+        if (isError) {
+            return
+        }
+        val newKey = call.getString("newKey")
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                name?.let { databaseName ->
+                    try {
+                        DatabaseManager.changeEncryptionKey(databaseName, newKey)
+                        return@withContext withContext(Dispatchers.Main) {
+                            call.resolve()
+                        }
+                    } catch (e: Exception) {
+                        return@withContext withContext(Dispatchers.Main) {
+                            call.reject("${e.message}")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     fun database_Delete(call: PluginCall) {
         val (name, isError) = PluginHelper.getStringFromCall(call, "name")
         if (isError) {

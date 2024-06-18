@@ -18,6 +18,7 @@ CAP_PLUGIN(CblIonicPlugin, "CblIonicPlugin",
            CAP_PLUGIN_METHOD(database_Delete, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(database_GetPath, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(database_Copy, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(database_ChangeEncryptionKey, CAPPluginReturnPromise);
            
            CAP_PLUGIN_METHOD(database_AddChangeListener, CAPPluginReturnCallback);
            CAP_PLUGIN_METHOD(database_RemoveChangeListener, CAPPluginReturnPromise);

@@ -203,6 +203,31 @@ public class CblIonicPluginPlugin: CAPPlugin {
         }
     }
     
+    @objc func database_ChangeEncryptionKey(_ call: CAPPluginCall) {
+        backgroundQueue.async {
+            guard 
+                let name = call.getString("name") else {
+                DispatchQueue.main.async {
+                    call.reject("Error:  Missing required parameter 'name'")
+                }
+                return
+            }
+            let newKey = call.getString("newKey")
+            do {
+                try DatabaseManager.shared.changeEncryptionKey(name, newKey: newKey)
+                DispatchQueue.main.async {
+                    call.resolve()
+                    return
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    call.reject("Unable to change encryption key for database - error: \(error.localizedDescription)")
+                    return
+                }
+            }
+        }
+    }
+    
     @objc func database_Delete(_ call: CAPPluginCall) {
         backgroundQueue.async {
             guard let name = call.getString("name") else {
