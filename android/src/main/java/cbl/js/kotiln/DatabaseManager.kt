@@ -16,15 +16,6 @@ object DatabaseManager {
     private val defaultCollectionName: String = "_default"
     private val defaultScopeName: String = "_default"
 
-    fun getDatabase(databaseName: String): Database? {
-        synchronized(openDatabases){
-            if (openDatabases.containsKey(databaseName)) {
-                return openDatabases[databaseName]!!
-            }
-            return null
-        }
-    }
-
     private fun buildDatabaseConfiguration(config: JSONObject?, context: Context)
     : DatabaseConfiguration {
         val databaseConfig = DatabaseConfiguration()
@@ -45,30 +36,6 @@ object DatabaseManager {
         return databaseConfig
     }
 
-    fun openDatabase(databaseName: String, config: JSONObject?, context: Context): Database {
-        synchronized(openDatabases) {
-            val databaseConfig = buildDatabaseConfiguration(config, context)
-            val newDatabase = Database(databaseName, databaseConfig)
-            if (openDatabases.containsKey(databaseName)) {
-                openDatabases.remove(databaseName)
-            }
-            openDatabases[databaseName] = newDatabase
-            return newDatabase
-        }
-    }
-
-    fun closeDatabase(databaseName: String) {
-        synchronized(openDatabases) {
-            val database = getDatabase(databaseName)
-            database?.close()
-        }
-    }
-
-    fun exists(databaseName: String, directoryPath:String): Boolean {
-        val directory = File(directoryPath)
-        return Database.exists(databaseName, directory)
-    }
-
     fun changeEncryptionKey(databaseName: String, encryptionKey: String?) {
         val db = getDatabase(databaseName) ?: throw Exception("Error: Database not found.")
         if (encryptionKey == null) {
@@ -79,45 +46,17 @@ object DatabaseManager {
         db.changeEncryptionKey(encryptionKeyValue)
     }
 
-    fun delete(databaseName: String) {
+    fun closeDatabase(databaseName: String) {
         synchronized(openDatabases) {
-            val db = getDatabase(databaseName)
-            db?.let { database ->
-                database.delete()
-                openDatabases.remove(databaseName)
-            }
+            val database = getDatabase(databaseName)
+            database?.close()
         }
-    }
-
-    fun getPath(databaseName: String) : String {
-        val db = getDatabase(databaseName)
-        return db?.path ?: ""
     }
 
     fun copy(path: String, newName: String, databaseConfig: JSONObject?, context: Context) {
         val config = buildDatabaseConfiguration(databaseConfig, context)
         val filePath = File(path)
         Database.copy(filePath, newName, config)
-    }
-
-    fun performMaintenance(databaseName: String, maintenanceType: MaintenanceType) {
-        val db = getDatabase(databaseName)
-        db?.performMaintenance(maintenanceType)
-    }
-
-    fun defaultScope(databaseName: String): Scope? {
-        val db = getDatabase(databaseName)
-        return db?.defaultScope
-    }
-
-    fun scopes (databaseName: String): Set<Scope> {
-        val db = getDatabase(databaseName)
-        return db?.scopes ?: setOf()
-    }
-
-    fun getScope(databaseName: String, scopeName: String): Scope? {
-        val db = getDatabase(databaseName)
-        return db?.getScope(scopeName)
     }
 
     fun createCollection(collectionName: String,
@@ -132,17 +71,19 @@ object DatabaseManager {
         return db?.defaultCollection
     }
 
-    fun getCollection(collectionName: String,
-                         scopeName: String,
-                         databaseName: String) : CBLCollection? {
+    fun defaultScope(databaseName: String): Scope? {
         val db = getDatabase(databaseName)
-        return db?.getCollection(collectionName, scopeName)
+        return db?.defaultScope
     }
 
-    fun getCollections(scopeName: String,
-                       databaseName: String): MutableSet<Collection>? {
-       val db = getDatabase(databaseName)
-       return db?.getCollections(scopeName)
+    fun delete(databaseName: String) {
+        synchronized(openDatabases) {
+            val db = getDatabase(databaseName)
+            db?.let { database ->
+                database.delete()
+                openDatabases.remove(databaseName)
+            }
+        }
     }
 
     fun deleteCollection(collectionName: String,
@@ -168,6 +109,11 @@ object DatabaseManager {
         return ""
     }
 
+    fun exists(databaseName: String, directoryPath:String): Boolean {
+        val directory = File(directoryPath)
+        return Database.exists(databaseName, directory)
+    }
+
     fun explainQuery(strQuery: String, databaseName: String, parameters: Parameters?): String {
         val db = getDatabase(databaseName)
         db?.let { database ->
@@ -181,4 +127,57 @@ object DatabaseManager {
         return ""
     }
 
+    fun getCollection(collectionName: String,
+                         scopeName: String,
+                         databaseName: String) : CBLCollection? {
+        val db = getDatabase(databaseName)
+        return db?.getCollection(collectionName, scopeName)
+    }
+
+    fun getCollections(scopeName: String,
+                       databaseName: String): MutableSet<Collection>? {
+       val db = getDatabase(databaseName)
+       return db?.getCollections(scopeName)
+    }
+
+    fun getDatabase(databaseName: String): Database? {
+        synchronized(openDatabases){
+            if (openDatabases.containsKey(databaseName)) {
+                return openDatabases[databaseName]!!
+            }
+            return null
+        }
+    }
+
+    fun getPath(databaseName: String) : String {
+        val db = getDatabase(databaseName)
+        return db?.path ?: ""
+    }
+
+    fun getScope(databaseName: String, scopeName: String): Scope? {
+        val db = getDatabase(databaseName)
+        return db?.getScope(scopeName)
+    }
+
+    fun openDatabase(databaseName: String, config: JSONObject?, context: Context): Database {
+        synchronized(openDatabases) {
+            val databaseConfig = buildDatabaseConfiguration(config, context)
+            val newDatabase = Database(databaseName, databaseConfig)
+            if (openDatabases.containsKey(databaseName)) {
+                openDatabases.remove(databaseName)
+            }
+            openDatabases[databaseName] = newDatabase
+            return newDatabase
+        }
+    }
+
+    fun performMaintenance(databaseName: String, maintenanceType: MaintenanceType) {
+        val db = getDatabase(databaseName)
+        db?.performMaintenance(maintenanceType)
+    }
+
+    fun scopes (databaseName: String): Set<Scope> {
+        val db = getDatabase(databaseName)
+        return db?.scopes ?: setOf()
+    }
 }

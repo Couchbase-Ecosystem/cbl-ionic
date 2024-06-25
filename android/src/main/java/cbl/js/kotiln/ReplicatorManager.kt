@@ -11,12 +11,14 @@ object ReplicatorManager {
     val replicatorChangeListeners: MutableMap<String, ListenerToken> = mutableMapOf()
     val replicatorDocumentListners: MutableMap<String, ListenerToken> = mutableMapOf()
 
-    fun getReplicator(replicatorId: String): Replicator? {
-        return replicators[replicatorId]
-    }
-
-    fun removeReplicator(replicatorId: String) {
-        replicators.remove(replicatorId)
+    fun cleanUp(replicatorId: String) {
+        val replicator = replicators[replicatorId]
+        if (replicator != null) {
+            replicator.stop()
+            replicators.remove(replicatorId)
+        } else {
+            throw Exception("Replicator not found")
+        }
     }
 
     fun createReplicator(replicatorConfig: ReplicatorConfiguration): String {
@@ -26,32 +28,8 @@ object ReplicatorManager {
         return id
     }
 
-    fun start(replicatorId: String) {
-        val replicator = replicators[replicatorId]
-        if (replicator != null) {
-           replicator.start()
-        } else {
-            throw Exception("Replicator not found")
-        }
-    }
-
-    fun stop(replicatorId: String) {
-        val replicator = replicators[replicatorId]
-        if (replicator != null) {
-           replicator.stop()
-        } else {
-            throw Exception("Replicator not found")
-        }
-    }
-    
-    fun resetCheckpoint(replicatorId: String) {
-        val replicator = replicators[replicatorId]
-        if (replicator != null) {
-            replicator.stop()
-            replicator.start(true)
-        } else {
-            throw Exception("Replicator not found")
-        }    
+    fun getReplicator(replicatorId: String): Replicator? {
+        return replicators[replicatorId]
     }
 
     fun getStatus(replicatorId: String): ReplicatorStatus {
@@ -63,23 +41,31 @@ object ReplicatorManager {
         }
     }
 
-    fun cleanUp(replicatorId: String) {
+    fun isDocumentPending(
+        docId: String,
+        replicatorId: String,
+        collectionName: String,
+        scopeName: String,
+        databaseName: String
+    ): Boolean {
         val replicator = replicators[replicatorId]
-        if (replicator != null) {
-            replicator.stop()
-            replicators.remove(replicatorId)
+        val collection = DatabaseManager.getCollection(collectionName, scopeName, databaseName)
+        if (replicator != null && collection != null) {
+            return replicator.isDocumentPending(docId, collection)
         } else {
-            throw Exception("Replicator not found")
+            throw Exception("Replicator or Collection not found")
         }
     }
-    
-    fun pendingDocIs(replicatorId: String, 
-                     collectionName: String,
-                     scopeName: String,
-                     databaseName: String): Set<String> {
+
+    fun pendingDocIs(
+        replicatorId: String,
+        collectionName: String,
+        scopeName: String,
+        databaseName: String
+    ): Set<String> {
         val mutableSet = mutableSetOf<String>()
         val collection = DatabaseManager.getCollection(collectionName, scopeName, databaseName)
-        if (collection != null){
+        if (collection != null) {
             val replicator = replicators[replicatorId]
             if (replicator != null) {
                 val pendingDocIds = replicator.getPendingDocumentIds(collection)
@@ -89,10 +75,10 @@ object ReplicatorManager {
             }
         } else {
             throw Exception("Collection not found")
-        } 
+        }
         return mutableSet
     }
-    
+
     fun removeChangeListener(replicatorId: String, token: String) {
         val replicator = replicators[replicatorId]
         replicator?.let {
@@ -100,6 +86,38 @@ object ReplicatorManager {
             listenerToken?.let {
                 listenerToken.remove()
             }
+        }
+    }
+
+    fun removeReplicator(replicatorId: String) {
+        replicators.remove(replicatorId)
+    }
+
+    fun resetCheckpoint(replicatorId: String) {
+        val replicator = replicators[replicatorId]
+        if (replicator != null) {
+            replicator.stop()
+            replicator.start(true)
+        } else {
+            throw Exception("Replicator not found")
+        }
+    }
+
+    fun start(replicatorId: String) {
+        val replicator = replicators[replicatorId]
+        if (replicator != null) {
+            replicator.start()
+        } else {
+            throw Exception("Replicator not found")
+        }
+    }
+
+    fun stop(replicatorId: String) {
+        val replicator = replicators[replicatorId]
+        if (replicator != null) {
+            replicator.stop()
+        } else {
+            throw Exception("Replicator not found")
         }
     }
 }
