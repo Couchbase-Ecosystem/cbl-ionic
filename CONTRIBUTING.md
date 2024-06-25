@@ -24,7 +24,8 @@ This guide provides instructions for contributing to this Capacitor plugin.
 - Android Development
     - [Android Studio](https://developer.android.com/studio?gad_source=1&gclid=CjwKCAjwzN-vBhAkEiwAYiO7oALYfxbMYW_zkuYoacS9TX16aItdvLYe6GB7_j1QwvXBjFDRkawfUBoComcQAvD_BwE&gclsrc=aw.ds) installed and working
     - Android SDK 34 >= installed and working (with command line tools)
-    - A Android Emulator downloaded and working 
+    - Java SDK v17 installed and working with Android Studio
+    - An Android Emulator downloaded and working 
 
 ## Plugin Project Structure
 
@@ -68,18 +69,9 @@ This is the Swift implementation of the Couchbase Lite SDK which includes defini
     ```shell
     brew install swiftlint
     ```
-   
-4. Install CocoaPods if you are going to work on iOS. 
+4. Run npm build verify to build Javascript - from project root and validate platform code works.
 
     ```shell
-    cd ios
-    pod install 
-    cd ..
-    ```
-5. Run npm build to build Javascript - from project root.
-
-    ```shell
-    npm run build
     npm run verify
     ```
 
@@ -90,13 +82,10 @@ To test the plugin an Example app has been provided.  To build the example app f
     ```shell
     cd example
     npm install
-    npm run build
     ```
-2. Install Cocoa Pods for iOS
+2. Run verify that will do a build and set up the platform code for iOS and Android:
     ```shell
-    cd ios/App
-    pod install
-    cd ..
+    npm run verify
     ```
 3. Run the example app.  From the root of the example directory run the following command:
     
@@ -122,7 +111,7 @@ Then, Rollup will bundle the code `dist/plugin.js` with the other two npm packag
 
 #### `npm run verify`
 
-Build and validate the web and native projects.
+Build and validate the Typescript and native projects to make sure they build.  This automatically installs the shared libraries dependencies for iOS and Android and builds the native projects.
 
 This is useful to run in CI to verify that the plugin builds for all platforms.
 

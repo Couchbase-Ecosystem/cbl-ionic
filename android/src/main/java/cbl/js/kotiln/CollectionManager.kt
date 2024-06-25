@@ -14,86 +14,13 @@ object CollectionManager {
     private val defaultScopeName: String = "_default"
 
     @Throws(Exception::class)
-    private fun getCollection(
-        collectionName: String,
-        scopeName: String,
-        databaseName: String
-    ): CBLCollection? {
-        return DatabaseManager.getDatabase(databaseName)?.getCollection(collectionName, scopeName)
-    }
-
-    @Throws(Exception::class)
-    fun documentsCount(
-        collectionName: String,
-        scopeName: String,
-        databaseName: String
-    ): Int {
-        var count = 0
-        val col = this.getCollection(collectionName, scopeName, databaseName)
-        col?.let { collection ->
-            count = collection.count.toInt()
-        }
-        return count
-    }
-
-    @Throws(Exception::class)
-    fun saveDocument(
-        documentId: String,
-        document: Map<String, Any?>,
-        concurrencyControl: ConcurrencyControl?,
-        collectionName: String,
-        scopeName: String,
-        databaseName: String
-    ): Pair<String, Boolean?> {
-        val col = this.getCollection(collectionName, scopeName, databaseName)
-        col?.let { collection ->
-            val mutableDocument =  if (documentId.isEmpty()) {
-                MutableDocument(document)
-            } else {
-                MutableDocument(documentId, document)
-            }
-            concurrencyControl?.let {
-                val result = collection.save(mutableDocument, it)
-                if (result) {
-                    return Pair(mutableDocument.id, true)
-                } else {
-                    return Pair(mutableDocument.id, false)
-                }
-            }
-            collection.save(mutableDocument)
-            return Pair(mutableDocument.id, null)
-        }
-        throw Error("Error: Document not saved")
-    }
-
-    @Throws(Exception::class)
-    fun getDocument(documentId: String,
+    fun createIndex(indexName: String,
+                    index: Index,
                     collectionName: String,
                     scopeName: String,
-                    databaseName: String): Document? {
+                    databaseName: String) {
         val col = this.getCollection(collectionName, scopeName, databaseName)
-        col?.let { collection ->
-            val doc = collection.getDocument(documentId)
-            return doc
-        }
-        return null
-    }
-
-    @Throws(Exception::class)
-    fun getBlobContent(key: String,
-                       documentId: String,
-                       collectionName: String,
-                        scopeName: String,
-                        databaseName: String): ByteArray? {
-
-        val doc = this.getDocument(documentId, collectionName, scopeName, databaseName)
-        doc?.let { document ->
-            val blob = document.getBlob(key)
-            blob?.let { b ->
-                return b.content
-            }
-        }
-        return null
+        col?.createIndex(indexName, index)
     }
 
     @Throws(Exception::class)
@@ -132,12 +59,121 @@ object CollectionManager {
     }
 
     @Throws(Exception::class)
+    fun deleteIndex(indexName: String,
+                    collectionName: String,
+                    scopeName: String,
+                    databaseName: String) {
+        val col = this.getCollection(collectionName, scopeName, databaseName)
+        col?.deleteIndex(indexName)
+    }
+
+    @Throws(Exception::class)
+    fun documentsCount(
+        collectionName: String,
+        scopeName: String,
+        databaseName: String
+    ): Int {
+        var count = 0
+        val col = this.getCollection(collectionName, scopeName, databaseName)
+        col?.let { collection ->
+            count = collection.count.toInt()
+        }
+        return count
+    }
+
+    @Throws(Exception::class)
+    fun getBlobContent(key: String,
+                       documentId: String,
+                       collectionName: String,
+                       scopeName: String,
+                       databaseName: String): ByteArray? {
+
+        val doc = this.getDocument(documentId, collectionName, scopeName, databaseName)
+        doc?.let { document ->
+            val blob = document.getBlob(key)
+            blob?.let { b ->
+                return b.content
+            }
+        }
+        return null
+    }
+
+    @Throws(Exception::class)
+    private fun getCollection(
+        collectionName: String,
+        scopeName: String,
+        databaseName: String
+    ): CBLCollection? {
+        return DatabaseManager.getDatabase(databaseName)?.getCollection(collectionName, scopeName)
+    }
+
+    @Throws(Exception::class)
+    fun getDocument(documentId: String,
+                    collectionName: String,
+                    scopeName: String,
+                    databaseName: String): Document? {
+        val col = this.getCollection(collectionName, scopeName, databaseName)
+        col?.let { collection ->
+            val doc = collection.getDocument(documentId)
+            return doc
+        }
+        return null
+    }
+
+    @Throws(Exception::class)
+    fun getDocumentExpiration(documentId: String,
+                              collectionName: String,
+                              scopeName: String,
+                              databaseName: String): Date? {
+        val col = this.getCollection(collectionName, scopeName, databaseName)
+        return col?.getDocumentExpiration(documentId)
+    }
+
+    @Throws(Exception::class)
+    fun getIndexes(collectionName: String,
+                   scopeName: String,
+                   databaseName: String): Set<String>? {
+        val col = this.getCollection(collectionName, scopeName, databaseName)
+        return col?.getIndexes()
+    }
+
+    @Throws(Exception::class)
     fun purgeDocument(documentId: String,
                       collectionName: String,
                       scopeName: String,
                       databaseName: String) {
         val col = this.getCollection(collectionName, scopeName, databaseName)
         col?.purge(documentId)
+    }
+
+    @Throws(Exception::class)
+    fun saveDocument(
+        documentId: String,
+        document: Map<String, Any?>,
+        concurrencyControl: ConcurrencyControl?,
+        collectionName: String,
+        scopeName: String,
+        databaseName: String
+    ): Pair<String, Boolean?> {
+        val col = this.getCollection(collectionName, scopeName, databaseName)
+        col?.let { collection ->
+            val mutableDocument =  if (documentId.isEmpty()) {
+                MutableDocument(document)
+            } else {
+                MutableDocument(documentId, document)
+            }
+            concurrencyControl?.let {
+                val result = collection.save(mutableDocument, it)
+                if (result) {
+                    return Pair(mutableDocument.id, true)
+                } else {
+                    return Pair(mutableDocument.id, false)
+                }
+            }
+            collection.save(mutableDocument)
+            return Pair(mutableDocument.id, null)
+        }
+        throw Error("Error: Document not saved")
     }
 
     @Throws(Exception::class)
@@ -151,41 +187,4 @@ object CollectionManager {
         val expirationDate = format.parse(expiration)
         col?.setDocumentExpiration(documentId, expirationDate)
     }
-
-    @Throws(Exception::class)
-    fun getDocumentExpiration(documentId: String,
-                              collectionName: String,
-                              scopeName: String,
-                              databaseName: String): Date? {
-        val col = this.getCollection(collectionName, scopeName, databaseName)
-        return col?.getDocumentExpiration(documentId)
-    }
-
-    @Throws(Exception::class)
-    fun createIndex(indexName: String,
-                    index: Index,
-                    collectionName: String,
-                    scopeName: String,
-                    databaseName: String) {
-        val col = this.getCollection(collectionName, scopeName, databaseName)
-        col?.createIndex(indexName, index)
-    }
-
-    @Throws(Exception::class)
-    fun deleteIndex(indexName: String,
-                    collectionName: String,
-                    scopeName: String,
-                    databaseName: String) {
-        val col = this.getCollection(collectionName, scopeName, databaseName)
-        col?.deleteIndex(indexName)
-    }
-
-    @Throws(Exception::class)
-    fun getIndexes(collectionName: String,
-                   scopeName: String,
-                   databaseName: String): Set<String>? {
-        val col = this.getCollection(collectionName, scopeName, databaseName)
-        return col?.getIndexes()
-    }
-
 }

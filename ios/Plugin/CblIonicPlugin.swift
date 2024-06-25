@@ -1209,6 +1209,43 @@ public class CblIonicPluginPlugin: CAPPlugin {
         }
     }
     
+    @objc func replicator_IsDocumentPending(_ call: CAPPluginCall) {
+        backgroundQueue.async {
+            guard let replicatorId = call.getString("replicatorId"),
+                  let documentId = call.getString("documentId"),
+                  let name = call.getString("name"),
+                  let scopeName = call.getString("scopeName"),
+                  let collectionName = call.getString("collectionName")
+            else {
+                DispatchQueue.main.async {
+                    call.reject("Error: No replicatorId, documentId, or  collection information supplied")
+                }
+                return
+            }
+            do {
+                if let collection = try CollectionManager.shared.getCollection(collectionName, scopeName: scopeName, databaseName: name) {
+                    let isPending = try ReplicatorManager
+                        .shared
+                        .isDocumentPending(replicatorId, documentId: documentId, collection: collection)
+                    DispatchQueue.main.async {
+                        call.resolve(isPending)
+                        return
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        call.reject("Error can't find collection for getting pending documentIds from replicator")
+                        return
+                    }
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    call.reject("Error getting pending documentIds \(error.localizedDescription)")
+                    return
+                }
+            }
+        }
+    }
+    
     @objc func replicator_Cleanup(_ call: CAPPluginCall) {
         backgroundQueue.async {
             guard let replicatorId = call.getString("replicatorId") else {

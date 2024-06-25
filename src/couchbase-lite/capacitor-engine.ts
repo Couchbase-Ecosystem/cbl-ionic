@@ -43,7 +43,7 @@ import {
   Scope,
   ScopeArgs,
   ScopesResult, ReplicationChangeListenerArgs, ReplicatorCollectionArgs,
-  DatabaseEncryptionKeyArgs,
+  DatabaseEncryptionKeyArgs, ReplicatorDocumentChangeListener, ReplicatorDocumentPendingArgs,
 } from '../cblite-js/cblite';
 
 import { IonicCouchbaseLite } from '../ionic-couchbase-lite';
@@ -425,6 +425,10 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
 
   async replicator_GetPendingDocumentIds(args: ReplicatorCollectionArgs): Promise<{ pendingDocumentIds: string[] }>{
     return IonicCouchbaseLite.replicator_GetPendingDocumentIds(args);
+  }
+
+  async replicator_IsDocumentPending(args: ReplicatorDocumentPendingArgs): Promise<{ isPending: boolean }>{
+    return IonicCouchbaseLite.replicator_IsDocumentPending(args);
   }
 
   async replicator_ResetCheckpoint(args: ReplicatorArgs): Promise<void> {
