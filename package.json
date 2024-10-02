@@ -62,7 +62,7 @@
     "swiftlint": "^1.0.1",
     "tslib": "^2.6.2",
     "typescript": "5.4.2",
-    "chai": "^5.1.0"
+    "uuid": "^9.0.1"
   },
   "peerDependencies": {
     "@capacitor/core": "^5.7.5"

@@ -32,7 +32,6 @@ import {
   DocumentResult,
   EngineLocator,
   ListenerCallback,
-  ListenerHandle,
   QueryChangeListenerArgs,
   QueryExecuteArgs,
   QueryRemoveChangeListenerArgs,
@@ -42,13 +41,16 @@ import {
   ReplicatorStatus,
   Scope,
   ScopeArgs,
-  ScopesResult, ReplicationChangeListenerArgs, ReplicatorCollectionArgs,
-  DatabaseEncryptionKeyArgs, ReplicatorDocumentChangeListener, ReplicatorDocumentPendingArgs,
+  ScopesResult,
+  ReplicationChangeListenerArgs,
+  ReplicatorCollectionArgs,
+  DatabaseEncryptionKeyArgs,
+  ReplicatorDocumentPendingArgs,
 } from '../cblite-js/cblite';
 
 import { IonicCouchbaseLite } from '../ionic-couchbase-lite';
 import { IonicCouchbaseLitePlugin } from '../definitions';
-
+import { v4 as uuidv4 } from 'uuid';
 export class CapacitorEngine implements IonicCouchbaseLitePlugin {
   _defaultCollectionName = '_default';
   _defaultScopeName = '_default';
@@ -61,7 +63,7 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
   collection_AddChangeListener(
       args: CollectionChangeListenerArgs,
       cb: ListenerCallback
-  ): Promise<ListenerHandle> {
+  ): Promise<void> {
     return IonicCouchbaseLite.collection_AddChangeListener(
         {
           name: args.name,
@@ -76,7 +78,7 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
   collection_AddDocumentChangeListener(
       args: DocumentChangeListenerArgs,
       cb: ListenerCallback
-  ): Promise<ListenerHandle> {
+  ): Promise<void> {
     return IonicCouchbaseLite.collection_AddDocumentChangeListener(
         {
           name: args.name,
@@ -201,6 +203,10 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
 
   async database_Delete(args: DatabaseArgs): Promise<void> {
     return IonicCouchbaseLite.database_Delete(args);
+  }
+
+  async database_DeleteWithPath(args: DatabaseExistsArgs): Promise<void> {
+    return IonicCouchbaseLite.database_DeleteWithPath(args);
   }
 
   /**
@@ -369,7 +375,7 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
   query_AddChangeListener(
       args: QueryChangeListenerArgs,
       cb: ListenerCallback
-  ): Promise<ListenerHandle> {
+  ): Promise<void> {
     return IonicCouchbaseLite.query_AddChangeListener(
         {
           name: args.name,
@@ -385,7 +391,7 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
     return await IonicCouchbaseLite.query_Execute(args);
   }
 
-  async query_Explain(args: QueryExecuteArgs): Promise<Result> {
+  async query_Explain(args: QueryExecuteArgs):  Promise<{ data: string }>{
     return await IonicCouchbaseLite.query_Explain(args);
   }
 
@@ -398,14 +404,14 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
   replicator_AddChangeListener(
       args: ReplicationChangeListenerArgs,
       cb: ListenerCallback
-  ): Promise<ListenerHandle> {
+  ): Promise<void> {
     return IonicCouchbaseLite.replicator_AddChangeListener(args, cb);
   }
 
   replicator_AddDocumentChangeListener(
       args: ReplicationChangeListenerArgs,
       cb: ListenerCallback
-  ): Promise<ListenerHandle> {
+  ): Promise<void> {
     return IonicCouchbaseLite.replicator_AddDocumentChangeListener(args, cb);
   }
 
@@ -459,6 +465,10 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
 
   async scope_GetScopes(args: DatabaseArgs): Promise<ScopesResult> {
     return IonicCouchbaseLite.scope_GetScopes(args);
+  }
+
+  getUUID(): string {
+    return uuidv4().toString();
   }
 
 }
