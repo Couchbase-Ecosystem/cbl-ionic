@@ -4,16 +4,17 @@
   "version": "0.1.7",
   "type": "module",
   "scripts": {
-    "dev": "vite",
     "build": "tsc && vite build",
-    "verify:ios": "cd ios/App && pod install && xcodebuild -workspace App.xcworkspace -scheme App -destination generic/platform=iOS CODE_SIGN_IDENTITY=\"\" CODE_SIGNING_REQUIRED=NO && cd ../..",
-    "verify:android": "cd android && ./gradlew clean build test && cd ..",
-    "verify": "npm run clean && npm run build && npm run verify:ios && npm run verify:android",
+    "buildAll": "cd .. && npm run build && cd example && npm run build",
+    "clean": "rm -rf dist",
+    "cleanAll": "cd .. && npm run clean && cd example && rm -rf dist",
+    "dev": "vite",
+    "lint": "eslint",
     "preview": "vite preview",
     "tailwind": "tailwindcss build -i src/main.css -o src/theme/tailwind.css",
-    "test.unit": "vitest",
-    "lint": "eslint",
-    "clean": "rm -rf dist"
+    "verify:ios": "cd ios/App && pod install && xcodebuild -workspace App.xcworkspace -scheme App -destination generic/platform=iOS CODE_SIGN_IDENTITY=\"\" CODE_SIGNING_REQUIRED=NO && cd ../..",
+    "verify:android": "cd android && ./gradlew clean build test && cd ..",
+    "verify": "npm run clean && npm run build && npm run verify:ios && npm run verify:android"
   },
   "dependencies": {
     "@capacitor/android": "^6.1.2",
