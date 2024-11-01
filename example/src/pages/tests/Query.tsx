@@ -2,7 +2,7 @@
 import React from 'react';
 import DetailPageTestContainerRunner from '../../components/DetailPageTestRunnerContainer/DetailPageTestRunnerContainer';
 
-import { QueryTests } from 'cbl-ionic';
+import { QueryTests } from '../../cblite-js-tests/cblite-tests/e2e/query-test';
 
 const QueryTestPage: React.FC = () => {
   return (

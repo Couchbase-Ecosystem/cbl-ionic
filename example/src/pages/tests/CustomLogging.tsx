@@ -1,8 +1,8 @@
 // CustomLoggingTests.tsx
-import React, { useState } from 'react';
+import React from 'react';
 import DetailPageTestContainerRunner from '../../components/DetailPageTestRunnerContainer/DetailPageTestRunnerContainer';
 
-import { CustomLoggingTests } from 'cbl-ionic';
+import { CustomLoggingTests } from '../../cblite-js-tests/cblite-tests/e2e/custom-logging-test';
 
 const CustomLoggingTestsPage: React.FC = () => {
 

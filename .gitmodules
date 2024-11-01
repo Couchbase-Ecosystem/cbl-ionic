@@ -4,3 +4,6 @@
 [submodule "ios/Plugin/cbl-js-swift"]
 	path = ios/Plugin/cbl-js-swift
 	url = git@github.com:Couchbase-Ecosystem/cbl-js-swift.git
+[submodule "example/src/cblite-js-tests"]
+	path = example/src/cblite-js-tests
+	url = git@github.com:Couchbase-Ecosystem/cblite-js-tests.git

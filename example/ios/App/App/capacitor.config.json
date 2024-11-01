@@ -7,5 +7,12 @@
 	},
 	"plugins": {
 		"cblite-ionic": {}
-	}
+	},
+	"packageClassList": [
+		"AppPlugin",
+		"HapticsPlugin",
+		"KeyboardPlugin",
+		"StatusBarPlugin",
+		"CblIonicPlugin"
+	]
 }
