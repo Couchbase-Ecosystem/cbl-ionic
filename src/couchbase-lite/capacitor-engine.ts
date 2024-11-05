@@ -11,7 +11,7 @@ import {
   CollectionDocumentSaveResult,
   CollectionGetDocumentArgs,
   CollectionPurgeDocumentArgs,
-  CollectionSaveArgs,
+  CollectionSaveStringArgs,
   CollectionsResult,
   DatabaseArgs,
   DatabaseCopyArgs,
@@ -166,7 +166,7 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
   }
 
   async collection_Save(
-      args: CollectionSaveArgs
+      args: CollectionSaveStringArgs
   ): Promise<CollectionDocumentSaveResult> {
     return IonicCouchbaseLite.collection_Save(args);
   }
@@ -318,12 +318,13 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
   async database_Save(
       args: DatabaseSaveArgs
   ): Promise<CollectionDocumentSaveResult> {
-    const colArgs:CollectionSaveArgs = {
+    const colArgs:CollectionSaveStringArgs = {
       name: args.name,
       collectionName: this._defaultCollectionName,
       scopeName: this._defaultScopeName,
       id: args.id,
-      document: args.document,
+      document: JSON.stringify(args.document),
+      blobs: JSON.stringify(args.blobs),
       concurrencyControl: args.concurrencyControl,
     };
     return IonicCouchbaseLite.collection_Save(colArgs);

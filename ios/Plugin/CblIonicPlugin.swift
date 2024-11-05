@@ -686,7 +686,7 @@ public class CblIonicPluginPlugin: CAPPlugin {
                 }
             }
             do {
-                let (documentId, concurrencyControlResult) = try CollectionManager.shared.saveDocument(
+                let result = try CollectionManager.shared.saveDocument(
                     docId,
                     document: document,
                     concurrencyControl: concurrencyControl,
@@ -695,8 +695,10 @@ public class CblIonicPluginPlugin: CAPPlugin {
                     databaseName: name)
                 DispatchQueue.main.async {
                     call.resolve([
-                        "_id": documentId,
-                        "concurrencyControlResult": concurrencyControlResult as Any
+                        "_id": result._id, 
+                        "_revId": result._revId,
+                        "_sequence": result._sequence,
+                        "concurrencyControlResult": result._concurrencyControl as Any
                     ])
                     return
                 }
@@ -803,6 +805,7 @@ public class CblIonicPluginPlugin: CAPPlugin {
                 data["_data"] = documentMap
                 data["_id"] = docId
                 data["_sequence"] = doc.sequence
+                data["_revId"] = doc.revisionID
                 DispatchQueue.main.async {
                     call.resolve(data)
                     return

@@ -823,7 +823,8 @@ class CblIonicPluginPlugin : Plugin() {
     fun collection_Save(call: PluginCall) {
         var docConcurrencyControl: ConcurrencyControl? = null
         val collectionDto = PluginHelper.getCollectionDtoFromCall(call)
-        if (collectionDto == null || collectionDto.isError) {
+        val documentDto = PluginHelper.getDocumentDtoFromCall(call)
+        if (collectionDto == null || collectionDto.isError || documentDto == null || documentDto.isError) {
             return
         }
         val documentId = call.getString("id")
@@ -839,27 +840,25 @@ class CblIonicPluginPlugin : Plugin() {
                     concurrencyControlValue?.let {
                         docConcurrencyControl = PluginHelper.getConcurrencyControlFromInt(it)
                     }
-                    val document = call.getObject("document")
-                    document?.let {
-                        val documentMap = PluginHelper.toMap(document)
-                        val (resultDocId, concurrencyResult) = CollectionManager.saveDocument(
-                            docId,
-                            documentMap,
-                            docConcurrencyControl,
-                            collectionDto.collectionName,
-                            collectionDto.scopeName,
-                            collectionDto.databaseName
-                        )
-                        val results = JSObject()
-                        results.put("_id", resultDocId)
-                        results.put("concurrencyResult", concurrencyResult)
-                        return@withContext withContext(Dispatchers.Main) {
-                            call.resolve(results)
-                        }
-                    }
+                    val blobs = PluginHelper.getBlobsFromString(documentDto.blobs)
+                    val result = CollectionManager.saveDocument(
+                        docId,
+                        documentDto.document,
+                        blobs,
+                        docConcurrencyControl,
+                        collectionDto.collectionName,
+                        collectionDto.scopeName,
+                        collectionDto.databaseName
+                    )
+                    val results = JSObject()
+                    results.put("_id", result._id)
+                    results.put("_revId", result._revId)
+                    results.put("_sequence", result._sequence)
+                    results.put("concurrencyResult", result._concurrencyControl)
                     return@withContext withContext(Dispatchers.Main) {
-                        call.reject("Error: couldn't map document from JSON Object to Map<String, Any?>")
+                        call.resolve(results)
                     }
+
                 } catch (e: Exception) {
                     return@withContext withContext(Dispatchers.Main) {
                         call.reject("${e.message}")
@@ -1246,8 +1245,7 @@ class CblIonicPluginPlugin : Plugin() {
     @Throws(JSONException::class)
     fun file_GetFileNamesInDirectory(call: PluginCall) {
         val (directoryPath, isDirectoryPathError) = PluginHelper.getStringFromCall(call, "path")
-        if (isDirectoryPathError || directoryPath.isNullOrEmpty())
-        {
+        if (isDirectoryPathError || directoryPath.isNullOrEmpty()) {
             return
         }
         GlobalScope.launch {
