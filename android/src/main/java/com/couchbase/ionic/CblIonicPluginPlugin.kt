@@ -605,11 +605,7 @@ class CblIonicPluginPlugin : Plugin() {
                     document?.let {
                         val results = PluginHelper.documentToMap(it)
                         return@withContext withContext(Dispatchers.Main) {
-                            if (results == null) {
-                                call.reject("Error mapping document data")
-                            } else {
-                                call.resolve(results)
-                            }
+                            call.resolve(results)
                         }
                     }
                     return@withContext withContext(Dispatchers.Main) {

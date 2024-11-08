@@ -662,54 +662,7 @@ public class CblIonicPluginPlugin: CAPPlugin {
     
     // MARK: - Document Functions
     
-    @objc func collection_Save(_ call: CAPPluginCall) {
-        backgroundQueue.async {
-            guard let name = call.getString("name"),
-                  let document = call.getObject("document"),
-                  let scopeName = call.getString("scopeName"),
-                  let collectionName = call.getString("collectionName")
-            else {
-                DispatchQueue.main.async {
-                    call.reject("Error:  Missing parameters")
-                }
-                return
-            }
-            
-            let docId = call.getString("id") ?? ""
-            
-            //deal with concurrentyControl
-            let concurrencyControlValue = call.getInt("concurrencyControl")
-            var concurrencyControl: ConcurrencyControl?
-            if (concurrencyControlValue != nil) {
-                if let uint8Value = UInt8(exactly: concurrencyControlValue!) {
-                    concurrencyControl = ConcurrencyControl(rawValue: uint8Value)
-                }
-            }
-            do {
-                let result = try CollectionManager.shared.saveDocument(
-                    docId,
-                    document: document,
-                    concurrencyControl: concurrencyControl,
-                    collectionName: collectionName,
-                    scopeName: scopeName,
-                    databaseName: name)
-                DispatchQueue.main.async {
-                    call.resolve([
-                        "_id": result._id, 
-                        "_revId": result._revId,
-                        "_sequence": result._sequence,
-                        "concurrencyControlResult": result._concurrencyControl as Any
-                    ])
-                    return
-                }
-            } catch {
-                DispatchQueue.main.async {
-                    call.reject("Unable to save document: \(error.localizedDescription)")
-                    return
-                }
-            }
-        }
-    }
+   
     
     @objc func collection_GetCount(_ call: CAPPluginCall) {
         backgroundQueue.async {
@@ -771,6 +724,46 @@ public class CblIonicPluginPlugin: CAPPlugin {
             } catch {
                 call.reject("Error deleting document: \(error.localizedDescription)")
                 return
+            }
+        }
+    }
+    
+    @objc func collection_GetBlobContent(_ call: CAPPluginCall) {
+        backgroundQueue.async {
+            guard let name = call.getString("name"),
+                  let documentId = call.getString("documentId"),
+                  let scopeName = call.getString("scopeName"),
+                  let collectionName = call.getString("collectionName"),
+                  let key = call.getString("key") else {
+                DispatchQueue.main.async {
+                    call.reject("Error: Missing required parameters 'name', 'documentId', or 'key'")
+                }
+                return
+            }
+            do {
+                
+                guard let blob = try CollectionManager
+                    .shared
+                    .getBlobContent(key,
+                                    documentId: documentId,
+                                    collectionName: collectionName,
+                                    scopeName: scopeName,
+                                    databaseName: name)
+                else {
+                    DispatchQueue.main.async{
+                        call.resolve(["data": []])
+                    }
+                    return
+                }
+                DispatchQueue.main.async {
+                    call.resolve(["data": blob])
+                    return
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    call.reject("Error getting document: \(error.localizedDescription)")
+                    return
+                }
             }
         }
     }
@@ -850,48 +843,60 @@ public class CblIonicPluginPlugin: CAPPlugin {
         }
     }
     
-    @objc func collection_GetBlobContent(_ call: CAPPluginCall) {
+    @objc func collection_Save(_ call: CAPPluginCall) {
         backgroundQueue.async {
             guard let name = call.getString("name"),
-                  let documentId = call.getString("documentId"),
+                  let document = call.getString("document"),
                   let scopeName = call.getString("scopeName"),
                   let collectionName = call.getString("collectionName"),
-                  let key = call.getString("key") else {
+                  let jsonDocument = call.getString("document"),
+                  let jsonBlobs = call.getString("blobs")
+            else {
                 DispatchQueue.main.async {
-                    call.reject("Error: Missing required parameters 'name', 'documentId', or 'key'")
+                    call.reject("Error:  Missing parameters")
                 }
                 return
             }
-            do {
-                
-                guard let blob = try CollectionManager
-                    .shared
-                    .getBlobContent(key,
-                                    documentId: documentId,
-                                    collectionName: collectionName,
-                                    scopeName: scopeName,
-                                    databaseName: name)
-                else {
-                    DispatchQueue.main.async{
-                        call.resolve(["data": []])
-                    }
-                    return
+            
+            let docId = call.getString("id") ?? ""
+            
+            //deal with concurrentyControl
+            let concurrencyControlValue = call.getInt("concurrencyControl")
+            var concurrencyControl: ConcurrencyControl?
+            if (concurrencyControlValue != nil) {
+                if let uint8Value = UInt8(exactly: concurrencyControlValue!) {
+                    concurrencyControl = ConcurrencyControl(rawValue: uint8Value)
                 }
+            }
+            do {
+                let blobs = try CollectionManager.shared.blobsFromJsonString(jsonBlobs)
+                let result = try CollectionManager.shared.saveDocument(
+                    docId,
+                    document: jsonDocument,
+                    blobs: blobs,
+                    concurrencyControl: concurrencyControl,
+                    collectionName: collectionName,
+                    scopeName: scopeName,
+                    databaseName: name)
                 DispatchQueue.main.async {
-                    call.resolve(["data": blob])
+                    call.resolve([
+                        "_id": result.id,
+                        "_revId": result.revId ?? "",
+                        "_sequence": result.sequence,
+                        "concurrencyControlResult": result.concurrencyControl as Any
+                    ])
                     return
                 }
             } catch {
                 DispatchQueue.main.async {
-                    call.reject("Error getting document: \(error.localizedDescription)")
+                    call.reject("Unable to save document: \(error.localizedDescription)")
                     return
                 }
             }
         }
     }
     
-    @objc func collection_SetDocumentExpiration(_
-                                                call: CAPPluginCall) {
+    @objc func collection_SetDocumentExpiration(_ call: CAPPluginCall) {
         backgroundQueue.async {
             guard let name = call.getString("name"),
                   let scopeName = call.getString("scopeName"),
@@ -924,8 +929,7 @@ public class CblIonicPluginPlugin: CAPPlugin {
         }
     }
     
-    @objc func collection_GetDocumentExpiration(_
-                                                call: CAPPluginCall) {
+    @objc func collection_GetDocumentExpiration(_ call: CAPPluginCall) {
         backgroundQueue.async {
             guard let name = call.getString("name"),
                   let scopeName = call.getString("scopeName"),
@@ -970,7 +974,6 @@ public class CblIonicPluginPlugin: CAPPlugin {
     }
     
     // MARK: - SQL++ Query Functions
-    
     @objc func query_Execute(_ call: CAPPluginCall){
         backgroundQueue.async {
             guard let name = call.getString("name"),
