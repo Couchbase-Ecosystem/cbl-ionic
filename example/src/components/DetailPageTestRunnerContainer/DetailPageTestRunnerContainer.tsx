@@ -2,7 +2,7 @@
 import './DetailPageTestRunnerContainer.css';
 import React from 'react';
 import useState from 'react-usestateref';
-import { TestRunner, ITestResult, TestCase } from 'cbl-ionic';
+import { TestRunner, ITestResult, TestCase } from '../../cblite-js-tests/cblite-tests/e2e/';
 
 import {
   IonButtons,

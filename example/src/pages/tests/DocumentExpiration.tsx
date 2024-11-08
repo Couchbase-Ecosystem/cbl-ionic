@@ -2,7 +2,7 @@
 import React from 'react';
 import DetailPageTestContainerRunner from '../../components/DetailPageTestRunnerContainer/DetailPageTestRunnerContainer';
 
-import { DocumentExpirationTests } from 'cbl-ionic';
+import { DocumentExpirationTests } from '../../cblite-js-tests/cblite-tests/e2e/document-expiration-test';
 
 const DocumentExpirationTestsPage: React.FC = () => {
 

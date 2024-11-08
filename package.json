@@ -1,7 +1,7 @@
 {
   "name": "cbl-ionic",
-  "version": "0.2.3",
-  "description": "Ionic Capacitor plugin for Couchbase Lite Enterprise (3.x+)",
+  "version": "0.2.4",
+  "description": "Ionic Capacitor plugin for Couchbase Lite Enterprise (3.2+)",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
@@ -46,26 +46,27 @@
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
-    "@capacitor/android": "^5.7.5",
-    "@capacitor/core": "^5.7.5",
-    "@capacitor/ios": "^5.7.5",
-    "@capacitor/docgen": "^0.0.18",
-    "@ionic/prettier-config": "^1.0.1",
-    "@ionic/swiftlint-config": "^1.1.2",
-    "@typescript-eslint/eslint-plugin": "^7.13.1",
-    "@typescript-eslint/parser": "^7.13.0",
-    "eslint": "^8.35.0",
-    "prettier": "~2.3.0",
-    "prettier-plugin-java": "~1.0.2",
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/ios": "^6.1.2",
+    "@capacitor/docgen": "^0.3.0",
+    "@ionic/prettier-config": "^4.0.0",
+    "@ionic/swiftlint-config": "^2.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.12.0",
+    "@typescript-eslint/parser": "^8.12.0",
+    "micromatch": "^4.0.8",
+    "eslint": "^8.57.1",
+    "prettier": "~3.3.0",
+    "prettier-plugin-java": "~2.6.5",
     "rimraf": "^3.0.2",
-    "rollup": "^2.32.0",
-    "swiftlint": "^1.0.1",
-    "tslib": "^2.6.2",
+    "rollup": "^2.79.2",
+    "swiftlint": "^2.0.0",
+    "tslib": "^2.8.0",
     "typescript": "5.4.2",
-    "chai": "^5.1.0"
+    "uuid": "^9.0.1"
   },
   "peerDependencies": {
-    "@capacitor/core": "^5.7.5"
+    "@capacitor/core": "^6.1.2"
   },
   "swiftlint": "@ionic/swiftlint-config",
   "capacitor": {

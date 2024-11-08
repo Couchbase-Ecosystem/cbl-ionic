@@ -2,7 +2,7 @@
 import React from 'react';
 import DetailPageTestContainerRunner from '../../components/DetailPageTestRunnerContainer/DetailPageTestRunnerContainer';
 
-import { VectorSearchTests } from 'cbl-ionic';
+import { VectorSearchTests } from '../../cblite-js-tests/cblite-tests/e2e/vector-search-test';
 
 const VectorSearchTestsPage: React.FC = () => {
   return (

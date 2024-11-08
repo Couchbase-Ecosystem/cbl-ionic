@@ -29,10 +29,12 @@ const GetDocumentPage: React.FC = () => {
       if (database != null && collection != null) {
         try {
           const doc = await collection.document(documentId);
-          if (doc !== null && doc.getId() != null) {
-            setResultsMessage(prev => [...prev, `${new Date()} Document Found: ` + JSON.stringify(doc)]);
+          if (doc !== undefined && doc !== null && doc.getId() != null) {
+            const docData = doc.toDictionary();
+            setResultsMessage(prev => [...prev, `${new Date()} Document Found: ` + JSON.stringify(docData)]);
             if (doc['textBlob'] !== null){
-               const blobText = await doc.getBlobContent('textBlob', collection);
+              const blob = doc.getBlob('textBlob');
+              const blobText = blob.getBytes();
                if (blobText !== null) {
                   const textDecoder = new TextDecoder();
                   const textBlobResults = textDecoder.decode(blobText);
