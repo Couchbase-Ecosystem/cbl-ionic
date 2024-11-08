@@ -4,17 +4,18 @@ This guide provides instructions for contributing to this Capacitor plugin.
 
 ## Development Requirements
 - Javascript
-    - [Node 18](https://formulae.brew.sh/formula/node@18)
+    - [Node 18](https://formulae.brew.sh/formula/node@18) or higher
 - Capacitor
-    - [Capacitor v5 cli](https://capacitorjs.com/docs/getting-started)
+    - [Capacitor v6 cli](https://capacitorjs.com/docs/getting-started)
     - [Understanding on Capacitor Plugins Development](https://capacitorjs.com/docs/plugins/creating-plugins)
 - IDEs
     - [Visual Studio Code](https://code.visualstudio.com/download)
         - [Visual Studio Code Ionic Extension](https://capacitorjs.com/docs/vscode/getting-started)
     - [IntelliJ IDEA](https://www.jetbrains.com/idea/download/)
+    - [Cursor](https://www.cursor.com/)
 - iOS Development
     - A modern Mac 
-    - [XCode 14](https://developer.apple.com/xcode/) or higher installed and working (XCode 15 installed is preferred)
+    - [XCode 15](https://developer.apple.com/xcode/) or higher installed and working (XCode 15 installed is preferred)
     - [XCode Command Line Tools](https://developer.apple.com/download/more/) installed 
     - [Simulators](https://developer.apple.com/documentation/safari-developer-tools/installing-xcode-and-simulators) downloaded and working
     - [Homebrew](https://brew.sh/) 
@@ -25,6 +26,7 @@ This guide provides instructions for contributing to this Capacitor plugin.
     - [Android Studio](https://developer.android.com/studio?gad_source=1&gclid=CjwKCAjwzN-vBhAkEiwAYiO7oALYfxbMYW_zkuYoacS9TX16aItdvLYe6GB7_j1QwvXBjFDRkawfUBoComcQAvD_BwE&gclsrc=aw.ds) installed and working
     - Android SDK 34 >= installed and working (with command line tools)
     - Java SDK v17 installed and working with Android Studio
+    - Java SDK v17 configured for Gradle builds in Android Studio
     - An Android Emulator downloaded and working 
 
 ## Plugin Project Structure
@@ -43,7 +45,9 @@ This guide provides instructions for contributing to this Capacitor plugin.
 ## Shared Libraries and Tests
 ### [cblite-js](https://github.com/Couchbase-Ecosystem/cblite-js)
 - `cblite` this is the Javascript implementation of the Couchbase Lite SDK which includes definitions for the main classes and methods in the Couchbase Lite SDK.  This is used by the plugin to call the native code.  This is added to the project via Git Submodule to the /src/cblite-js directory.
-- `cblite-tests` this is the Javascript end to end (e2e) test that are used to fully test the plugin to validate that all functionality works.  This includes a custom test runner that can be used by any UI to run the tests.  This is added to the project via Git Submodule to the /src/cblite-js directory.
+
+### [cblite-tests](https://github.com/Couchbase-Ecosystem/cblite-js-tests)
+- `cblite-tests` this is the Javascript end to end (e2e) test that are used to fully test the plugin to validate that all functionality works.  This includes a custom test runner that can be used by any UI to run the tests.  This is added to the project via Git Submodule to the /example/src/cblite-tests directory so that the test library dependencies are available to the test runner but don't affect the main project.
 
 ### [cbl-js-swift](https://github.com/Couchbase-Ecosystem/cbl-js-swift)
 This is the Swift implementation of the Couchbase Lite SDK which includes definitions for the main classes and methods in the Couchbase Lite SDK.  This is used by the plugin to call the native code.  This is added to the project via Git Submodule to the /src/ios/Plugin/cbl-js-swift directory.
@@ -51,6 +55,7 @@ This is the Swift implementation of the Couchbase Lite SDK which includes defini
 ## Local Setup
 
 ### How to Build the Plugin
+Because the project uses submodules to manage the shared libraries and tests, you need to clone the repo with the submodules.  Failure to follow these directions will result in the build failing.  
 
 1. Fork and clone this repo.  You will need to also clone all the submodules for the shared libraries and tests and update them with the latest version of each of those modules code.  Run the following commands from the root of the cbl-ionic repo:
     ```shell
@@ -125,12 +130,3 @@ Any new features should be published with e2e tests that are ran against the exa
 
 ## TODO - Publishing
 
-This section is not complete - **DO NOT FOLLOW**:
-
-There is a `prepublishOnly` hook in `package.json` which prepares the plugin before publishing, so all you need to do is run:
-
-```shell
-npm publish
-```
-
-> **Note**: The [`files`](https://docs.npmjs.com/cli/v7/configuring-npm/package-json#files) array in `package.json` specifies which files get published. If you rename files/directories or add files elsewhere, you may need to update it.
