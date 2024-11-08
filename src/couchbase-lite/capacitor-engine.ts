@@ -55,9 +55,8 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
   _defaultCollectionName = '_default';
   _defaultScopeName = '_default';
 
-  constructor(config: any = {}) {
+  constructor() {
     EngineLocator.registerEngine(EngineLocator.key, this);
-    this.plugin_Configure(config);
   }
 
   collection_AddChangeListener(

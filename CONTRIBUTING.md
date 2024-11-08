@@ -15,7 +15,7 @@ This guide provides instructions for contributing to this Capacitor plugin.
     - [Cursor](https://www.cursor.com/)
 - iOS Development
     - A modern Mac 
-    - [XCode 15](https://developer.apple.com/xcode/) or higher installed and working (XCode 15 installed is preferred)
+    - [XCode 15](https://developer.apple.com/xcode/) or higher installed and working (XCode 15 installed is preferred per Capacitor v6 requirements)
     - [XCode Command Line Tools](https://developer.apple.com/download/more/) installed 
     - [Simulators](https://developer.apple.com/documentation/safari-developer-tools/installing-xcode-and-simulators) downloaded and working
     - [Homebrew](https://brew.sh/) 

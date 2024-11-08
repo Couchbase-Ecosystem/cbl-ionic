@@ -30,17 +30,6 @@ public class CblIonicPluginPlugin: CAPPlugin {
         queryChangeListeners = [:]
     }
     
-    // MARK: - Capacitor Plugin Functions
-    
-    @objc func plugin_Configure(_ call: CAPPluginCall) {
-        let config = call.getObject("config", [:]) as [String: Any]
-        
-        if let chunkSizeVal = config["allResultsChunkSize"] as? Int {
-            self.allResultsChunkSize = chunkSizeVal
-        }
-        call.resolve()
-    }
-    
     // MARK: - File System Helper Functions
     
     @objc func file_GetDefaultPath(_ call: CAPPluginCall) {

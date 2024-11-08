@@ -38,12 +38,6 @@ class CblIonicPluginPlugin : Plugin() {
         CouchbaseLite.init(bridge.context, true)
     }
 
-    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
-    @Throws(JSONException::class, CouchbaseLiteException::class)
-    fun plugin_Configure(call: PluginCall) {
-        val config: JSObject = call.getObject("config")
-    }
-
     @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
     @Throws(JSONException::class)
     fun collection_AddChangeListener(call: PluginCall) {
