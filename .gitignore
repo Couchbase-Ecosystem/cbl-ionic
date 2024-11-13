@@ -12,7 +12,7 @@ example/.vscode
 example/android/.gradle
 example/android/app/build/*
 example/ios/DerivedData/*
-
+example/ios/App/App/public/assets/*
 
 # windows
 windows/IonicCouchbaseLite/.vs/*
