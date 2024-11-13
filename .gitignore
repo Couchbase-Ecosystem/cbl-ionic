@@ -13,6 +13,7 @@ example/android/.gradle
 example/android/app/build/*
 example/ios/DerivedData/*
 
+
 # windows
 windows/IonicCouchbaseLite/.vs/*
 windows/IonicCouchbaseLite/IonicCouchbaseLite/obj
