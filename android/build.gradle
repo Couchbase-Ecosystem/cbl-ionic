@@ -60,7 +60,7 @@ repositories {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':capacitor-android')
-    implementation "com.couchbase.lite:couchbase-lite-android-ee-ktx:3.2.0"
+    implementation "com.couchbase.lite:couchbase-lite-android-ee-ktx:3.2.1"
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
     implementation 'androidx.core:core-ktx:1.10.1'
     testImplementation "junit:junit:$junitVersion"
