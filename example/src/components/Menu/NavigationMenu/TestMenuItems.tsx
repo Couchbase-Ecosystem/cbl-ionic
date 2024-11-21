@@ -17,12 +17,6 @@ const TestMenuItems: React.FC = () => {
             </IonItemDivider>
             <IonItem
                 style={{marginLeft: 20}}
-                routerLink="/tests/all"
-                routerDirection="none">
-                <IonLabel>All</IonLabel>
-            </IonItem>
-            <IonItem
-                style={{marginLeft: 20}}
                 routerLink="/tests/consoleLogging"
                 routerDirection="none">
                 <IonLabel>Console Logging</IonLabel>
