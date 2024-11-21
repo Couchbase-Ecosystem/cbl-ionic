@@ -59,12 +59,6 @@ const TestMenuItems: React.FC = () => {
             </IonItem>
             <IonItem
                 style={{marginLeft: 20}}
-                routerLink="/tests/predicateQuery"
-                routerDirection="none">
-                <IonLabel>Predicate Query</IonLabel>
-            </IonItem>
-            <IonItem
-                style={{marginLeft: 20}}
                 routerLink="/tests/query"
                 routerDirection="none">
                 <IonLabel>Query SQL++</IonLabel>
