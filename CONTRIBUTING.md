@@ -1,7 +1,15 @@
 # Contributing
 
-This guide provides instructions for contributing to this Capacitor plugin.
+Whether you have a fix for a typo in a component, a bugfix, or a new feature, we'd love to collaborate.
 
+## Steps for Contributing to a Project
+1. Sign the Contributor License Agreement:
+   1. [Join the code review site](http://review.couchbase.org/).
+   2. Log into the review site.
+   3. [Fill out the agreement](http://review.couchbase.org/#/settings/agreements) under *Settings > Agreements*.
+
+And while we welcome questions, we prefer to answer questions on our [developer forums](https://forums.couchbase.com/) rather than in Github issues.
+   
 ## Development Requirements
 - Javascript
     - [Node 18](https://formulae.brew.sh/formula/node@18) or higher
