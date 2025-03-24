@@ -54,6 +54,7 @@ import { v4 as uuidv4 } from 'uuid';
 export class CapacitorEngine implements IonicCouchbaseLitePlugin {
   _defaultCollectionName = '_default';
   _defaultScopeName = '_default';
+  debugConsole: boolean;
 
   constructor() {
     EngineLocator.registerEngine(EngineLocator.key, this);
