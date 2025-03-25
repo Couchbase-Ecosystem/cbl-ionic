@@ -46,7 +46,7 @@ const GetDocumentPage: React.FC = () => {
             setResultsMessage(prev => [...prev, `${new Date()} Error: Document not found`]);
           }
         } catch (error) {
-          setResultsMessage(prev => [...prev, error]);
+          setResultsMessage(prev => [...prev, error.message]);
         }
       } else {
         setResultsMessage(prev => [...prev, `${new Date()} Error: Database is not setup (defined)`]);
@@ -55,23 +55,24 @@ const GetDocumentPage: React.FC = () => {
   }
 
   async function getDocumentExpiration() {
+    try {
     if (databaseName in databases) {
       const database = databases[databaseName];
       const collection = await database.collection(collectionName, scopeName);
       if (database != null && collection != null) {
-        try {
           const date = await collection.getDocumentExpiration(documentId);
           if (date !== null) {
             setResultsMessage(prev => [...prev, `Document Expiration: ${date}`]);
           } else {
             setResultsMessage(prev => [...prev, `Document Expiration not set - came back null`]);
           }
-        } catch (error) {
-          setResultsMessage(prev => [...prev, error]);
         }
       }
     }
+    catch (error) {
+    setResultsMessage(prev => [...prev, error.message]);
   }
+}
 
   return (
     <DetailPageDatabaseCollectionRun

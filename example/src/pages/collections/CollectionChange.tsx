@@ -21,7 +21,7 @@ const CollectionChangePage: React.FC = () => {
   async function update() {
     try {
       const database = databases[databaseName];
-      if (database !== null) {
+      if (!!database) {
         const collection = await database.collection(collectionName, scopeName);
         if (collection != null) {
           setCollection(collection);
@@ -53,7 +53,7 @@ const CollectionChangePage: React.FC = () => {
         setResultsMessages(prev => [...prev, `Database ${databaseName} not found`])
       }
     } catch (error) {
-      setResultsMessages(error.message);
+      setResultsMessages([error.message]);
     }
   }
 
