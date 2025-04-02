@@ -21,7 +21,7 @@ const CollectionChangePage: React.FC = () => {
   async function update() {
     try {
       const database = databases[databaseName];
-      if (!!database) {
+      if (database) {
         const collection = await database.collection(collectionName, scopeName);
         if (collection != null) {
           setCollection(collection);
