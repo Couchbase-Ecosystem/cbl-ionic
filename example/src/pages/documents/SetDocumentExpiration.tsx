@@ -34,13 +34,13 @@ const SetDocumentExpirationPage: React.FC = () => {
           const doc = await collection.document(documentId);
           if (doc !== null && doc.getId() != null) {
             const fields = doc.toDictionary();
-            const fieldsMessage = Object.entries(fields)
+            const formattedFields = Object.entries(fields)
               .map(([key, value]) => `${key}: ${value}`)
               .join(', ');
 
               setResultsMessage(prev => [
                 ...prev,
-                `${new Date()} Document Found: ${fieldsMessage}`,
+                `${new Date()} Document Found: ${formattedFields}`,
               ]);
             await collection.setDocumentExpiration(documentId, expirationDate);
             setResultsMessage(prev => [...prev, `${new Date()} Document Expiration Set`]);
