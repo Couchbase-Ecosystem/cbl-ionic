@@ -1,6 +1,6 @@
 {
   "name": "cbl-ionic",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "Ionic Capacitor plugin for Couchbase Lite Enterprise (3.2+)",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",

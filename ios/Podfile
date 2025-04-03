@@ -9,7 +9,7 @@ end
 
 def couchbase_pods
   use_frameworks!
-  pod 'CouchbaseLite-Swift-Enterprise', '3.2.1'
+  pod 'CouchbaseLite-Swift-Enterprise', '3.2.2'
 end
 
 target 'Plugin' do
