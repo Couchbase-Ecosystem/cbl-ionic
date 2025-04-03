@@ -54,6 +54,8 @@ import { v4 as uuidv4 } from 'uuid';
 export class CapacitorEngine implements IonicCouchbaseLitePlugin {
   _defaultCollectionName = '_default';
   _defaultScopeName = '_default';
+  // The `debugConsole` property was added to align with the `IonicCouchbaseLitePlugin` interface
+  // and enable optional debug logging for development and troubleshooting purposes.
   debugConsole: boolean;
 
   constructor() {
