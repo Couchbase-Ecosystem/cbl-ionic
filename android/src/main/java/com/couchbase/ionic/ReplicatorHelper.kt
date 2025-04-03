@@ -117,8 +117,8 @@ object ReplicatorHelper {
                 BasicAuthenticator(username, password.toCharArray())
             }
             "session" -> {
-                val sessionId = authenticator.getString("sessionId")
-                val cookieName = authenticator.getString("cookieName")
+                val sessionId = data.getString("sessionId")
+                val cookieName = data.getString("cookieName")
                 SessionAuthenticator(sessionId, cookieName)
             }
             else -> throw IllegalArgumentException("Invalid authenticator type")
