@@ -1090,9 +1090,9 @@ class CblIonicPluginPlugin : Plugin() {
             name?.let { databaseName ->
                 withContext(Dispatchers.IO) {
                     try {
-                        DatabaseManager.openDatabase(databaseName, config, bridge.context)
+                        val databaseUniqueName = DatabaseManager.openDatabase(databaseName, config, bridge.context)
                         return@withContext withContext(Dispatchers.Main) {
-                            call.resolve()
+                            call.resolve(JSObject().put("databaseUniqueName", databaseUniqueName))
                         }
                     } catch (e: Exception) {
                         return@withContext withContext(Dispatchers.Main) {

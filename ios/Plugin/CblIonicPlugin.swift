@@ -78,9 +78,11 @@ public class CblIonicPluginPlugin: CAPPlugin {
                 return
             }
             do {
-                try DatabaseManager.shared.open (name, databaseConfig: configValue)
+               let databaseUniqueName =  try DatabaseManager.shared.open (name, databaseConfig: configValue)
                 DispatchQueue.main.async {
-                    call.resolve()
+                    call.resolve(
+                        ["databaseUniqueName": databaseUniqueName]
+                    )
                     return
                 }
             } catch {
