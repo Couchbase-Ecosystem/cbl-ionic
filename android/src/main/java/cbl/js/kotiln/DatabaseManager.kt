@@ -159,15 +159,17 @@ object DatabaseManager {
         return db?.getScope(scopeName)
     }
 
-    fun openDatabase(databaseName: String, config: JSONObject?, context: Context): Database {
+    fun openDatabase(databaseName: String, config: JSONObject?, context: Context): String {
         synchronized(openDatabases) {
+            val timestamp = System.currentTimeMillis() 
+            val uniqueName = "${databaseName}_$timestamp"
+
             val databaseConfig = buildDatabaseConfiguration(config, context)
             val newDatabase = Database(databaseName, databaseConfig)
-            if (openDatabases.containsKey(databaseName)) {
-                openDatabases.remove(databaseName)
-            }
-            openDatabases[databaseName] = newDatabase
-            return newDatabase
+
+            openDatabases[uniqueName] = newDatabase
+
+            return uniqueName
         }
     }
 
