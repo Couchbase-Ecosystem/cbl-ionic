@@ -63,33 +63,33 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
   }
 
   collection_AddChangeListener(
-      args: CollectionChangeListenerArgs,
-      cb: ListenerCallback
+    args: CollectionChangeListenerArgs,
+    cb: ListenerCallback
   ): Promise<void> {
     return IonicCouchbaseLite.collection_AddChangeListener(
-        {
-          name: args.name,
-          scopeName: args.scopeName,
-          collectionName: args.collectionName,
-          changeListenerToken: args.changeListenerToken,
-        },
-        cb
+      {
+        name: args.name,
+        scopeName: args.scopeName,
+        collectionName: args.collectionName,
+        changeListenerToken: args.changeListenerToken,
+      },
+      cb
     );
   }
 
   collection_AddDocumentChangeListener(
-      args: DocumentChangeListenerArgs,
-      cb: ListenerCallback
+    args: DocumentChangeListenerArgs,
+    cb: ListenerCallback
   ): Promise<void> {
     return IonicCouchbaseLite.collection_AddDocumentChangeListener(
-        {
-          name: args.name,
-          scopeName: args.scopeName,
-          collectionName: args.collectionName,
-          changeListenerToken: args.changeListenerToken,
-          documentId: args.documentId,
-        },
-        cb
+      {
+        name: args.name,
+        scopeName: args.scopeName,
+        collectionName: args.collectionName,
+        changeListenerToken: args.changeListenerToken,
+        documentId: args.documentId,
+      },
+      cb
     );
   }
 
@@ -130,7 +130,7 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
   }
 
   async collection_GetDocument(args: CollectionGetDocumentArgs)
-      : Promise<DocumentResult> {
+    : Promise<DocumentResult> {
     return IonicCouchbaseLite.collection_GetDocument(args);
   }
 
@@ -139,14 +139,14 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
   }
 
   async collection_GetBlobContent(
-      args: CollectionDocumentGetBlobContentArgs
-  ) : Promise<{data: ArrayBuffer}> {
+    args: CollectionDocumentGetBlobContentArgs
+  ): Promise<{ data: ArrayBuffer }> {
     const data = await IonicCouchbaseLite.collection_GetBlobContent(args);
-    return {data: new Uint8Array(data.data).buffer};
+    return { data: new Uint8Array(data.data).buffer };
   }
 
   async collection_GetIndexes(
-      args: CollectionArgs
+    args: CollectionArgs
   ): Promise<{ indexes: string[] }> {
     return IonicCouchbaseLite.collection_GetIndexes(args);
   }
@@ -156,19 +156,19 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
   }
 
   async collection_RemoveChangeListener(
-      args: CollectionChangeListenerArgs
+    args: CollectionChangeListenerArgs
   ): Promise<void> {
     return IonicCouchbaseLite.collection_RemoveChangeListener(args);
   }
 
   async collection_RemoveDocumentChangeListener(
-      args: CollectionChangeListenerArgs
+    args: CollectionChangeListenerArgs
   ): Promise<void> {
     return IonicCouchbaseLite.collection_RemoveChangeListener(args);
   }
 
   async collection_Save(
-      args: CollectionSaveStringArgs
+    args: CollectionSaveStringArgs
   ): Promise<CollectionDocumentSaveResult> {
     return IonicCouchbaseLite.collection_Save(args);
   }
@@ -186,7 +186,7 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
   }
 
   async database_ChangeEncryptionKey(args: DatabaseEncryptionKeyArgs): Promise<void> {
-    return IonicCouchbaseLite.database_ChangeEncryptionKey(args); 
+    return IonicCouchbaseLite.database_ChangeEncryptionKey(args);
   }
 
   /**
@@ -215,9 +215,9 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
    * @deprecated This will be removed in future versions. Use collection_GetCount instead.
    */
   async database_DeleteDocument(
-      args: DatabaseDeleteDocumentArgs
+    args: DatabaseDeleteDocumentArgs
   ): Promise<void> {
-    const colArgs:CollectionDeleteDocumentArgs = {
+    const colArgs: CollectionDeleteDocumentArgs = {
       name: args.name,
       collectionName: this._defaultCollectionName,
       scopeName: this._defaultScopeName,
@@ -241,7 +241,7 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
   }
 
   async database_Exists(
-      args: DatabaseExistsArgs
+    args: DatabaseExistsArgs
   ): Promise<{ exists: boolean }> {
     return IonicCouchbaseLite.database_Exists(args);
   }
@@ -250,7 +250,7 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
    * @deprecated This will be removed in future versions. Use collection_GetCount instead.
    */
   async database_GetCount(args: DatabaseArgs): Promise<{ count: number }> {
-    const colArgs:CollectionArgs = {
+    const colArgs: CollectionArgs = {
       name: args.name,
       collectionName: this._defaultCollectionName,
       scopeName: this._defaultScopeName,
@@ -262,9 +262,9 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
    * @deprecated This will be removed in future versions. Use collection_GetCount instead.
    */
   async database_GetDocument(
-      args: DatabaseGetDocumentArgs
+    args: DatabaseGetDocumentArgs
   ): Promise<DocumentResult> {
-    const colArgs:CollectionGetDocumentArgs = {
+    const colArgs: CollectionGetDocumentArgs = {
       name: args.name,
       collectionName: this._defaultCollectionName,
       scopeName: this._defaultScopeName,
@@ -277,7 +277,7 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
    * @deprecated This function will be removed in future versions. Use colllection_CreateIndex instead.
    */
   async database_GetIndexes(
-      args: DatabaseArgs
+    args: DatabaseArgs
   ): Promise<{ indexes: string[] }> {
     const colArgs: CollectionArgs = {
       name: args.name,
@@ -291,12 +291,12 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
     return IonicCouchbaseLite.database_GetPath(args);
   }
 
-  async database_Open(args: DatabaseOpenArgs): Promise<void> {
+  async database_Open(args: DatabaseOpenArgs): Promise<{ databaseUniqueName: string }> {
     return IonicCouchbaseLite.database_Open(args);
   }
 
   async database_PerformMaintenance(
-      args: DatabasePerformMaintenanceArgs
+    args: DatabasePerformMaintenanceArgs
   ): Promise<void> {
     return IonicCouchbaseLite.database_PerformMaintenance(args);
   }
@@ -305,7 +305,7 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
    * @deprecated This will be removed in future versions. Use collection_GetCount instead.
    */
   async database_PurgeDocument(args: DatabasePurgeDocumentArgs): Promise<void> {
-    const colArgs:CollectionPurgeDocumentArgs = {
+    const colArgs: CollectionPurgeDocumentArgs = {
       name: args.name,
       collectionName: this._defaultCollectionName,
       scopeName: this._defaultScopeName,
@@ -318,9 +318,9 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
    * @deprecated This function will be removed in future versions. Use colllection_Save instead.
    */
   async database_Save(
-      args: DatabaseSaveArgs
+    args: DatabaseSaveArgs
   ): Promise<CollectionDocumentSaveResult> {
-    const colArgs:CollectionSaveStringArgs = {
+    const colArgs: CollectionSaveStringArgs = {
       name: args.name,
       collectionName: this._defaultCollectionName,
       scopeName: this._defaultScopeName,
@@ -333,7 +333,7 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
   }
 
   async database_SetFileLoggingConfig(
-      args: DatabaseSetFileLoggingConfigArgs
+    args: DatabaseSetFileLoggingConfigArgs
   ): Promise<void> {
     return IonicCouchbaseLite.database_SetFileLoggingConfig(args);
   }
@@ -346,9 +346,9 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
    * @deprecated This will be removed in future versions. Use collection_GetCount instead.
    */
   async document_GetBlobContent(
-      args: DocumentGetBlobContentArgs
-  ): Promise<{data: ArrayBuffer}> {
-    const colArgs:CollectionDocumentGetBlobContentArgs = {
+    args: DocumentGetBlobContentArgs
+  ): Promise<{ data: ArrayBuffer }> {
+    const colArgs: CollectionDocumentGetBlobContentArgs = {
       name: args.name,
       collectionName: this._defaultCollectionName,
       scopeName: this._defaultScopeName,
@@ -356,7 +356,7 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
       key: args.key
     };
     const data = await IonicCouchbaseLite.collection_GetBlobContent(colArgs);
-    return {data: new Uint8Array(data.data).buffer};
+    return { data: new Uint8Array(data.data).buffer };
   }
 
   async file_GetDefaultPath(): Promise<{ path: string }> {
@@ -376,17 +376,17 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
   }
 
   query_AddChangeListener(
-      args: QueryChangeListenerArgs,
-      cb: ListenerCallback
+    args: QueryChangeListenerArgs,
+    cb: ListenerCallback
   ): Promise<void> {
     return IonicCouchbaseLite.query_AddChangeListener(
-        {
-          name: args.name,
-          query: args.query,
-          parameters: args.parameters,
-          changeListenerToken: args.changeListenerToken,
-        },
-        cb
+      {
+        name: args.name,
+        query: args.query,
+        parameters: args.parameters,
+        changeListenerToken: args.changeListenerToken,
+      },
+      cb
     );
   }
 
@@ -394,26 +394,26 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
     return await IonicCouchbaseLite.query_Execute(args);
   }
 
-  async query_Explain(args: QueryExecuteArgs):  Promise<{ data: string }>{
+  async query_Explain(args: QueryExecuteArgs): Promise<{ data: string }> {
     return await IonicCouchbaseLite.query_Explain(args);
   }
 
   async query_RemoveChangeListener(
-      args: QueryRemoveChangeListenerArgs
+    args: QueryRemoveChangeListenerArgs
   ): Promise<void> {
     return IonicCouchbaseLite.query_RemoveChangeListener(args);
   }
 
   replicator_AddChangeListener(
-      args: ReplicationChangeListenerArgs,
-      cb: ListenerCallback
+    args: ReplicationChangeListenerArgs,
+    cb: ListenerCallback
   ): Promise<void> {
     return IonicCouchbaseLite.replicator_AddChangeListener(args, cb);
   }
 
   replicator_AddDocumentChangeListener(
-      args: ReplicationChangeListenerArgs,
-      cb: ListenerCallback
+    args: ReplicationChangeListenerArgs,
+    cb: ListenerCallback
   ): Promise<void> {
     return IonicCouchbaseLite.replicator_AddDocumentChangeListener(args, cb);
   }
@@ -432,11 +432,11 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
     return IonicCouchbaseLite.replicator_GetStatus(args);
   }
 
-  async replicator_GetPendingDocumentIds(args: ReplicatorCollectionArgs): Promise<{ pendingDocumentIds: string[] }>{
+  async replicator_GetPendingDocumentIds(args: ReplicatorCollectionArgs): Promise<{ pendingDocumentIds: string[] }> {
     return IonicCouchbaseLite.replicator_GetPendingDocumentIds(args);
   }
 
-  async replicator_IsDocumentPending(args: ReplicatorDocumentPendingArgs): Promise<{ isPending: boolean }>{
+  async replicator_IsDocumentPending(args: ReplicatorDocumentPendingArgs): Promise<{ isPending: boolean }> {
     return IonicCouchbaseLite.replicator_IsDocumentPending(args);
   }
 
@@ -445,7 +445,7 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
   }
 
   async replicator_RemoveChangeListener(
-      args: ReplicationChangeListenerArgs
+    args: ReplicationChangeListenerArgs
   ): Promise<void> {
     return IonicCouchbaseLite.replicator_RemoveChangeListener(args);
   }
