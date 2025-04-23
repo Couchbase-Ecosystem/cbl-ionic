@@ -6,7 +6,7 @@ import {
     setupIonicReact,
 } from '@ionic/react';
 
-import {IonReactRouter} from '@ionic/react-router';
+import { IonReactRouter } from '@ionic/react-router';
 import {
     Route,
     Redirect
@@ -37,7 +37,7 @@ import {
     EditDocumentPage,
     DeleteDocumentPage,
     GetDocumnetPage,
-    SetDocumentExpirationPage, 
+    SetDocumentExpirationPage,
     ChangeDocumnetPage,
     CreateBatchPage,
 } from './pages/documents';
@@ -73,14 +73,14 @@ import {
     VectorSearchTestsPage,
 } from './pages/tests';
 
-import { 
+import {
     ConsoleLogPage,
     CustomLogPage,
     FileLogPage,
 } from './pages/logging/';
 
 import {
-    ReplicatorPage,
+    ReplicatorLivePage,
     ReplicatorConfigPage
 } from './pages/replication/';
 
@@ -110,51 +110,51 @@ const App: React.FC = () => {
         <IonApp>
             <IonReactRouter>
                 <IonSplitPane contentId="main">
-                    <Menu/>
+                    <Menu />
                     <IonRouterOutlet id="main">
-                        <Route path="/tests/all" component={AllTestsPage} exact/>
-                        <Route path="/tests/consoleLogging" component={ConsoleLoggingTestsPage} exact/>
-                        <Route path="/tests/customLogging" component={CustomLoggingTestsPage} exact/>
-                        <Route path="/tests/databases" component={DatabaseTestsPage} exact/>
-                        <Route path="/tests/collections" component={CollectionTestsPage} exact/>
-                        <Route path="/tests/document" component={DocumentTestsPage} exact/>
-                        <Route path="/tests/documentExpiration" component={DocumentExpirationTestsPage} exact/>
-                        <Route path="/tests/fileLogging" component={FileLoggingTestsPage} exact/>
-                        <Route path="/tests/indexes" component={IndexingTestsPage} exact/>
-                        <Route path="/tests/notifications" component={NotificationsTestsPage} exact/>
-                        <Route path="/tests/predicateQuery" component={PredicateQueryTestsPage} exact/>
-                        <Route path="/tests/query" component={QueryTestsPage} exact/>
-                        <Route path="/tests/replicator" component={ReplicatorTestsPage} exact/>
-                        <Route path="/tests/vectorSearch" component={VectorSearchTestsPage} exact/>
-                        <Route path="/tests/testing" component={TestingTestPage} exact/>
+                        <Route path="/tests/all" component={AllTestsPage} exact />
+                        <Route path="/tests/consoleLogging" component={ConsoleLoggingTestsPage} exact />
+                        <Route path="/tests/customLogging" component={CustomLoggingTestsPage} exact />
+                        <Route path="/tests/databases" component={DatabaseTestsPage} exact />
+                        <Route path="/tests/collections" component={CollectionTestsPage} exact />
+                        <Route path="/tests/document" component={DocumentTestsPage} exact />
+                        <Route path="/tests/documentExpiration" component={DocumentExpirationTestsPage} exact />
+                        <Route path="/tests/fileLogging" component={FileLoggingTestsPage} exact />
+                        <Route path="/tests/indexes" component={IndexingTestsPage} exact />
+                        <Route path="/tests/notifications" component={NotificationsTestsPage} exact />
+                        <Route path="/tests/predicateQuery" component={PredicateQueryTestsPage} exact />
+                        <Route path="/tests/query" component={QueryTestsPage} exact />
+                        <Route path="/tests/replicator" component={ReplicatorTestsPage} exact />
+                        <Route path="/tests/vectorSearch" component={VectorSearchTestsPage} exact />
+                        <Route path="/tests/testing" component={TestingTestPage} exact />
 
-                        <Route path="/log/console" component={ConsoleLogPage} exact/>
-                        <Route path="/log/file" component={FileLogPage} exact/>
-                        <Route path="/log/custom" component={CustomLogPage} exact/>
+                        <Route path="/log/console" component={ConsoleLogPage} exact />
+                        <Route path="/log/file" component={FileLogPage} exact />
+                        <Route path="/log/custom" component={CustomLogPage} exact />
 
-                        <Route path="/database/setup" component={DatabaseSetupPage} exact/>
-                        <Route path="/database/open" component={DatabaseOpenPage} exact/>
-                        <Route path="/database/close" component={DatabaseClosePage} exact/>
-                        <Route path="/database/copy" component={DatabaseCopyPage} exact/>
-                        <Route path="/database/changeKey" component={ChangeEncryptionKeyPage} exact/>
+                        <Route path="/database/setup" component={DatabaseSetupPage} exact />
+                        <Route path="/database/open" component={DatabaseOpenPage} exact />
+                        <Route path="/database/close" component={DatabaseClosePage} exact />
+                        <Route path="/database/copy" component={DatabaseCopyPage} exact />
+                        <Route path="/database/changeKey" component={ChangeEncryptionKeyPage} exact />
 
-                        <Route path="/database/delete" component={DatabaseDeletePage} exact/>
-                        <Route path="/database/maintenance" component={PerformMaintenancePage} exact/>
+                        <Route path="/database/delete" component={DatabaseDeletePage} exact />
+                        <Route path="/database/maintenance" component={PerformMaintenancePage} exact />
 
-                        <Route path="/database/collection/create" component={CollectionCreatePage} exact/>
-                        <Route path="/database/collection/delete" component={CollectionDeletePage} exact/>
-                        <Route path="/database/collections" component={CollectionListPage} exact/>
-                        <Route path="/database/collections/default" component={CollectionDefaultPage} exact/>
-                        <Route path="/database/scopes" component={ScopeListPage} exact/>
-                        <Route path="/database/collections/scopes/default" component={ScopeDefaultPage} exact/>
-                        <Route path="/database/collection/change" component={CollectionChangePage} exact/>
+                        <Route path="/database/collection/create" component={CollectionCreatePage} exact />
+                        <Route path="/database/collection/delete" component={CollectionDeletePage} exact />
+                        <Route path="/database/collections" component={CollectionListPage} exact />
+                        <Route path="/database/collections/default" component={CollectionDefaultPage} exact />
+                        <Route path="/database/scopes" component={ScopeListPage} exact />
+                        <Route path="/database/collections/scopes/default" component={ScopeDefaultPage} exact />
+                        <Route path="/database/collection/change" component={CollectionChangePage} exact />
 
-                        <Route path="/documents/create" component={EditDocumentPage} exact/>
-                        <Route path="/documents/get" component={GetDocumnetPage} exact/>
-                        <Route path="/documents/setExpiration" component={SetDocumentExpirationPage} exact/>
-                        <Route path="/documents/change" component={ChangeDocumnetPage} exact/>
-                        <Route path="/documents/delete" component={DeleteDocumentPage} exact/>
-                        <Route path="/documents/batch/create" component={CreateBatchPage} exact/>
+                        <Route path="/documents/create" component={EditDocumentPage} exact />
+                        <Route path="/documents/get" component={GetDocumnetPage} exact />
+                        <Route path="/documents/setExpiration" component={SetDocumentExpirationPage} exact />
+                        <Route path="/documents/change" component={ChangeDocumnetPage} exact />
+                        <Route path="/documents/delete" component={DeleteDocumentPage} exact />
+                        <Route path="/documents/batch/create" component={CreateBatchPage} exact />
 
                         <Route path="/index/create" component={CreateIndexPage} exact />
                         <Route path="/index/createFTS" component={CreateFTSIndexPage} exact />
@@ -165,11 +165,11 @@ const App: React.FC = () => {
                         <Route path="/query/queryFTS" component={QueryFTSPage} exact />
                         <Route path="/query/sqlPlusPlus" component={SqlPlusPlusPage} exact />
 
-                        <Route path="/replication/replicator" component={ReplicatorPage} exact />
                         <Route path="/replication/replicatorConfig" component={ReplicatorConfigPage} exact />
+                        <Route path="/replication/replicatorLive" component={ReplicatorLivePage} exact />
 
-                        <Route path="/home" component={Page} exact/>
-                        <Redirect from="/" to="/home" exact/>
+                        <Route path="/home" component={Page} exact />
+                        <Redirect from="/" to="/home" exact />
                     </IonRouterOutlet>
                 </IonSplitPane>
             </IonReactRouter>

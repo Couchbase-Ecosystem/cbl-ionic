@@ -8,21 +8,21 @@ import '../Menu.css';
 const ReplicationMenuItems: React.FC = () => {
   return (
     <>
-   <IonItemDivider>
+      <IonItemDivider>
         <i className="fa-duotone fa-rotate"></i>
-        <IonLabel style={{ marginLeft: 20}}>Replication API</IonLabel>
-     </IonItemDivider>
-      <IonItem
-        style={{ marginLeft: 20 }}
-        routerLink="/replication/replicator"
-        routerDirection="none">
-        <IonLabel>Replicator</IonLabel>
-      </IonItem>
+        <IonLabel style={{ marginLeft: 20 }}>Replication API</IonLabel>
+      </IonItemDivider>
       <IonItem
         style={{ marginLeft: 20 }}
         routerLink="/replication/replicatorConfig"
         routerDirection="none">
         <IonLabel>Replicator Config</IonLabel>
+      </IonItem>
+      <IonItem
+        style={{ marginLeft: 20 }}
+        routerLink="/replication/replicatorLive"
+        routerDirection="none">
+        <IonLabel>Replicator Live</IonLabel>
       </IonItem>
     </>
   );
