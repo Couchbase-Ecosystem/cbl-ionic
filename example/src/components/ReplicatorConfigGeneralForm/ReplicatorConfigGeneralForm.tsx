@@ -11,7 +11,7 @@ import {
     IonToggle
 } from '@ionic/react';
 
-import {ReplicatorType} from 'cbl-ionic';
+import { ReplicatorType } from 'cbl-ionic';
 
 export type ReplicatorConfigGeneralFormType = {
     connectionString: string;
@@ -36,25 +36,25 @@ export type ReplicatorConfigGeneralFormType = {
 
 const ReplicatorConfigGeneralForm: React.FC<ReplicatorConfigGeneralFormType> =
     ({
-         connectionString,
-         setConnectionString,
-         headers,
-         setHeaders,
-         heartbeat,
-         setHeartbeat,
-         maxAttempts,
-         setMaxAttempts,
-         maxAttemptWaitTime,
-         setMaxAttemptWaitTime,
-         selectedReplicatorType,
-         setSelectedReplicatorType,
-         continuous,
-         setContinuous,
-         autoPurgeEnabled,
-         setAutoPurgeEnabled,
-         acceptParentDomainCookies,
-         setAcceptParentDomainCookies
-     }) => {
+        connectionString,
+        setConnectionString,
+        headers,
+        setHeaders,
+        heartbeat,
+        setHeartbeat,
+        maxAttempts,
+        setMaxAttempts,
+        maxAttemptWaitTime,
+        setMaxAttemptWaitTime,
+        selectedReplicatorType,
+        setSelectedReplicatorType,
+        continuous,
+        setContinuous,
+        autoPurgeEnabled,
+        setAutoPurgeEnabled,
+        acceptParentDomainCookies,
+        setAcceptParentDomainCookies
+    }) => {
         return (
             <>
                 <IonItem key={'connection-string-item-key'}>
@@ -82,7 +82,7 @@ const ReplicatorConfigGeneralForm: React.FC<ReplicatorConfigGeneralFormType> =
                     <IonInput
                         key={'heartbeat-input-key'}
                         type="number"
-                        onInput={(e: any) => setHeartbeat(e.target.value)}
+                        onInput={(e: any) => setHeartbeat(Number(e.target.value))}
                         value={heartbeat}
                     ></IonInput>
                 </IonItem>
@@ -93,7 +93,7 @@ const ReplicatorConfigGeneralForm: React.FC<ReplicatorConfigGeneralFormType> =
                     <IonInput
                         key={'max-attempts-input-key'}
                         type="number"
-                        onInput={(e: any) => setMaxAttempts(e.target.value)}
+                        onInput={(e: any) => setMaxAttempts(Number(e.target.value))}
                         value={maxAttempts}
                     ></IonInput>
                 </IonItem>
@@ -104,7 +104,7 @@ const ReplicatorConfigGeneralForm: React.FC<ReplicatorConfigGeneralFormType> =
                     <IonInput
                         key={'max-attempt-wait-time-input-key'}
                         type="number"
-                        onInput={(e: any) => setMaxAttemptWaitTime(e.target.value)}
+                        onInput={(e: any) => setMaxAttemptWaitTime(Number(e.target.value))}
                         value={maxAttemptWaitTime}
                     ></IonInput>
                 </IonItem>

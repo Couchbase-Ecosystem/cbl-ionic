@@ -1,7 +1,7 @@
 // ReplicatorChannelsEditorForm.tsx
 import React from 'react';
 
-import {IonItem, IonInput, IonLabel} from '@ionic/react';
+import { IonItem, IonInput, IonLabel } from '@ionic/react';
 
 interface ReplicatorChannelsEditorProps {
     channels: string;
@@ -10,9 +10,9 @@ interface ReplicatorChannelsEditorProps {
 
 const ReplicatorChannelsEditorForm: React.FC<ReplicatorChannelsEditorProps> =
     ({
-         channels,
-         setChannels,
-     }) => {
+        channels,
+        setChannels,
+    }) => {
 
         return (
             <>
@@ -23,7 +23,8 @@ const ReplicatorChannelsEditorForm: React.FC<ReplicatorChannelsEditorProps> =
                     <IonInput
                         key="channel-new-input"
                         value={channels}
-                        onIonChange={(e: any) => setChannels(e.target.value)}>
+                        onIonInput={(e: any) => setChannels(e.target.value)}
+                    >
                     </IonInput>
                 </IonItem>
             </>

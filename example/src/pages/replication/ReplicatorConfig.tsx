@@ -1,8 +1,8 @@
 // Replicator.tsx
-import React, 
-{ 
-  useState, 
-  useContext 
+import React,
+{
+  useState,
+  useContext
 } from 'react';
 
 import DatabaseContext from '../../providers/DatabaseContext';
@@ -17,11 +17,11 @@ import AuthenticationTwoFieldForm from '../../components/AuthenticationTwoFieldF
 import ReplicatorChannelsEditorForm from '../../components/ReplicatorChannelsEditor/ReplicatorChannelsEditor';
 import ReplicatorCertificationForm from '../../components/ReplicatorCertificationForm/ReplicatorCertificationForm';
 
-import { 
-  IonItem, 
-  IonLabel, 
-  IonSegment, 
-  IonSegmentButton 
+import {
+  IonButton,
+  IonLabel,
+  IonSegment,
+  IonSegmentButton
 } from '@ionic/react';
 
 import {
@@ -29,13 +29,14 @@ import {
   SessionAuthenticator,
   ReplicatorConfiguration,
   URLEndpoint,
-  Replicator
+  Replicator,
+  CollectionConfig
 } from 'cbl-ionic';
 
 
 const ReplicatorConfigPage: React.FC = () => {
   const { databases } = useContext(DatabaseContext)!;
-  const { replicatorIds } = useContext(ReplicatorContext)!;
+  const { replicator, setReplicator, setReplicatorConfig } = useContext(ReplicatorContext)!;
 
   const [databaseName, setDatabaseName] = useState<string>('');
 
@@ -44,7 +45,7 @@ const ReplicatorConfigPage: React.FC = () => {
 
   //used for general configuration fields
   const [connectionString, setConnectionString] = useState<string>('');
-  const [headers , setHeaders] = useState<string>('');
+  const [headers, setHeaders] = useState<string>('');
   const [selectedReplicatorType, setSelectedReplicatorType] =
     useState<string>('');
   const [heartbeat, setHeartbeat] = useState<number>(60);
@@ -53,7 +54,6 @@ const ReplicatorConfigPage: React.FC = () => {
   const [continuous, setContinuous] = useState<boolean>(true);
   const [autoPurgeEnabled, setAutoPurgeEnabled] = useState<boolean>(true);
   const [acceptParentDomainCookies, setAcceptParentDomainCookies] = useState<boolean>(false);
-
 
   //used for authentication type and authentication fields
   const [selectedAuthenticationType, setSelectedAuthenticationType] =
@@ -73,60 +73,72 @@ const ReplicatorConfigPage: React.FC = () => {
   const [resultsMessage, setResultsMessage] = useState<string[]>([]);
 
   async function update() {
-    setResultsMessage([]);
-    if (databaseName in databases) {
-      const db = databases[databaseName];
-      if (db != null) {
-        const config = new ReplicatorConfiguration(new URLEndpoint(connectionString));
+    if (!databaseName || !(databaseName in databases)) {
+      setResultsMessage(['Error: Database is not setup (defined)']);
+      return;
+    }
+    const db = databases[databaseName];
+    if (db == null) {
+      setResultsMessage(['Error: Database is not setup (defined)']);
+      return;
+    }
 
-        //general section
-        config.setHeaders(JSON.parse(headers));
-        config.setHeartbeat(heartbeat);
-        config.setMaxAttemptWaitTime(maxAttemptWaitTime);
-        config.setMaxAttempts(maxAttempts);
-        switch(selectedReplicatorType) {
-          case 'push':
-            config.setReplicatorType(ReplicatorConfiguration.ReplicatorType.PUSH);
-            break;
-          case 'pull':
-           config.setReplicatorType(ReplicatorConfiguration.ReplicatorType.PULL);
-           break;
-          default:
-            config.setReplicatorType(ReplicatorConfiguration.ReplicatorType.PUSH_AND_PULL);
-            break;
-        }
-        config.setContinuous(continuous);
-        config.setAutoPurgeEnabled(autoPurgeEnabled);
-        config.setAcceptParentDomainCookies(acceptParentDomainCookies);
+    const defaultCollection = await db.collection('_default');
+    const config = new ReplicatorConfiguration(new URLEndpoint(connectionString));
 
-        //auth section
-        switch(selectedAuthenticationType) {
-          case 'basic':
-            config.setAuthenticator(new BasicAuthenticator(username, password));
-            break;
-          case 'session':
-            config.setAuthenticator(new SessionAuthenticator(sessionId, cookieName));
-            break;
-          default:
-            setResultsMessage(['Error: Authentication is not setup (defined)']);
-            break;
-        }
-        //cert section
-        config.setAcceptOnlySelfSignedCerts(selfSignedCerts);
-        config.setPinnedServerCertificate(pinnedServerCertBase64);
+    //general section
+    if (headers.length > 0) {
+      config.setHeaders(JSON.parse(headers));
+    }
 
-        //channel section
-        /*
-        const channelArray = channels.split(',').map(channel => channel.trim());
-        config.setChannels(channelArray);
-         */
+    config.setHeartbeat(heartbeat);
+    config.setMaxAttemptWaitTime(maxAttemptWaitTime);
+    config.setMaxAttempts(maxAttempts);
+    switch (selectedReplicatorType) {
+      case 'push':
+        config.setReplicatorType(ReplicatorConfiguration.ReplicatorType.PUSH);
+        break;
+      case 'pull':
+        config.setReplicatorType(ReplicatorConfiguration.ReplicatorType.PULL);
+        break;
+      default:
+        config.setReplicatorType(ReplicatorConfiguration.ReplicatorType.PUSH_AND_PULL);
+        break;
+    }
+    config.setContinuous(continuous);
+    config.setAutoPurgeEnabled(autoPurgeEnabled);
+    config.setAcceptParentDomainCookies(acceptParentDomainCookies);
 
-        const replicator = await Replicator.create(config);
-        await replicator.start(false);
-      }
-    } else {
-     setResultsMessage(['Error: Database is not setup (defined)']);
-   }
+    //auth section
+    switch (selectedAuthenticationType) {
+      case 'basic':
+        config.setAuthenticator(new BasicAuthenticator(username, password));
+        break;
+      case 'session':
+        config.setAuthenticator(new SessionAuthenticator(sessionId, cookieName));
+        break;
+      default:
+        setResultsMessage(['Error: Authentication is not setup (defined)']);
+        break;
+    }
+    //cert section
+    config.setAcceptOnlySelfSignedCerts(selfSignedCerts);
+    config.setPinnedServerCertificate(pinnedServerCertBase64);
+    setReplicatorConfig(config);
+
+    //channel section
+    const channelArray = channels.split(',').map(channel => channel.trim());
+    const collConfig = new CollectionConfig([], []);
+    collConfig.setChannels(channelArray);
+    config.addCollections([defaultCollection], collConfig);
+    try {
+      const replicator = await Replicator.create(config);
+      setReplicator(replicator);
+      setResultsMessage(['Replicator created successfully. To run it, please go to the Replicator Live page.']);
+    } catch (error) {
+      console.error('Error starting replicator:', error);
+      setResultsMessage(prev => [...prev, '❌ Error: ' + error]);
+    }
   }
 
   function reset() {
@@ -157,8 +169,24 @@ const ReplicatorConfigPage: React.FC = () => {
     //channels section
     setChannels('');
 
+    //cleanup replicator
+    if (replicator) {
+      replicator.cleanup();
+      replicator.stop();
+      setReplicator(null);
+      setReplicatorConfig(null);
+    }
+
     //results section
     setResultsMessage([]);
+  }
+
+  function loadDockerExampleConfig() {
+    setConnectionString("ws://localhost:4984/projects")
+    setSelectedAuthenticationType("basic")
+    setUsername("demo@example.com")
+    setPassword("P@ssw0rd12")
+    setSelectedReplicatorType("PUSH_AND_PULL")
   }
 
   return (
@@ -173,8 +201,15 @@ const ReplicatorConfigPage: React.FC = () => {
       titleButtons={null}
       results={resultsMessage}>
       <>
+        <IonButton
+          expand="full"
+          onClick={loadDockerExampleConfig}
+          className="m-1">
+          Load Docker Example Config
+        </IonButton>
+
         <IonSegment className="mt-4 mb-4" value={selectedSegment}
-                    onIonChange={e => setSelectedSegment(e.detail.value.toString())}>
+          onIonChange={e => setSelectedSegment(e.detail.value.toString())}>
           <IonSegmentButton value="general">
             <IonLabel>General</IonLabel>
           </IonSegmentButton>
@@ -192,55 +227,56 @@ const ReplicatorConfigPage: React.FC = () => {
           switch (selectedSegment) {
             case 'general':
               return (
-                  <ReplicatorConfigGeneralForm
-                      connectionString={connectionString}
-                      setConnectionString={setConnectionString}
-                      headers={headers}
-                      setHeaders={setHeaders}
-                      heartbeat={heartbeat}
-                      setHeartbeat={setHeartbeat}
-                      maxAttempts={maxAttempts}
-                      setMaxAttempts={setMaxAttempts}
-                      maxAttemptWaitTime={maxAttemptWaitTime}
-                      setMaxAttemptWaitTime={setMaxAttemptWaitTime}
-                      selectedReplicatorType={selectedReplicatorType}
-                      setSelectedReplicatorType={setSelectedReplicatorType}
-                      continuous={continuous}
-                      setContinuous={setContinuous}
-                      autoPurgeEnabled={autoPurgeEnabled}
-                      setAutoPurgeEnabled={setAutoPurgeEnabled}
-                      acceptParentDomainCookies={acceptParentDomainCookies}
-                      setAcceptParentDomainCookies={setAcceptParentDomainCookies}
-                  />
+                <ReplicatorConfigGeneralForm
+                  connectionString={connectionString}
+                  setConnectionString={setConnectionString}
+                  headers={headers}
+                  setHeaders={setHeaders}
+                  heartbeat={heartbeat}
+                  setHeartbeat={setHeartbeat}
+                  maxAttempts={maxAttempts}
+                  setMaxAttempts={setMaxAttempts}
+                  maxAttemptWaitTime={maxAttemptWaitTime}
+                  setMaxAttemptWaitTime={setMaxAttemptWaitTime}
+                  selectedReplicatorType={selectedReplicatorType}
+                  setSelectedReplicatorType={setSelectedReplicatorType}
+                  continuous={continuous}
+                  setContinuous={setContinuous}
+                  autoPurgeEnabled={autoPurgeEnabled}
+                  setAutoPurgeEnabled={setAutoPurgeEnabled}
+                  acceptParentDomainCookies={acceptParentDomainCookies}
+                  setAcceptParentDomainCookies={setAcceptParentDomainCookies}
+                />
               );
             case 'authentication':
               return <AuthenticationTwoFieldForm
-                  selectedAuthenticationType={selectedAuthenticationType}
-                  setSelectedAuthenticationType={setSelectedAuthenticationType}
-                  username={username}
-                  setUsername={setUsername}
-                  password={password}
-                  setPassword={setPassword}
-                  sessionId={sessionId}
-                  setSessionId={setSessionId}
-                  cookieName={cookieName}
-                  setCookieName={setCookieName}>
+                selectedAuthenticationType={selectedAuthenticationType}
+                setSelectedAuthenticationType={setSelectedAuthenticationType}
+                username={username}
+                setUsername={setUsername}
+                password={password}
+                setPassword={setPassword}
+                sessionId={sessionId}
+                setSessionId={setSessionId}
+                cookieName={cookieName}
+                setCookieName={setCookieName}>
               </AuthenticationTwoFieldForm>
             case 'certificate':
               return <ReplicatorCertificationForm
-                  acceptSelfSignedCertOnly={selfSignedCerts}
-                  setAcceptSelfSignedCertOnly={setSelfSignedCerts}
-                  pinnedServerCertBase64={pinnedServerCertBase64}
-                  setPinnedServerCertBase64={setPinnedServerCertBase64}>
+                acceptSelfSignedCertOnly={selfSignedCerts}
+                setAcceptSelfSignedCertOnly={setSelfSignedCerts}
+                pinnedServerCertBase64={pinnedServerCertBase64}
+                setPinnedServerCertBase64={setPinnedServerCertBase64}>
               </ReplicatorCertificationForm>
             case 'channels':
               return <ReplicatorChannelsEditorForm
-                  channels={channels}
-                  setChannels={setChannels}>
+                channels={channels}
+                setChannels={setChannels}>
               </ReplicatorChannelsEditorForm>
             default:
               return null;
-          }})()}
+          }
+        })()}
       </>
     </DetailPageContainerRun>
   );
