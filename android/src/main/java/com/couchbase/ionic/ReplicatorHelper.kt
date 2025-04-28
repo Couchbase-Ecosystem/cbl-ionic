@@ -143,7 +143,7 @@ object ReplicatorHelper {
         }
         progressJson.put("completed", status.progress.completed)
         progressJson.put("total", status.progress.total)
-        json.put("activity", status.activityLevel.name)
+        json.put("activityLevel", status.activityLevel.ordinal)
         json.put("progress", progressJson)
         json.put("error", errorJson)
         return json
@@ -155,6 +155,11 @@ object ReplicatorHelper {
         for (doc in change.documents) {
             val docJson = JSObject()
             val flags = JSArray()
+            val errorJson = JSObject()
+            doc.error?.let {
+                errorJson.put("message", it.message)
+                docJson.put("error", errorJson)
+            }
             if (doc.flags.contains(DocumentFlag.DELETED)) {
                 flags.put("DELETED")
             } else if (doc.flags.contains(DocumentFlag.ACCESS_REMOVED)) {
@@ -164,7 +169,6 @@ object ReplicatorHelper {
             docJson.put("id", doc.id)
             docJson.put("scopeName", doc.scope)
             docJson.put("collectionName", doc.collection)
-            docJson.put("error", doc.error?.message)
             docs.put(docJson)
         }
         json.put("documents", docs)
