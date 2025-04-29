@@ -1322,7 +1322,7 @@ public class CblIonicPluginPlugin: CAPPlugin {
                 }
             } else {
                 DispatchQueue.main.async {
-                    call.reject("No such replicator listener")
+                    call.reject("No such listener found")
                 }
                 return
             }

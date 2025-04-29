@@ -32,6 +32,12 @@ import {
   Replicator,
   CollectionConfig
 } from 'cbl-ionic';
+import { Capacitor } from '@capacitor/core';
+
+
+const SYNC_GATEWAY_URL = Capacitor.getPlatform() === 'android'
+  ? 'ws://10.0.2.2:4984/projects'
+  : 'ws://localhost:4984/projects';
 
 
 const ReplicatorConfigPage: React.FC = () => {
@@ -127,7 +133,9 @@ const ReplicatorConfigPage: React.FC = () => {
     setReplicatorConfig(config);
 
     //channel section
-    const channelArray = channels.split(',').map(channel => channel.trim());
+    const channelArray = channels.split(',')
+      .map(channel => channel.trim())
+      .filter(channel => channel.length > 0);
     const collConfig = new CollectionConfig([], []);
     collConfig.setChannels(channelArray);
     config.addCollections([defaultCollection], collConfig);
@@ -182,7 +190,7 @@ const ReplicatorConfigPage: React.FC = () => {
   }
 
   function loadDockerExampleConfig() {
-    setConnectionString("ws://localhost:4984/projects")
+    setConnectionString(SYNC_GATEWAY_URL);
     setSelectedAuthenticationType("basic")
     setUsername("demo@example.com")
     setPassword("P@ssw0rd12")

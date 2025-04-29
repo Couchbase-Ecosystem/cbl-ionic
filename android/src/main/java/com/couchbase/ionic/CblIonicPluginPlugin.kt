@@ -1421,7 +1421,7 @@ class CblIonicPluginPlugin : Plugin() {
                                 ReplicatorHelper.generateReplicatorStatusJson(change.status)
                             call.resolve(result)
                         }
-                        ReplicatorManager.replicatorChangeListeners.put(token, listenerToken)
+                        replicationChangeListeners[token] = listenerToken
                     }
 
                 } catch (e: Exception) {
@@ -1457,7 +1457,7 @@ class CblIonicPluginPlugin : Plugin() {
                                 ReplicatorHelper.generateReplicatorDocumentChangeJson(change)
                             call.resolve(result)
                         }
-                        ReplicatorManager.replicatorChangeListeners.put(token, listenerToken)
+                        replicationChangeListeners.put(token, listenerToken)
                     }
 
                 } catch (e: Exception) {
@@ -1474,15 +1474,23 @@ class CblIonicPluginPlugin : Plugin() {
             call,
             "replicatorId"
         )
-        if (isReplicatorIdError || replicatorId.isNullOrEmpty()) {
+        if (isReplicatorIdError || replicatorId.isNullOrEmpty()){
+            call.reject("Error: No replicatorId provided")
             return
         }
         GlobalScope.launch {
             withContext(Dispatchers.IO) {
                 try {
                     ReplicatorManager.getReplicator(replicatorId)?.let { replicator ->
-                        replicator.stop()
-                        ReplicatorManager.removeReplicator(replicatorId)
+                        replicationChangeListeners[replicatorId]?.let { listener ->
+
+                            replicator.stop()
+                            ReplicatorManager.removeReplicator(replicatorId)
+                            replicationChangeListeners.remove(replicatorId)
+                        }
+                    } ?: run {
+                        call.reject("No such replicator")
+                        return@withContext
                     }
                     call.resolve()
                 } catch (e: Exception) {
@@ -1634,7 +1642,7 @@ class CblIonicPluginPlugin : Plugin() {
         }
     }
 
-    @PluginMethod(returnType = PluginMethod.RETURN_CALLBACK)
+    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
     @Throws(JSONException::class)
     fun replicator_RemoveChangeListener(call: PluginCall) {
         val (replicatorId, isReplicatorIdError) = PluginHelper.getStringFromCall(
@@ -1642,24 +1650,26 @@ class CblIonicPluginPlugin : Plugin() {
             "replicatorId"
         )
         val (token, isTokenError) = PluginHelper.getStringFromCall(call, "changeListenerToken")
-        if (isReplicatorIdError ||
-            replicatorId.isNullOrEmpty() ||
-            isTokenError ||
-            token.isNullOrEmpty()
-        ) {
+        if (isReplicatorIdError || replicatorId.isNullOrEmpty() || isTokenError || token.isNullOrEmpty()) {
             return
         }
         GlobalScope.launch {
             withContext(Dispatchers.IO) {
                 try {
-                    val replicator = ReplicatorManager.getReplicator(replicatorId)
-                    replicator?.let {
-                        ReplicatorManager.removeChangeListener(replicatorId, token)
+                    if(replicationChangeListeners.isEmpty()) {
+                        call.reject("No such listener found")
+                        return@withContext
                     }
+
+                    replicationChangeListeners[token].let { listener ->
+                        ReplicatorManager.removeChangeListener(replicatorId, token)
+                        replicationChangeListeners.remove(token)
+                        call.resolve()
+                    } 
                 } catch (e: Exception) {
                     call.reject("${e.message}")
                 }
-            }
+                }
         }
     }
 
