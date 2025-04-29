@@ -35,7 +35,7 @@ import {
 import { Capacitor } from '@capacitor/core';
 
 
-const DOCKER_URL = Capacitor.getPlatform() === 'android'
+const SYNC_GATEWAY_URL = Capacitor.getPlatform() === 'android'
   ? 'ws://10.0.2.2:4984/projects'
   : 'ws://localhost:4984/projects';
 
@@ -190,7 +190,7 @@ const ReplicatorConfigPage: React.FC = () => {
   }
 
   function loadDockerExampleConfig() {
-    setConnectionString(DOCKER_URL);
+    setConnectionString(SYNC_GATEWAY_URL);
     setSelectedAuthenticationType("basic")
     setUsername("demo@example.com")
     setPassword("P@ssw0rd12")
