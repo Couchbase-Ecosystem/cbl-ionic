@@ -39,24 +39,24 @@ const TestMenuItems: React.FC = () => {
                 routerDirection="none">
                 <IonLabel>Document</IonLabel>
             </IonItem>
-            <IonItem
+            {/* <IonItem
                 style={{marginLeft: 20}}
                 routerLink="/tests/documentExpiration"
                 routerDirection="none">
                 <IonLabel>Document Expiration</IonLabel>
-            </IonItem>
+            </IonItem> */}
             <IonItem
                 style={{marginLeft: 20}}
                 routerLink="/tests/indexes"
                 routerDirection="none">
                 <IonLabel>Indexes</IonLabel>
             </IonItem>
-            <IonItem
+            {/* <IonItem
                 style={{marginLeft: 20}}
                 routerLink="/tests/notifications"
                 routerDirection="none">
                 <IonLabel>Notifications</IonLabel>
-            </IonItem>
+            </IonItem> */}
             <IonItem
                 style={{marginLeft: 20}}
                 routerLink="/tests/query"
