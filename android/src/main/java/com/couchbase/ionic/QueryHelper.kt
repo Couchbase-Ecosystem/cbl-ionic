@@ -3,6 +3,7 @@ package com.couchbase.ionic
 import com.couchbase.lite.Parameters
 import com.getcapacitor.JSObject
 import java.text.SimpleDateFormat
+import java.util.TimeZone
 
 object QueryHelper {
     fun getQueryParameters(jsObject: JSObject): Parameters {
@@ -32,11 +33,20 @@ object QueryHelper {
                     "date" -> {
                         val dateValue = it.getString(valueKey)
                         dateValue?.let { strValue ->
-                            //
-                            //bug in SDK with Android and Date
-                            val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+                            // Check if the date string contains 'Z' (UTC)
+                            val dateFormat = if (strValue.endsWith("Z")) {
+                                SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").apply {
+                                    timeZone = TimeZone.getTimeZone("UTC") 
+                                }
+                            } else {
+                                // Handle date strings with or without time zone offsets
+                                SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").apply {
+                                    timeZone = TimeZone.getDefault() 
+                                }
+                            }
+                            // Parse the date
                             val date = dateFormat.parse(strValue)
-                            date?.let {d ->
+                            date?.let { d ->
                                 queryParameters.setDate(key, d)
                             }
                         }
