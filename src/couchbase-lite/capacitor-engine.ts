@@ -166,7 +166,7 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
   async collection_RemoveDocumentChangeListener(
     args: CollectionChangeListenerArgs
   ): Promise<void> {
-    return IonicCouchbaseLite.collection_RemoveChangeListener(args);
+    return IonicCouchbaseLite.collection_RemoveDocumentChangeListener(args);
   }
 
   async collection_Save(

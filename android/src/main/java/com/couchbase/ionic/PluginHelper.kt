@@ -280,4 +280,31 @@ object PluginHelper {
         }
         return Pair(value, false)
     }
+
+    /**
+     * Converts a `Collection` object to a `JSObject` representation.
+     *
+     * This method transforms the given `Collection` into a `JSObject` that includes its name, scope, and database name.
+     * The resulting JSON object contains the following structure:
+     * {
+     *   "name": "collectionName",
+     *   "scope": {
+     *     "name": "scopeName",
+     *     "databaseName": "databaseName"
+     *   }
+     * }
+     *
+     * @param collection The `Collection` object to convert.
+     * @param databaseName The name of the database to which the collection belongs.
+     * @return A `JSObject` containing the collection's name, scope, and database name.
+     */
+    fun collectionToJson(collection: CollectionDto): JSObject {
+        val colResult = JSObject()
+        val scopeResult = JSObject()
+        colResult.put("name", collection.collectionName)
+        scopeResult.put("name", collection.scopeName)
+        scopeResult.put("databaseName", collection.databaseName)
+        colResult.put("scope", scopeResult)
+        return colResult
+    }
 }

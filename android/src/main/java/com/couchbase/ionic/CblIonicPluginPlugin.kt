@@ -63,6 +63,8 @@ class CblIonicPluginPlugin : Plugin() {
                             val listenerToken = collection.addChangeListener { change ->
                                 val results = JSObject()
                                 results.put("documentIDs", JSONArray(change.documentIDs))
+                                val collectionDictonary = PluginHelper.collectionToJson(collectionDto)
+                                results.put("collection", collectionDictonary)
                                 call.resolve(results)
                             }
                             collectionChangeListeners.put(strToken, listenerToken)
@@ -101,7 +103,7 @@ class CblIonicPluginPlugin : Plugin() {
                             val listenerToken =
                                 collection.addDocumentChangeListener(documentId) { change ->
                                     val results = JSObject()
-                                    results.put("documentID", change.documentID)
+                                    results.put("documentId", change.documentID)
                                     results.put("collectionName", change.collection.name)
                                     results.put("scopeName", change.collection.scope.name)
                                     results.put("databaseName", collectionDto.databaseName)
