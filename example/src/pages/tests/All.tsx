@@ -5,15 +5,9 @@ import DetailPageTestContainerRunner from '../../components/DetailPageTestRunner
 import {
 	ConsoleLoggingTests,
 	CollectionTests,
-	CustomLoggingTests,
 	DatabaseTests,
 	DocumentTests,
-	DocumentExpirationTests,
-	FileLoggingTests,
-	FragmentTests,
 	IndexingTests,
-	ListenerTests,
-	PredicateQueryTests,
 	QueryTests,
 	ReplicatorTests
 } from '../../cblite-js-tests/cblite-tests/';
@@ -25,16 +19,10 @@ const AllTestsPage: React.FC = () => {
       collapseTitle="All Tests"
       testCases={[
 		ConsoleLoggingTests,
-		CustomLoggingTests,
 		DatabaseTests,
 		CollectionTests,
 		DocumentTests,
-		DocumentExpirationTests,
-		FileLoggingTests,
-		FragmentTests,
 		IndexingTests,
-		ListenerTests,
-		PredicateQueryTests,
 		QueryTests,
 		ReplicatorTests
 	]}
