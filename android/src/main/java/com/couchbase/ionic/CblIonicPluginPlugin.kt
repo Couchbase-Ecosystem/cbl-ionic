@@ -1483,18 +1483,16 @@ class CblIonicPluginPlugin : Plugin() {
         GlobalScope.launch {
             withContext(Dispatchers.IO) {
                 try {
-                    ReplicatorManager.getReplicator(replicatorId)?.let { replicator ->
+                    val replicator = ReplicatorManager.getReplicator(replicatorId)
+                    replicator?.let {
                         replicationChangeListeners[replicatorId]?.let { listener ->
-
                             replicator.stop()
                             ReplicatorManager.removeReplicator(replicatorId)
                             replicationChangeListeners.remove(replicatorId)
                         }
-                    } ?: run {
-                        call.reject("No such replicator")
-                        return@withContext
-                    }
+                    }   
                     call.resolve()
+
                 } catch (e: Exception) {
                     call.reject("${e.message}")
                 }
