@@ -615,7 +615,7 @@ class CblIonicPluginPlugin : Plugin() {
                                 val result = JSObject()
                                 result.put("_data", jsonObj)
                                 result.put("_id", document.id)
-                                result.put("_sequence", document.sequence.toDouble())
+                                result.put("_sequence", document.sequence)
                                 result.put("_revId", document.revisionID)
                                 call.resolve(result)
                             } catch (e: Exception) {
