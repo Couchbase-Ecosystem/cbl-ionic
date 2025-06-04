@@ -33,7 +33,7 @@ const GetDocumentPage: React.FC = () => {
             const docData = doc.toDictionary();
             setResultsMessage(prev => [...prev, `${new Date()} Document Found: ` + JSON.stringify(docData)]);
             if (doc['textBlob'] !== null){
-              const blob = doc.getBlob('textBlob');
+              const blob =  await doc.getBlob('textBlob');
               const blobText = blob.getBytes();
                if (blobText !== null) {
                   const textDecoder = new TextDecoder();

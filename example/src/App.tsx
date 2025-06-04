@@ -103,6 +103,7 @@ import '@ionic/react/css/display.css';
 /* Theme variables */
 import './theme/variables.css';
 import ChangeEncryptionKey from "./pages/databases/ChangeEncryptionKey";
+import { ActivePeerPage, PassivePeerPage } from './pages/p2p';
 
 setupIonicReact();
 const App: React.FC = () => {
@@ -167,6 +168,9 @@ const App: React.FC = () => {
 
                         <Route path="/replication/replicatorConfig" component={ReplicatorConfigPage} exact />
                         <Route path="/replication/replicatorLive" component={ReplicatorLivePage} exact />
+
+                        <Route path="/p2p/activePeer" component={ActivePeerPage} exact />
+                        <Route path="/p2p/passivePeer" component={PassivePeerPage} exact />
 
                         <Route path="/home" component={Page} exact />
                         <Redirect from="/" to="/home" exact />

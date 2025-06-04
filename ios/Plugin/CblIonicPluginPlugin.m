@@ -83,4 +83,10 @@ CAP_PLUGIN(CblIonicPlugin, "CblIonicPlugin",
            CAP_PLUGIN_METHOD(replicator_RemoveChangeListener, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(replicator_AddDocumentChangeListener, CAPPluginReturnCallback);
            CAP_PLUGIN_METHOD(replicator_Cleanup, CAPPluginReturnPromise);
+
+           // URL Endpoints functions
+           CAP_PLUGIN_METHOD(URLEndpointListener_createListener, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(URLEndpointListener_startListener, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(URLEndpointListener_stopListener, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(URLEndpointListener_getStatus, CAPPluginReturnPromise);
 )

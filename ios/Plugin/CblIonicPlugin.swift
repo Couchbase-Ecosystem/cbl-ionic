@@ -785,10 +785,19 @@ public class CblIonicPluginPlugin: CAPPlugin {
                 }
                 
                 var data: [String: Any] = [:]
-                let documentMap = MapHelper.documentToMap(doc)
-                data["_data"] = documentMap
-                data["_id"] = docId
-                data["_sequence"] = doc.sequence
+                let documentJson = doc.toJSON()
+        if !documentJson.isEmpty {
+            guard let jsonData = documentJson.data(using: .utf8),
+                  let jsonDict = try JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: Any] else {
+                call.reject("DOCUMENT_ERROR", "Failed to parse document JSON", nil)
+                return
+            }
+            data["_data"] = jsonDict
+        } else {
+            data["_data"] = [:]
+        }
+        data["_id"] = docId
+        data["_sequence"] = doc.sequence
                 data["_revId"] = doc.revisionID
                 DispatchQueue.main.async {
                     call.resolve(data)
@@ -1582,4 +1591,91 @@ public class CblIonicPluginPlugin: CAPPlugin {
              }
         }
     }
+
+// MARK: - URL Endpoint Listener 
+
+@objc func URLEndpointListener_createListener(_ call: CAPPluginCall) {
+    guard let collectionsArray = call.getArray("collections") as? [[String: String]],
+          let port = call.getInt("port"),
+          let networkInterface = call.getString("networkInterface")
+          else {
+            call.reject("Missing required parameters")
+        return
+    }
+
+    let disableTLS = call.getBool("disableTLS")
+    let enableDeltaSync = call.getBool("enableDeltaSync")
+    var collections: [Collection] = []
+    do {
+        for dict in collectionsArray {
+            guard let dbName = dict["databaseName"],
+                  let scopeName = dict["scopeName"],
+                  let collectionName = dict["name"],
+                  let db = DatabaseManager.shared.getDatabase(dbName),
+                  let scope = try? db.scope(name: scopeName),
+                  let collection = try? scope.collection(name: collectionName) else {
+                call.reject("Invalid collection parameters")
+                return
+            }
+            collections.append(collection)
+        }
+        let listenerId = try URLEndpointListenerManager.shared.createListener(
+            collections: collections,
+            port: UInt16(port),
+            tlsIdentity: nil,
+            networkInterface: networkInterface,
+            disableTLS: disableTLS,
+            enableDeltaSync: enableDeltaSync
+        )
+        call.resolve(["listenerId": listenerId])
+    } catch {
+        call.reject("Failed to create listener: \(error.localizedDescription)")
+    }
+}
+
+    @objc func URLEndpointListener_startListener(_ call: CAPPluginCall) {
+        guard let listenerId = call.getString("listenerId") else {
+            call.reject("Missing required parameter: 'listenerId'")
+            return
+        }
+
+        do {
+            try URLEndpointListenerManager.shared.startListener(listenerId: listenerId)
+            call.resolve()
+        } catch {
+            call.reject("Failed to start listener: \(error.localizedDescription)")
+        }
+    } 
+    @objc func URLEndpointListener_stopListener(_ call: CAPPluginCall) {
+
+        guard let listenerId = call.getString("listenerId") else {
+            call.reject("Missing required parameter: 'listenerId'")
+            return
+        }
+
+        do {
+            try URLEndpointListenerManager.shared.stopListener(listenerId: listenerId)
+            call.resolve()
+        } catch {
+            call.reject("Failed to stop listener: \(error.localizedDescription)")
+        }
+    }
+    @objc func URLEndpointListener_getStatus(_ call: CAPPluginCall) {
+    guard let listenerId = call.getString("listenerId") else {
+        call.reject("Missing required parameter: 'listenerId'")
+        return
+    }
+
+    do {
+        let status = try URLEndpointListenerManager.shared.getListenerStatus(listenerId: listenerId)
+        
+        let result: [String: Any] = [
+            "connectionsCount": status.connectionCount,
+            "activeConnectionCount": status.activeConnectionCount
+        ]
+        call.resolve(result)
+    } catch {
+        call.reject("Failed to get listener status: \(error.localizedDescription)")
+    }
+}
 }

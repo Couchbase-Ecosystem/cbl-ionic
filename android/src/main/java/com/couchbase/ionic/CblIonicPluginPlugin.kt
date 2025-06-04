@@ -7,6 +7,7 @@ import cbl.js.kotiln.DatabaseManager
 import cbl.js.kotiln.FileSystemHelper
 import cbl.js.kotiln.LoggingManager
 import cbl.js.kotiln.ReplicatorManager
+import cbl.js.kotiln.URLEndpointListenerManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -16,6 +17,10 @@ import com.getcapacitor.PluginCall
 import com.getcapacitor.PluginMethod
 import com.getcapacitor.annotation.CapacitorPlugin
 import com.couchbase.lite.*
+import com.couchbase.lite.URLEndpointListener
+import com.couchbase.lite.URLEndpointListenerConfiguration
+import com.couchbase.lite.Collection
+import com.couchbase.lite.Database
 import com.getcapacitor.JSArray
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -598,19 +603,31 @@ class CblIonicPluginPlugin : Plugin() {
                         collectionDto.scopeName,
                         collectionDto.databaseName
                     )
-                    document?.let {
-                        val results = PluginHelper.documentToMap(it)
-                        return@withContext withContext(Dispatchers.Main) {
-                            call.resolve(results)
+                    withContext(Dispatchers.Main) {
+                        if (document == null) {
+                            call.resolve(JSObject())
+                            return@withContext
+                        }
+                        val documentJson = document.toJSON()
+                        if (!documentJson.isNullOrEmpty()) {
+                            try {
+                                val jsonObj = org.json.JSONObject(documentJson)
+                                val result = JSObject()
+                                result.put("_data", jsonObj)
+                                result.put("_id", document.id)
+                                result.put("_sequence", document.sequence.toDouble())
+                                result.put("_revId", document.revisionID)
+                                call.resolve(result)
+                            } catch (e: Exception) {
+                                call.reject("DOCUMENT_ERROR: Failed to parse document JSON: ${e.message}")
+                            }
+                        } else {
+                            call.resolve(JSObject())
                         }
                     }
-                    return@withContext withContext(Dispatchers.Main) {
-                        val results = JSObject()
-                        call.resolve(results)
-                    }
                 } catch (e: Exception) {
-                    return@withContext withContext(Dispatchers.Main) {
-                        call.reject("${e.message}")
+                    withContext(Dispatchers.Main) {
+                        call.reject("DOCUMENT_ERROR: ${e.message}")
                     }
                 }
             }
@@ -1656,7 +1673,7 @@ class CblIonicPluginPlugin : Plugin() {
         GlobalScope.launch {
             withContext(Dispatchers.IO) {
                 try {
-                    if(replicationChangeListeners.isEmpty()) {
+                    if(replicationChangeListeners.isEmpty() || !replicationChangeListeners.containsKey(token)) {
                         call.reject("No such listener found")
                         return@withContext
                     }
@@ -1839,4 +1856,116 @@ class CblIonicPluginPlugin : Plugin() {
         }
     }
 
+    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+    fun URLEndpointListener_createListener(call: PluginCall) {
+        val collectionsArray = call.getArray("collections")
+        val (port, isPortError) = PluginHelper.getIntFromCall(call, "port")
+        val (networkInterface, isNetworkInterfaceError) = PluginHelper.getStringFromCall(call, "networkInterface")
+        if (collectionsArray == null || isPortError || port == null || isNetworkInterfaceError || networkInterface.isNullOrEmpty()) {
+            call.reject("Missing required parameters")
+            return
+        }
+        val disableTLS = call.getBoolean("disableTLS") ?: false
+        val enableDeltaSync = call.getBoolean("enableDeltaSync") ?: false
+    
+        val collections = mutableSetOf<Collection>()
+        for (i in 0 until collectionsArray.length()) {
+            val dict = collectionsArray.getJSONObject(i)
+            val dbName = dict.getString("databaseName")
+            val scopeName = dict.getString("scopeName")
+            val collectionName = dict.getString("name")
+            val db = DatabaseManager.getDatabase(dbName)
+            val scope = db?.getScope(scopeName)
+            val collection = scope?.getCollection(collectionName)
+            if (db == null || scope == null || collection == null) {
+                call.reject("Invalid collection parameters")
+                return
+            }
+            collections.add(collection)
+        }
+    
+        try {
+            val listenerId = URLEndpointListenerManager.shared.createListener(
+                collections = collections,
+                port = port,
+                tlsIdentity = null,
+                networkInterface = networkInterface,
+                disableTLS = disableTLS,
+                enableDeltaSync = enableDeltaSync
+            )
+            val result = JSObject()
+            result.put("listenerId", listenerId)
+            call.resolve(result)
+        } catch (e: Exception) {
+            call.reject("Failed to create listener: ${e.localizedMessage}")
+        }
+    }
+
+    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+    fun URLEndpointListener_startListener(call: PluginCall) {
+        val listenerId = call.getString("listenerId")
+        if (listenerId == null) {
+            call.reject("Missing required parameter: 'listenerId'")
+            return
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    URLEndpointListenerManager.shared.startListener(listenerId)
+                    withContext(Dispatchers.Main) {
+                        call.resolve()
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        call.reject("Failed to start listener: ${e.localizedMessage}")
+                    }
+                }
+            }
+        }
+    }
+    
+    @PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+    fun URLEndpointListener_stopListener(call: PluginCall) {
+        val listenerId = call.getString("listenerId")
+        if (listenerId == null) {
+            call.reject("Missing required parameter: 'listenerId'")
+            return
+        }
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    URLEndpointListenerManager.shared.stopListener(listenerId)
+                    withContext(Dispatchers.Main) {
+                        call.resolve()
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        call.reject("Failed to stop listener: ${e.localizedMessage}")
+                    }
+                }
+            }
+        }
+    }
+
+@PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+fun URLEndpointListener_getStatus(call: PluginCall) {
+    val listenerId = call.getString("listenerId")
+    if (listenerId == null) {
+        call.reject("Missing required parameter: 'listenerId'")
+        return
+    }
+    try {
+        val status = URLEndpointListenerManager.shared.getListenerStatus(listenerId)
+        if (status == null) {
+            call.reject("Listener not found or status unavailable")
+            return
+        }
+        val result = JSObject()
+        result.put("connectionsCount", status.connectionCount)
+        result.put("activeConnectionCount", status.activeConnectionCount)
+        call.resolve(result)
+    } catch (e: Exception) {
+        call.reject("Failed to get listener status: ${e.localizedMessage}")
+    }
+}
 }
