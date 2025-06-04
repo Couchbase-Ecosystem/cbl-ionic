@@ -11,6 +11,7 @@ import {
 	QueryTests,
 	ReplicatorTests
 } from '../../cblite-js-tests/cblite-tests/';
+import { URLEndpointListenerTests } from '../../cblite-js-tests/cblite-tests/e2e/url-endpoint-listener-test';
 
 const AllTestsPage: React.FC = () => {
   return (
@@ -24,6 +25,7 @@ const AllTestsPage: React.FC = () => {
 		DocumentTests,
 		IndexingTests,
 		QueryTests,
+		URLEndpointListenerTests,
 		ReplicatorTests
 	]}
     ></DetailPageTestContainerRunner>

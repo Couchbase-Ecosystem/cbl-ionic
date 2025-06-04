@@ -46,6 +46,9 @@ import {
   ReplicatorCollectionArgs,
   DatabaseEncryptionKeyArgs,
   ReplicatorDocumentPendingArgs,
+  URLEndpointListenerCreateArgs,
+  URLEndpointListenerArgs,
+  URLEndpointListenerStatus,
 } from '../cblite-js/cblite';
 
 import { Capacitor } from '@capacitor/core';
@@ -474,6 +477,23 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
 
   getUUID(): string {
     return uuidv4().toString();
+  }
+
+
+  async URLEndpointListener_createListener(args: URLEndpointListenerCreateArgs): Promise<{ listenerId: string; }> {
+    const result = await IonicCouchbaseLite.URLEndpointListener_createListener(args);
+    return { listenerId: result.listenerId };
+  }
+
+  async URLEndpointListener_startListener(args: { listenerId: string; }): Promise<void> {
+    return await IonicCouchbaseLite.URLEndpointListener_startListener(args);
+  }
+  async URLEndpointListener_stopListener(args: { listenerId: string; }): Promise<void> {
+    return await IonicCouchbaseLite.URLEndpointListener_stopListener(args);
+  }
+
+  async URLEndpointListener_getStatus(args: URLEndpointListenerArgs): Promise<URLEndpointListenerStatus> {
+      return await IonicCouchbaseLite.URLEndpointListener_getStatus(args)
   }
 
 }
