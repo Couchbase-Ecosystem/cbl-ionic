@@ -1602,7 +1602,7 @@ public class CblIonicPluginPlugin: CAPPlugin {
             call.reject("Missing required parameters")
         return
     }
-
+    let authenticatorConfig = call.getObject("authenticatorConfig") as? [String: Any]
     let disableTLS = call.getBool("disableTLS")
     let enableDeltaSync = call.getBool("enableDeltaSync")
     var collections: [Collection] = []
@@ -1625,7 +1625,8 @@ public class CblIonicPluginPlugin: CAPPlugin {
             tlsIdentity: nil,
             networkInterface: networkInterface,
             disableTLS: disableTLS,
-            enableDeltaSync: enableDeltaSync
+            enableDeltaSync: enableDeltaSync,
+            authenticatorConfig: authenticatorConfig
         )
         call.resolve(["listenerId": listenerId])
     } catch {
