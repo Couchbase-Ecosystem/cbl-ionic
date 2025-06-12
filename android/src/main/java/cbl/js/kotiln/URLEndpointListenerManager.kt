@@ -77,7 +77,11 @@ class URLEndpointListenerManager private constructor() {
     fun getListenerUrls(listenerId: String): List<String> {
         val listener = listeners[listenerId]
             ?: throw UnableToFindListenerException(listenerId)
-        return listener.urls.map { it.toString() } ?: emptyList()
+        //if listener is not started, urls is null
+        if (listener.urls == null || listener.urls.isEmpty()) {
+            return emptyList()
+        }
+        return listener.urls.map { it.toString() }
     }
 
     private fun listenerAuthenticatorFromConfig(config: Map<String, Any>): ListenerPasswordAuthenticator? {
