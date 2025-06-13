@@ -22,6 +22,7 @@ import {
 } from './NavigationMenu/';
 
 import './Menu.css';
+import P2pMenuItems from './NavigationMenu/P2pMenuItems';
 
 const Menu: React.FC = () => {
   return (
@@ -41,6 +42,7 @@ const Menu: React.FC = () => {
           <IndexMenuItems />
           <QueryMenuItems />
           <ReplicationMenuItems />
+          <P2pMenuItems />
         </IonMenuToggle>
       </IonContent>
     </IonMenu>

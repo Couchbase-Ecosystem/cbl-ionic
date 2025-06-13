@@ -15,44 +15,6 @@ import org.json.JSONObject
 object PluginHelper {
 
     /**
-     * Converts a `Document` object to a `JSObject` representation.
-     *
-     * This method transforms the given `Document` into a `JSObject` that includes its data, ID, sequence, and revision ID.
-     * It iterates through the document's map, and if a value is a `Blob`, it replaces it with its properties in the resulting JSON object.
-     *
-     * @param document The `Document` object to convert.
-     * @return A `JSObject` containing the document's data, ID, sequence, and revision ID, or `null` if an error occurs.
-     * @throws Exception If an error occurs during the conversion process.
-     */
-    fun documentToMap(document: Document): JSObject {
-        try {
-            val dMap = document.toMap()
-            val docJson = JSONObject(dMap)
-            val keys: Iterator<*> = docJson.keys()
-            while (keys.hasNext()) {
-                val key = keys.next() as String
-                val value = dMap[key]
-                // only replace the value if it's a blob because
-                // JSONObject will not map in the blob object into the JSON object
-                // since it's not a supported JSON type
-                if (value is Blob) {
-                    val blobProps = JSONObject(value.properties)
-                    blobProps.put("raw", JSONArray(value.content))
-                    docJson.put(key, blobProps)
-                }
-            }
-            val docMap = JSObject()
-            docMap.put("_data", docJson)
-            docMap.put("_id", document.id)
-            docMap.put("_sequence", document.sequence)
-            docMap.put("_revId", document.revisionID)
-            return docMap
-        } catch (ex: Exception) {
-            throw ex
-        }
-    }
-
-    /**
      * Converts a JSON string representation of blobs into a map of Blob objects.
      *
      * @param value The JSON string containing blob data. The string should be in the format:
