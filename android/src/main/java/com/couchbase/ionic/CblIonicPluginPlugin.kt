@@ -1868,7 +1868,8 @@ class CblIonicPluginPlugin : Plugin() {
         val disableTLS = call.getBoolean("disableTLS") ?: false
         val enableDeltaSync = call.getBoolean("enableDeltaSync") ?: false
         val authenticatorConfig = call.getObject("authenticatorConfig") ?: null
-    
+        val tlsIdentityConfig = call.getObject("tlsIdentityConfig") ?: null
+
         val collections = mutableSetOf<Collection>()
         for (i in 0 until collectionsArray.length()) {
             val dict = collectionsArray.getJSONObject(i)
@@ -1889,11 +1890,11 @@ class CblIonicPluginPlugin : Plugin() {
             val listenerId = URLEndpointListenerManager.shared.createListener(
                 collections = collections,
                 port = port,
-                tlsIdentity = null,
                 networkInterface = networkInterface,
                 disableTLS = disableTLS,
                 enableDeltaSync = enableDeltaSync,
-                authenticatorConfig = authenticatorConfig
+                authenticatorConfig = authenticatorConfig,
+                tlsIdentityConfig = tlsIdentityConfig
             )
             val result = JSObject()
             result.put("listenerId", listenerId)
