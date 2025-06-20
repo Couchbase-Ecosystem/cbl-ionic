@@ -1603,6 +1603,7 @@ public class CblIonicPluginPlugin: CAPPlugin {
         return
     }
     let authenticatorConfig = call.getObject("authenticatorConfig") as? [String: Any]
+    let tlsIdentityConfig = call.getObject("tlsIdentityConfig") as? [String: Any]
     let disableTLS = call.getBool("disableTLS")
     let enableDeltaSync = call.getBool("enableDeltaSync")
     var collections: [Collection] = []
@@ -1622,11 +1623,11 @@ public class CblIonicPluginPlugin: CAPPlugin {
         let listenerId = try URLEndpointListenerManager.shared.createListener(
             collections: collections,
             port: UInt16(port),
-            tlsIdentity: nil,
             networkInterface: networkInterface,
             disableTLS: disableTLS,
             enableDeltaSync: enableDeltaSync,
-            authenticatorConfig: authenticatorConfig
+            authenticatorConfig: authenticatorConfig,
+            tlsIdentityConfig: tlsIdentityConfig
         )
         call.resolve(["listenerId": listenerId])
     } catch {

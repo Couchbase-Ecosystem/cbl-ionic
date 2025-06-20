@@ -25,6 +25,16 @@ const PassivePeerPage: React.FC = () => {
   const [scopeName, setScopeName] = useState<string>('_default');
   const [collectionName, setCollectionName] = useState<string>('_default');
 
+  // Set initial expiration to start of tomorrow in UTC ISO8601 format
+  const tomorrow = new Date();
+  tomorrow.setUTCHours(0, 0, 0, 0);
+  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+  const initialCertExpiration = tomorrow.toISOString();
+
+  const [certExpiration, setCertExpiration] = useState<string>(initialCertExpiration);
+  const [certLabel, setCertLabel] = useState<string>('');
+  const [certCommonName, setCertCommonName] = useState<string>('');
+
   useEffect(() => {
     const fetchCollections = async () => {
       const options = await Promise.all(
@@ -60,6 +70,13 @@ const PassivePeerPage: React.FC = () => {
         scopeName,
         name: collectionName
       }];
+      const tlsIdentityConfig = certCommonName
+        ? {
+            ...(certExpiration ? { expiration: certExpiration } : {}),
+            ...(certLabel ? { label: certLabel } : {}),
+            attributes: { certAttrCommonName: certCommonName }
+          }
+        : undefined;
       const config = {
         collections,
         port,
@@ -69,7 +86,8 @@ const PassivePeerPage: React.FC = () => {
         authenticatorConfig: username && password ? {
           type: 'basic' as const,
           data: { username, password }
-        } : undefined
+        } : undefined,
+        ...(tlsIdentityConfig ? { tlsIdentityConfig } : {})
       };
       setCurrentConfig(config);
       const listener = await URLEndpointListener.create(config);
@@ -171,6 +189,18 @@ const PassivePeerPage: React.FC = () => {
         <IonItem>
           <IonLabel>Enable Delta Sync</IonLabel>
           <IonToggle checked={enableDeltaSync} onIonChange={e => setEnableDeltaSync(e.detail.checked)} />
+        </IonItem>
+        <IonItem>
+          <IonLabel position="stacked">TLS Cert Expiration (ISO8601, optional)</IonLabel>
+          <IonInput type="text" value={certExpiration} onIonChange={e => setCertExpiration(e.detail.value!)} placeholder="2025-06-14T00:00:00.000Z" />
+        </IonItem>
+        <IonItem>
+          <IonLabel position="stacked">TLS Cert Label (optional)</IonLabel>
+          <IonInput type="text" value={certLabel} onIonChange={e => setCertLabel(e.detail.value!)} placeholder="my-cert-label" />
+        </IonItem>
+        <IonItem>
+          <IonLabel position="stacked">TLS Cert Common Name (optional)</IonLabel>
+          <IonInput type="text" value={certCommonName} onIonChange={e => setCertCommonName(e.detail.value!)} placeholder="localhost" />
         </IonItem>
         <IonItem>
           <IonLabel>Status: {status}</IonLabel>

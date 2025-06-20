@@ -8,6 +8,8 @@ import com.couchbase.lite.TLSIdentity
 import com.couchbase.lite.ListenerPasswordAuthenticator
 import com.getcapacitor.JSObject
 import java.util.UUID
+import java.text.SimpleDateFormat
+import java.util.TimeZone
 
 class URLEndpointListenerManager private constructor() {
     private val listeners = mutableMapOf<String, URLEndpointListener>()
@@ -19,11 +21,11 @@ class URLEndpointListenerManager private constructor() {
     fun createListener(
         collections: Set<Collection>,
         port: Int? = null,
-        tlsIdentity: TLSIdentity? = null,
         networkInterface: String? = null,
         disableTLS: Boolean? = null,
         enableDeltaSync: Boolean? = null,
         authenticatorConfig: JSObject? = null,
+        tlsIdentityConfig: JSObject? = null
     ): String {
         val config = URLEndpointListenerConfiguration(collections)
         port?.let { config.port = it }
@@ -50,6 +52,33 @@ class URLEndpointListenerManager private constructor() {
             val authenticator = listenerAuthenticatorFromConfig(authenticatorConfigMap)
             config.authenticator = authenticator
         }
+        if (tlsIdentityConfig != null) {
+            val tlsIdentityConfigMap = toKotlinMap(tlsIdentityConfig) as Map<String, Any>
+            val attrs = (tlsIdentityConfigMap["attributes"] as? Map<*, *>)?.mapNotNull { 
+                (k, v) -> 
+                if (k is String && v is String) k to v else null 
+            }?.toMap()?.toMutableMap() ?: mutableMapOf()
+
+            // Map certAttrCommonName to the correct constant if present
+            val commonName = attrs.remove("certAttrCommonName")
+            if (commonName != null) {
+                attrs[TLSIdentity.CERT_ATTRIBUTE_COMMON_NAME] = commonName
+            }
+
+            val expiration = tlsIdentityConfigMap["expiration"] as? String ?: null
+
+            val expirationDate = expiration?.let { 
+                val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX")
+                formatter.timeZone = TimeZone.getTimeZone("UTC")
+                formatter.parse(it)
+            }
+
+            val label = tlsIdentityConfigMap["label"] as? String ?: UUID.randomUUID().toString()
+
+            val tlsIdentity = TLSIdentity.createIdentity(true, attrs, expirationDate, label)
+            config.tlsIdentity = tlsIdentity
+        }
+
         val listener = URLEndpointListener(config)
         val listenerId = UUID.randomUUID().toString()
         listeners[listenerId] = listener
