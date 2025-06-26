@@ -89,4 +89,5 @@ CAP_PLUGIN(CblIonicPlugin, "CblIonicPlugin",
            CAP_PLUGIN_METHOD(URLEndpointListener_startListener, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(URLEndpointListener_stopListener, CAPPluginReturnPromise);
            CAP_PLUGIN_METHOD(URLEndpointListener_getStatus, CAPPluginReturnPromise);
+           CAP_PLUGIN_METHOD(URLEndpointListener_deleteIdentity, CAPPluginReturnPromise);
 )

@@ -1971,4 +1971,18 @@ fun URLEndpointListener_getStatus(call: PluginCall) {
         call.reject("Failed to get listener status: ${e.localizedMessage}")
     }
 }
+@PluginMethod(returnType = PluginMethod.RETURN_PROMISE)
+fun URLEndpointListener_deleteIdentity(call: PluginCall) {
+    val label = call.getString("label")
+    if (label == null) {
+        call.reject("Missing required parameter: 'label'")
+        return
+    }
+    try {
+        URLEndpointListenerManager.deleteIdentity(label)
+        call.resolve()
+    } catch (e: Exception) {
+        call.reject("Failed to delete identity: ${e.localizedMessage}")
+    }
+}
 }
