@@ -10,12 +10,17 @@ import com.getcapacitor.JSObject
 import java.util.UUID
 import java.text.SimpleDateFormat
 import java.util.TimeZone
+import java.util.Base64
 
 class URLEndpointListenerManager private constructor() {
     private val listeners = mutableMapOf<String, URLEndpointListener>()
 
     companion object {
         val shared: URLEndpointListenerManager by lazy { URLEndpointListenerManager() }
+        @JvmStatic
+        fun deleteIdentity(label: String) {
+            throw UnsupportedOperationException("Delete identity is not implemented")
+        }
     }
 
     fun createListener(
@@ -54,6 +59,11 @@ class URLEndpointListenerManager private constructor() {
         }
         if (tlsIdentityConfig != null) {
             val tlsIdentityConfigMap = toKotlinMap(tlsIdentityConfig) as Map<String, Any>
+
+            val mode = tlsIdentityConfigMap["mode"] as? String ?: "selfSigned"
+            val label = tlsIdentityConfigMap["label"] as? String ?: UUID.randomUUID().toString()
+            if (mode == "selfSigned") {
+
             val attrs = (tlsIdentityConfigMap["attributes"] as? Map<*, *>)?.mapNotNull { 
                 (k, v) -> 
                 if (k is String && v is String) k to v else null 
@@ -66,17 +76,17 @@ class URLEndpointListenerManager private constructor() {
             }
 
             val expiration = tlsIdentityConfigMap["expiration"] as? String ?: null
-
             val expirationDate = expiration?.let { 
                 val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX")
                 formatter.timeZone = TimeZone.getTimeZone("UTC")
                 formatter.parse(it)
             }
-
-            val label = tlsIdentityConfigMap["label"] as? String ?: UUID.randomUUID().toString()
-
             val tlsIdentity = TLSIdentity.createIdentity(true, attrs, expirationDate, label)
             config.tlsIdentity = tlsIdentity
+            }
+            if (mode == "imported") {
+                throw UnsupportedOperationException("Importing TLS identity is not implemented")
+            }
         }
 
         val listener = URLEndpointListener(config)

@@ -1680,4 +1680,17 @@ public class CblIonicPluginPlugin: CAPPlugin {
         call.reject("Failed to get listener status: \(error.localizedDescription)")
     }
 }
+    @objc func URLEndpointListener_deleteIdentity(_ call: CAPPluginCall) {
+    guard let label = call.getString("label") else {
+        call.reject("Missing required parameter: 'label'")
+        return
+    }
+
+    do {
+        try URLEndpointListenerManager.shared.deleteIdentity(label: label)
+        call.resolve()
+    } catch {
+        call.reject("Failed to delete identity: \(error.localizedDescription)")
+    }
+}
 }

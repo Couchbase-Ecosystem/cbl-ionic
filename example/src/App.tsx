@@ -71,6 +71,7 @@ import {
     ReplicatorTestsPage,
     TestingTestPage,
     VectorSearchTestsPage,
+    URLEndpointListenerTestsPage,
 } from './pages/tests';
 
 import {
@@ -125,6 +126,7 @@ const App: React.FC = () => {
                         <Route path="/tests/notifications" component={NotificationsTestsPage} exact />
                         <Route path="/tests/predicateQuery" component={PredicateQueryTestsPage} exact />
                         <Route path="/tests/query" component={QueryTestsPage} exact />
+                        <Route path="/tests/urlEndpointListener" component={URLEndpointListenerTestsPage} exact />
                         <Route path="/tests/replicator" component={ReplicatorTestsPage} exact />
                         <Route path="/tests/vectorSearch" component={VectorSearchTestsPage} exact />
                         <Route path="/tests/testing" component={TestingTestPage} exact />
