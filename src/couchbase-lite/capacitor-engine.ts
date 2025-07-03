@@ -49,6 +49,7 @@ import {
   URLEndpointListenerCreateArgs,
   URLEndpointListenerArgs,
   URLEndpointListenerStatus,
+  URLEndpointListenerTLSIdentityArgs,
 } from '../cblite-js/cblite';
 
 import { Capacitor } from '@capacitor/core';
@@ -496,4 +497,7 @@ export class CapacitorEngine implements IonicCouchbaseLitePlugin {
       return await IonicCouchbaseLite.URLEndpointListener_getStatus(args)
   }
 
+  async URLEndpointListener_deleteIdentity(args: URLEndpointListenerTLSIdentityArgs): Promise<void> {
+    return await IonicCouchbaseLite.URLEndpointListener_deleteIdentity(args);
+  }
 }

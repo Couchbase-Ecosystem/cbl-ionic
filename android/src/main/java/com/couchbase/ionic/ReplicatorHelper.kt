@@ -18,6 +18,10 @@ import com.getcapacitor.JSObject
 import org.json.JSONArray
 import org.json.JSONObject
 import java.net.URI
+import java.security.cert.X509Certificate
+import java.security.cert.CertificateFactory
+import java.util.Base64
+import java.io.ByteArrayInputStream
 import com.couchbase.lite.Collection as CBLCollection
 
 object ReplicatorHelper {
@@ -39,14 +43,28 @@ object ReplicatorHelper {
         val acceptSelfSignedCerts = config.getBoolean("acceptSelfSignedCerts")
         val autoPurgeEnabled = config.getBoolean("autoPurgeEnabled")
         val replicatorType = getReplicatorTypeFromString(replicatorTypeString)
+        val pinnedServerCertificateString = config.getString("pinnedServerCertificate")
 
-        val configBuilder = ReplicatorConfigurationFactory.newConfig(
-            target = endpoint,
-            continuous = continuous,
-            acceptParentDomainCookies = acceptParentDomainCookies,
-            acceptOnlySelfSignedServerCertificate = acceptSelfSignedCerts,
-            enableAutoPurge = autoPurgeEnabled,
-            type = replicatorType,
+        var pinnedServerCertificate: X509Certificate? = null
+        if (!pinnedServerCertificateString.isNullOrBlank()) {
+            try {
+                val decodedBytes = Base64.getDecoder().decode(pinnedServerCertificateString)
+                val inputStream = ByteArrayInputStream(decodedBytes)
+                val certificateFactory = CertificateFactory.getInstance("X.509")
+                pinnedServerCertificate = certificateFactory.generateCertificate(inputStream) as X509Certificate
+            } catch (e: Throwable) {
+                throw IllegalArgumentException("Invalid pinned certificate")
+            }
+        }
+
+            val configBuilder = ReplicatorConfigurationFactory.newConfig(
+                target = endpoint,
+                continuous = continuous,
+                acceptParentDomainCookies = acceptParentDomainCookies,
+                acceptOnlySelfSignedServerCertificate = acceptSelfSignedCerts,
+                enableAutoPurge = autoPurgeEnabled,
+                type = replicatorType,
+                pinnedServerCertificate = pinnedServerCertificate
         )
 
         //optional values

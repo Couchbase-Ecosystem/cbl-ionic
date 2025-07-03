@@ -74,7 +74,8 @@ const PassivePeerPage: React.FC = () => {
         ? {
             ...(certExpiration ? { expiration: certExpiration } : {}),
             ...(certLabel ? { label: certLabel } : {}),
-            attributes: { certAttrCommonName: certCommonName }
+            attributes: { certAttrCommonName: certCommonName },
+            mode: 'selfSigned' as const
           }
         : undefined;
       const config = {

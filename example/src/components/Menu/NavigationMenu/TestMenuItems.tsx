@@ -71,6 +71,12 @@ const TestMenuItems: React.FC = () => {
             </IonItem>
             <IonItem
                 style={{marginLeft: 20}}
+                routerLink="/tests/urlEndpointListener"
+                routerDirection="none">
+                <IonLabel>URL Endpoint Listener</IonLabel>
+            </IonItem>
+            <IonItem
+                style={{marginLeft: 20}}
                 routerLink="/tests/replicator"
                 routerDirection="none">
                 <IonLabel>Replicator</IonLabel>
