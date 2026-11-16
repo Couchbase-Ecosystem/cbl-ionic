@@ -9,6 +9,11 @@ Please note that this project is not officially supported by Ionic or Couchbase.
 
 See the documentation for directions on how to [install](https://cbl-ionic.dev/StartHere/install) the cbl-ionic plugin in your app. 
 
+## Requirements
+- Couchbase Lite Enterprise 3.4.2 (native iOS and Android SDKs)
+- iOS 15.0 or later
+- Android API 26 or later
+
 ## Contributing
 To build from source, or to contribute to the project, see the [Contributing](CONTRIBUTING.md) page for more information.
 
