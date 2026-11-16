@@ -27,7 +27,7 @@ And while we welcome questions, we prefer to answer questions on our [developer 
     - [XCode Command Line Tools](https://developer.apple.com/download/more/) installed 
     - [Simulators](https://developer.apple.com/documentation/safari-developer-tools/installing-xcode-and-simulators) downloaded and working
     - [Homebrew](https://brew.sh/) 
-    - [Cocopods](https://formulae.brew.sh/formula/cocoapods)
+    - [Cocopods](https://formulae.brew.sh/formula/cocoapods) 1.15 or higher (required by Couchbase Lite 3.4)
    
     - A valid Apple Developer account and certificates installed and working
 - Android Development

@@ -52,15 +52,20 @@ android {
 
 repositories {
     google()
-    maven {url 'https://mobile.maven.couchbase.com/maven2/dev/'}
     mavenCentral()
+    maven {
+        url 'https://mobile.maven.couchbase.com/maven2/dev/'
+        content {
+            includeGroupByRegex 'com\\.couchbase.*'
+        }
+    }
 }
 
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':capacitor-android')
-    implementation "com.couchbase.lite:couchbase-lite-android-ee-ktx:3.2.2"
+    implementation "com.couchbase.lite:couchbase-lite-android-ee-ktx:3.4.2"
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
     implementation 'androidx.core:core-ktx:1.10.1'
     testImplementation "junit:junit:$junitVersion"
