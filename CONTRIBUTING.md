@@ -37,6 +37,10 @@ And while we welcome questions, we prefer to answer questions on our [developer 
     - Java SDK v17 configured for Gradle builds in Android Studio
     - An Android Emulator downloaded and working 
 
+## Upgrading the native Couchbase Lite SDKs
+
+The native Couchbase Lite version is defined once, in `package.json` under `couchbaseLite.nativeVersion`. `CblIonic.podspec`, `ios/Podfile`, and `android/build.gradle` all read it from there, so a native SDK upgrade only needs that one value changed (plus the version listed under Requirements in the README).
+
 ## Plugin Project Structure
 
 - **`src/definitions.ts`** - interface definition for the plugin.  This defines the interface `IonicCouchbaseLitePlugin` that inherits from the interface `ICoreEngine`.  `IonicCouchbaseLitePlugin` is used by Capacitor to connect to the Engine that implements the bridge between the Javascript code in cblite JS npm package and the native code in the iOS and Android projects.  This file is used to define the methods that the plugin supports.  The names of the methods in this file must match the names of the methods in the native implementation which are defined in both interface files.  

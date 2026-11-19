@@ -13,6 +13,6 @@ Pod::Spec.new do |s|
   s.source_files = 'ios/Plugin/**/*.{swift,h,m,c,cc,mm,cpp}'
   s.ios.deployment_target  = '15.0'
   s.dependency 'Capacitor'
-  s.dependency 'CouchbaseLite-Swift-Enterprise', '3.4.2'
+  s.dependency 'CouchbaseLite-Swift-Enterprise', package['couchbaseLite']['nativeVersion']
   s.swift_version = '5.5'
 end

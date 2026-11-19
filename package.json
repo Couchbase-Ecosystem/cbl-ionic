@@ -69,6 +69,9 @@
     "@capacitor/core": "^6.1.2"
   },
   "swiftlint": "@ionic/swiftlint-config",
+  "couchbaseLite": {
+    "nativeVersion": "3.4.2"
+  },
   "capacitor": {
     "ios": {
       "src": "ios"

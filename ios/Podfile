@@ -1,3 +1,8 @@
+require 'json'
+
+# Native Couchbase Lite SDK version is defined once in package.json (couchbaseLite.nativeVersion).
+couchbase_lite_version = JSON.parse(File.read(File.join(__dir__, '..', 'package.json')))['couchbaseLite']['nativeVersion']
+
 platform :ios, '15.0'
 
 def capacitor_pods
@@ -7,18 +12,18 @@ def capacitor_pods
   pod 'CapacitorCordova', :path => '../node_modules/@capacitor/ios'
 end
 
-def couchbase_pods
+def couchbase_pods(version)
   use_frameworks!
-  pod 'CouchbaseLite-Swift-Enterprise', '3.4.2'
+  pod 'CouchbaseLite-Swift-Enterprise', version
 end
 
 target 'Plugin' do
-  couchbase_pods
+  couchbase_pods(couchbase_lite_version)
   capacitor_pods
 end
 
 target 'PluginTests' do
-  couchbase_pods
+  couchbase_pods(couchbase_lite_version)
   capacitor_pods
 end
 
